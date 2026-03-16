@@ -1,0 +1,245 @@
+/* ============================================================
+   GEMBA GUITAR — Shared Brand Stylesheet
+   Import this in every tool's <head> AFTER your own style.css
+   <link rel="stylesheet" href="../css/gemba.css">
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&display=swap');
+
+/* ── BRAND TOKENS ── */
+:root {
+  --gemba-navy:        #0b1e3d;
+  --gemba-navy-mid:    #122a52;
+  --gemba-navy-light:  #1a3a6e;
+  --gemba-gold:        #c9a84c;
+  --gemba-gold-light:  #e8c96a;
+  --gemba-gold-glow:   rgba(201, 168, 76, 0.25);
+  --gemba-white:       #f5f0e8;
+  --gemba-muted:       #8fa3bf;
+  --gemba-border:      rgba(201, 168, 76, 0.15);
+  --gemba-surface:     #122a52;
+  --gemba-surface2:    #1a3a6e;
+  --gemba-navbar-h:    64px;
+}
+
+/* ── GLOBAL OVERRIDES ──
+   Override both tools' accent colors with gold,
+   and background/surface colors with navy.
+   These target the CSS variables used in each tool.
+*/
+
+/* Metronome overrides */
+body {
+  --bg:        var(--gemba-navy) !important;
+  --surface:   var(--gemba-navy-mid) !important;
+  --surface2:  var(--gemba-navy-light) !important;
+  --border:    rgba(201, 168, 76, 0.2) !important;
+  --accent:    var(--gemba-gold) !important;
+  --accent2:   var(--gemba-gold-light) !important;
+  --text:      #f5f0e8 !important;
+  --muted:     var(--gemba-muted) !important;
+  --bg-glow:   rgba(201, 168, 76, 0.06) !important;
+  padding-top: calc(var(--gemba-navbar-h) + 24px) !important;
+}
+
+/* Chord Generator overrides */
+body,
+body.theme-dark {
+  --accent:      var(--gemba-gold) !important;
+  --accent-lt:   rgba(201, 168, 76, 0.12) !important;
+  --accent-dk:   #b8923a !important;
+  --accent-glow: var(--gemba-gold-glow) !important;
+  --bg:          var(--gemba-navy) !important;
+  --surface:     var(--gemba-navy-mid) !important;
+  --surface2:    var(--gemba-navy-light) !important;
+  --border:      rgba(201, 168, 76, 0.2) !important;
+  --border2:     rgba(201, 168, 76, 0.35) !important;
+  --text:        #f5f0e8 !important;
+  --muted:       var(--gemba-muted) !important;
+  --faint:       rgba(143, 163, 191, 0.6) !important;
+  font-family: 'DM Sans', sans-serif !important;
+}
+
+/* Force navy on light theme too */
+body:not(.theme-dark) {
+  --bg:       var(--gemba-navy) !important;
+  --surface:  var(--gemba-navy-mid) !important;
+  --surface2: var(--gemba-navy-light) !important;
+  --text:     #f5f0e8 !important;
+  --border:   rgba(201, 168, 76, 0.2) !important;
+}
+
+/* Fix any remaining purple/orange slider thumbs */
+input[type="range"]::-webkit-slider-thumb {
+  background: var(--gemba-gold) !important;
+  box-shadow: 0 0 8px var(--gemba-gold-glow) !important;
+}
+
+/* Fix select dropdowns */
+select:focus,
+.input:focus {
+  border-color: var(--gemba-gold) !important;
+  box-shadow: 0 0 0 3px var(--gemba-gold-glow) !important;
+}
+
+/* Fix green start / red stop buttons — keep them but tone to brand */
+.btn-start {
+  background: #1aaf6f !important;
+  box-shadow: 0 4px 20px rgba(26, 175, 111, 0.25) !important;
+}
+
+.btn-stop {
+  background: #d63a58 !important;
+}
+
+/* Tap tempo stays gold */
+.btn-tap {
+  background: var(--gemba-gold) !important;
+  color: var(--gemba-navy) !important;
+  box-shadow: 0 4px 20px var(--gemba-gold-glow) !important;
+}
+
+/* Chord name color */
+.chord-name {
+  color: var(--gemba-gold) !important;
+}
+
+/* Export buttons */
+.btn-primary {
+  background: var(--gemba-gold) !important;
+  border-color: var(--gemba-gold) !important;
+  color: var(--gemba-navy) !important;
+}
+
+.btn-primary:hover {
+  background: var(--gemba-gold-light) !important;
+  border-color: var(--gemba-gold-light) !important;
+}
+
+/* Active quick BPM buttons */
+.quickBpmBtn.active {
+  border-color: var(--gemba-gold) !important;
+  color: var(--gemba-gold) !important;
+  background: rgba(201, 168, 76, 0.12) !important;
+}
+
+.quickBpmBtn:hover {
+  border-color: var(--gemba-gold) !important;
+  color: var(--gemba-gold) !important;
+}
+
+/* ── GEMBA NAVBAR ── */
+.gemba-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--gemba-navbar-h);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 32px;
+  background: rgba(11, 30, 61, 0.95);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--gemba-border);
+}
+
+.gemba-nav-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+}
+
+.gemba-nav-mark {
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+}
+
+.gemba-nav-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1;
+}
+
+.gemba-nav-text strong {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 18px;
+  letter-spacing: 2px;
+  color: #f5f0e8;
+}
+
+.gemba-nav-text span {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 9px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--gemba-gold);
+  margin-top: 2px;
+}
+
+.gemba-nav-links {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.gemba-nav-links a {
+  color: rgba(245, 240, 232, 0.75);
+  text-decoration: none;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 6px 14px;
+  border-radius: 6px;
+  transition: color 0.2s, background 0.2s;
+  display: block;
+}
+
+.gemba-nav-links a:hover {
+  color: #f5f0e8;
+  background: rgba(255,255,255,0.06);
+}
+
+.gemba-nav-links a.active {
+  color: var(--gemba-gold);
+  background: rgba(201, 168, 76, 0.1);
+}
+
+.gemba-nav-home {
+  color: rgba(245, 240, 232, 0.75);
+  text-decoration: none;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 7px 16px;
+  border-radius: 7px;
+  border: 1px solid var(--gemba-border);
+  transition: border-color 0.2s, color 0.2s;
+}
+
+.gemba-nav-home:hover {
+  border-color: var(--gemba-gold);
+  color: var(--gemba-gold);
+}
+
+/* ── NAVBAR MOBILE ── */
+@media (max-width: 600px) {
+  .gemba-nav {
+    padding: 0 16px;
+  }
+
+  .gemba-nav-links {
+    display: none;
+  }
+
+  .gemba-nav-text span {
+    display: none;
+  }
+}
