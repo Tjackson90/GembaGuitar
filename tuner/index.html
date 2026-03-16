@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Guitar Tuner — GembaGuitar</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="../css/gemba.css"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy:        #0b1e3d;
+      --navy-mid:    #122a52;
+      --navy-light:  #1a3a6e;
+      --gold:        #c9a84c;
+      --gold-light:  #e8c96a;
+      --gold-glow:   rgba(201,168,76,0.25);
+      --cream:       #f5f0e8;
+      --muted:       #8fa3bf;
+      --border:      rgba(201,168,76,0.18);
+      --green:       #1adf8c;
+      --red:         #ff4d6d;
+      --surface:     #122a52;
+      --surface2:    #1a3a6e;
+    }
+
+    body {
+      background: var(--navy);
+      color: var(--cream);
+      font-family: 'DM Sans', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 96px 24px 48px;
+      background-image:
+        radial-gradient(ellipse 60% 40% at 50% 0%, rgba(201,168,76,0.05) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 60% at 80% 80%, rgba(26,58,110,0.6) 0%, transparent 60%);
+    }
+
+    /* ── PAGE HEADER ── */
+    .page-header {
+      text-align: center;
+      margin-bottom: 48px;
+      animation: fadeUp 0.5s ease both;
+    }
+
+    .page-tag {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 10px;
+    }
+
+    .page-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(42px, 8vw, 64px);
+      letter-spacing: 3px;
+      color: var(--cream);
+      line-height: 1;
+    }
+
+    .page-subtitle {
+      font-size: 14px;
+      color: var(--muted);
+      margin-top: 8px;
+      letter-spacing: 0.5px;
+    }
+
+    /* ── MAIN TUNER CARD ── */
+    .tuner-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 40px 32px 36px;
+      width: 100%;
+      max-width: 480px;
+      position: relative;
+      overflow: hidden;
+      animation: fadeUp 0.5s ease 0.1s both;
+      box-shadow: 0 24px 64px rgba(0,0,0,0.4);
+    }
+
+    .tuner-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+      opacity: 0.6;
+    }
+
+    /* ── NOTE DISPLAY ── */
+    .note-display {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+
+    .note-name {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 96px;
+      line-height: 1;
+      letter-spacing: 4px;
+      color: var(--cream);
+      transition: color 0.2s;
+      min-height: 96px;
+      display: block;
+    }
+
+    .note-name.in-tune  { color: var(--green); }
+    .note-name.sharp    { color: var(--red); }
+    .note-name.flat     { color: var(--red); }
+
+    .note-freq {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      color: var(--muted);
+      letter-spacing: 2px;
+      margin-top: 4px;
+      min-height: 20px;
+    }
+
+    /* ── GAUGE ── */
+    .gauge-wrap {
+      position: relative;
+      width: 100%;
+      margin-bottom: 20px;
+    }
+
+    .gauge-svg {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    /* ── CENTS LABEL ── */
+    .cents-label {
+      text-align: center;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      color: var(--muted);
+      letter-spacing: 2px;
+      margin-bottom: 28px;
+      min-height: 20px;
+    }
+
+    .cents-label.in-tune { color: var(--green); }
+    .cents-label.off     { color: var(--gold); }
+
+    /* ── STATUS ── */
+    .tuner-status {
+      text-align: center;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 28px;
+      min-height: 16px;
+    }
+
+    .tuner-status.listening { color: var(--gold); }
+    .tuner-status.in-tune   { color: var(--green); }
+
+    /* ── TUNE BUTTON ── */
+    .btn-tune {
+      width: 100%;
+      padding: 16px;
+      border: none;
+      border-radius: 14px;
+      background: var(--gold);
+      color: var(--navy);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+      box-shadow: 0 4px 20px var(--gold-glow);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .btn-tune:hover {
+      background: var(--gold-light);
+      box-shadow: 0 6px 28px var(--gold-glow);
+    }
+
+    .btn-tune:active { transform: scale(0.97); }
+
+    .btn-tune.active {
+      background: var(--navy-light);
+      color: var(--gold);
+      border: 1px solid var(--gold);
+      box-shadow: none;
+    }
+
+    .btn-tune svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    /* ── STRING REFERENCE ── */
+    .strings-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 28px;
+      width: 100%;
+      max-width: 480px;
+      margin-top: 20px;
+      animation: fadeUp 0.5s ease 0.2s both;
+    }
+
+    .strings-title {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 18px;
+      text-align: center;
+    }
+
+    .strings-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 10px;
+    }
+
+    .string-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      padding: 14px 8px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: var(--navy);
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s, transform 0.15s;
+    }
+
+    .string-btn:hover {
+      border-color: var(--gold);
+      background: rgba(201,168,76,0.06);
+      transform: translateY(-2px);
+    }
+
+    .string-btn.active {
+      border-color: var(--gold);
+      background: rgba(201,168,76,0.1);
+    }
+
+    .string-note {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 22px;
+      letter-spacing: 1px;
+      color: var(--cream);
+    }
+
+    .string-num {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      color: var(--muted);
+      letter-spacing: 1px;
+    }
+
+    .string-freq {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9px;
+      color: rgba(143,163,191,0.6);
+    }
+
+    /* ── TUNING SELECTOR ── */
+    .tuning-selector {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .tuning-btn {
+      padding: 7px 14px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--navy);
+      color: var(--muted);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: border-color 0.2s, color 0.2s, background 0.2s;
+      white-space: nowrap;
+    }
+
+    .tuning-btn:hover {
+      border-color: var(--gold);
+      color: var(--gold);
+    }
+
+    .tuning-btn.active {
+      background: rgba(201,168,76,0.12);
+      border-color: var(--gold);
+      color: var(--gold);
+    }
+
+    .tuning-desc {
+      font-size: 12px;
+      color: var(--muted);
+      font-family: 'JetBrains Mono', monospace;
+      letter-spacing: 1px;
+      margin-bottom: 16px;
+      padding: 10px 14px;
+      background: rgba(201,168,76,0.05);
+      border-radius: 8px;
+      border: 1px solid rgba(201,168,76,0.1);
+    }
+
+    /* ── TIPS ── */
+    .tips-card {
+      background: rgba(201,168,76,0.06);
+      border: 1px solid rgba(201,168,76,0.15);
+      border-radius: 16px;
+      padding: 20px 24px;
+      width: 100%;
+      max-width: 480px;
+      margin-top: 20px;
+      animation: fadeUp 0.5s ease 0.3s both;
+    }
+
+    .tips-title {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 12px;
+    }
+
+    .tips-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .tips-list li {
+      font-size: 13px;
+      color: var(--muted);
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      line-height: 1.5;
+    }
+
+    .tips-list li::before {
+      content: '→';
+      color: var(--gold);
+      font-size: 12px;
+      margin-top: 1px;
+      flex-shrink: 0;
+    }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes pulse-ring {
+      0%   { transform: scale(1); opacity: 0.6; }
+      100% { transform: scale(1.15); opacity: 0; }
+    }
+
+    .listening-ring {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 100%; height: 100%;
+      border-radius: 14px;
+      border: 2px solid var(--gold);
+      animation: pulse-ring 1.5s ease-out infinite;
+      pointer-events: none;
+      display: none;
+    }
+
+    .btn-tune.active .listening-ring { display: block; }
+
+    @media (max-width: 480px) {
+      body { padding: 88px 16px 40px; }
+      .tuner-card { padding: 28px 20px; }
+      .note-name { font-size: 72px; }
+      .string-note { font-size: 18px; }
+      .strings-grid { gap: 6px; }
+      .string-btn { padding: 10px 4px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar injected by gemba.css -->
+  <nav class="gemba-nav">
+    <a href="/" class="gemba-nav-logo">
+      <svg class="gemba-nav-mark" viewBox="0 0 32 32" fill="none">
+        <rect width="32" height="32" rx="8" fill="#122a52"/>
+        <line x1="7" y1="9"  x2="25" y2="9"  stroke="#c9a84c" stroke-width="1.5" stroke-linecap="round" opacity="0.4"/>
+        <line x1="7" y1="16" x2="25" y2="16" stroke="#c9a84c" stroke-width="1.5" stroke-linecap="round" opacity="0.4"/>
+        <line x1="7" y1="23" x2="25" y2="23" stroke="#c9a84c" stroke-width="1.5" stroke-linecap="round" opacity="0.4"/>
+        <line x1="16" y1="5" x2="16" y2="27" stroke="#c9a84c" stroke-width="2" stroke-linecap="round"/>
+        <circle cx="16" cy="16" r="3.5" fill="#c9a84c"/>
+        <circle cx="16" cy="5"  r="2"   fill="#e8c96a"/>
+      </svg>
+      <div class="gemba-nav-text">
+        <strong>GembaGuitar</strong>
+        <span>Play. Learn. Master.</span>
+      </div>
+    </a>
+    <ul class="gemba-nav-links">
+      <li><a href="/chord-generator">Chords</a></li>
+      <li><a href="/metronome">Metronome</a></li>
+      <li><a href="/tuner" class="active">Tuner</a></li>
+    </ul>
+    <a href="/" class="gemba-nav-home">← Home</a>
+  </nav>
+
+  <!-- ── PAGE HEADER ── -->
+  <div class="page-header">
+    <p class="page-tag">Tool 03</p>
+    <h1 class="page-title">Guitar Tuner</h1>
+    <p class="page-subtitle">Chromatic pitch detection — tune any string, any tuning</p>
+  </div>
+
+  <!-- ── TUNER CARD ── -->
+  <div class="tuner-card">
+
+    <div class="note-display">
+      <span class="note-name" id="noteName">—</span>
+      <div class="note-freq" id="noteFreq">tap the button to start</div>
+    </div>
+
+    <!-- SVG Gauge -->
+    <div class="gauge-wrap">
+      <svg class="gauge-svg" viewBox="0 0 360 110" fill="none" xmlns="http://www.w3.org/2000/svg" id="gaugeSvg">
+        <!-- Tick marks -->
+        <g id="ticks"></g>
+        <!-- Arc track -->
+        <path d="M 30 100 A 150 150 0 0 1 330 100" stroke="rgba(201,168,76,0.12)" stroke-width="3" stroke-linecap="round"/>
+        <!-- Active arc -->
+        <path d="M 30 100 A 150 150 0 0 1 330 100" stroke="rgba(201,168,76,0.08)" stroke-width="8" stroke-linecap="round"/>
+        <!-- Center line -->
+        <line x1="180" y1="60" x2="180" y2="100" stroke="rgba(201,168,76,0.3)" stroke-width="2" stroke-dasharray="4 3"/>
+        <!-- Labels -->
+        <text x="24"  y="108" font-family="JetBrains Mono" font-size="10" fill="rgba(143,163,191,0.6)" text-anchor="middle">−50</text>
+        <text x="180" y="46"  font-family="JetBrains Mono" font-size="10" fill="rgba(201,168,76,0.7)"  text-anchor="middle">0</text>
+        <text x="336" y="108" font-family="JetBrains Mono" font-size="10" fill="rgba(143,163,191,0.6)" text-anchor="middle">+50</text>
+        <!-- Needle -->
+        <g id="needle" transform="rotate(0, 180, 100)">
+          <line x1="180" y1="100" x2="180" y2="10" stroke="#c9a84c" stroke-width="2.5" stroke-linecap="round"/>
+          <circle cx="180" cy="100" r="6" fill="#c9a84c"/>
+          <circle cx="180" cy="100" r="3" fill="#0b1e3d"/>
+        </g>
+        <!-- In-tune zone -->
+        <path d="M 168 100 A 150 150 0 0 1 192 100" stroke="rgba(26,223,140,0)" stroke-width="8" stroke-linecap="round" id="inTuneArc"/>
+      </svg>
+    </div>
+
+    <div class="cents-label" id="centsLabel">— cents</div>
+    <div class="tuner-status" id="tunerStatus">ready</div>
+
+    <button class="btn-tune" id="tuneBtn" onclick="toggleTuner()">
+      <div class="listening-ring"></div>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" id="btnIcon">
+        <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+        <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+        <line x1="12" y1="19" x2="12" y2="23"/>
+        <line x1="8"  y1="23" x2="16" y2="23"/>
+      </svg>
+      <span id="btnText">Start Tuning</span>
+    </button>
+
+  </div>
+
+  <!-- ── STRING REFERENCE ── -->
+  <div class="strings-card">
+    <p class="strings-title">Tuning Reference — Click to hear</p>
+
+    <!-- Tuning Selector -->
+    <div class="tuning-selector">
+      <button class="tuning-btn active" onclick="setTuning('standard')">Standard</button>
+      <button class="tuning-btn" onclick="setTuning('dropD')">Drop D</button>
+      <button class="tuning-btn" onclick="setTuning('dropC')">Drop C</button>
+      <button class="tuning-btn" onclick="setTuning('openG')">Open G</button>
+      <button class="tuning-btn" onclick="setTuning('openE')">Open E</button>
+      <button class="tuning-btn" onclick="setTuning('openD')">Open D</button>
+      <button class="tuning-btn" onclick="setTuning('dadgad')">DADGAD</button>
+      <button class="tuning-btn" onclick="setTuning('halfDown')">Eb (Half Down)</button>
+      <button class="tuning-btn" onclick="setTuning('fullDown')">D (Full Down)</button>
+    </div>
+
+    <div class="tuning-desc" id="tuningDesc">E A D G B E — the most common tuning</div>
+
+    <div class="strings-grid" id="stringsGrid"></div>
+  </div>
+
+  <!-- ── TIPS ── -->
+  <div class="tips-card">
+    <p class="tips-title">Tuning Tips</p>
+    <ul class="tips-list">
+      <li>Always tune up to a note — come from below so the string tension is consistent</li>
+      <li>Play each string individually and let it ring clearly near the microphone</li>
+      <li>Tune in a quiet room for best accuracy — background noise affects detection</li>
+      <li>If a string is way off, tune to roughly the right pitch first then fine-tune</li>
+    </ul>
+  </div>
+
+  <script>
+    // ── TUNING DEFINITIONS ──
+    const TUNINGS = {
+      standard: {
+        name: 'Standard',
+        desc: 'E A D G B E — the most common tuning',
+        strings: [
+          { note: 'E', num: '6th', freq: 82.41  },
+          { note: 'A', num: '5th', freq: 110.00 },
+          { note: 'D', num: '4th', freq: 146.83 },
+          { note: 'G', num: '3rd', freq: 196.00 },
+          { note: 'B', num: '2nd', freq: 246.94 },
+          { note: 'E', num: '1st', freq: 329.63 },
+        ]
+      },
+      dropD: {
+        name: 'Drop D',
+        desc: 'D A D G B E — great for rock and metal power chords',
+        strings: [
+          { note: 'D', num: '6th', freq: 73.42  },
+          { note: 'A', num: '5th', freq: 110.00 },
+          { note: 'D', num: '4th', freq: 146.83 },
+          { note: 'G', num: '3rd', freq: 196.00 },
+          { note: 'B', num: '2nd', freq: 246.94 },
+          { note: 'E', num: '1st', freq: 329.63 },
+        ]
+      },
+      dropC: {
+        name: 'Drop C',
+        desc: 'C G C F A D — popular in hard rock and metal',
+        strings: [
+          { note: 'C', num: '6th', freq: 65.41  },
+          { note: 'G', num: '5th', freq: 98.00  },
+          { note: 'C', num: '4th', freq: 130.81 },
+          { note: 'F', num: '3rd', freq: 174.61 },
+          { note: 'A', num: '2nd', freq: 220.00 },
+          { note: 'D', num: '1st', freq: 293.66 },
+        ]
+      },
+      openG: {
+        name: 'Open G',
+        desc: 'D G D G B D — favoured by blues and slide players',
+        strings: [
+          { note: 'D', num: '6th', freq: 73.42  },
+          { note: 'G', num: '5th', freq: 98.00  },
+          { note: 'D', num: '4th', freq: 146.83 },
+          { note: 'G', num: '3rd', freq: 196.00 },
+          { note: 'B', num: '2nd', freq: 246.94 },
+          { note: 'D', num: '1st', freq: 293.66 },
+        ]
+      },
+      openE: {
+        name: 'Open E',
+        desc: 'E B E G# B E — bright and powerful open chord',
+        strings: [
+          { note: 'E', num: '6th', freq: 82.41  },
+          { note: 'B', num: '5th', freq: 123.47 },
+          { note: 'E', num: '4th', freq: 164.81 },
+          { note: 'G#', num: '3rd', freq: 207.65 },
+          { note: 'B', num: '2nd', freq: 246.94 },
+          { note: 'E', num: '1st', freq: 329.63 },
+        ]
+      },
+      openD: {
+        name: 'Open D',
+        desc: 'D A D F# A D — warm and full, great for fingerpicking',
+        strings: [
+          { note: 'D', num: '6th', freq: 73.42  },
+          { note: 'A', num: '5th', freq: 110.00 },
+          { note: 'D', num: '4th', freq: 146.83 },
+          { note: 'F#', num: '3rd', freq: 185.00 },
+          { note: 'A', num: '2nd', freq: 220.00 },
+          { note: 'D', num: '1st', freq: 293.66 },
+        ]
+      },
+      dadgad: {
+        name: 'DADGAD',
+        desc: 'D A D G A D — popular in Celtic and folk music',
+        strings: [
+          { note: 'D', num: '6th', freq: 73.42  },
+          { note: 'A', num: '5th', freq: 110.00 },
+          { note: 'D', num: '4th', freq: 146.83 },
+          { note: 'G', num: '3rd', freq: 196.00 },
+          { note: 'A', num: '2nd', freq: 220.00 },
+          { note: 'D', num: '1st', freq: 293.66 },
+        ]
+      },
+      halfDown: {
+        name: 'Eb (Half Step Down)',
+        desc: 'Eb Ab Db Gb Bb Eb — used by Hendrix, Guns N Roses, Stevie Ray Vaughan',
+        strings: [
+          { note: 'Eb', num: '6th', freq: 77.78  },
+          { note: 'Ab', num: '5th', freq: 103.83 },
+          { note: 'Db', num: '4th', freq: 138.59 },
+          { note: 'Gb', num: '3rd', freq: 185.00 },
+          { note: 'Bb', num: '2nd', freq: 233.08 },
+          { note: 'Eb', num: '1st', freq: 311.13 },
+        ]
+      },
+      fullDown: {
+        name: 'D (Full Step Down)',
+        desc: 'D G C F A D — heavy and dark, used in grunge and metal',
+        strings: [
+          { note: 'D', num: '6th', freq: 73.42  },
+          { note: 'G', num: '5th', freq: 98.00  },
+          { note: 'C', num: '4th', freq: 130.81 },
+          { note: 'F', num: '3rd', freq: 174.61 },
+          { note: 'A', num: '2nd', freq: 220.00 },
+          { note: 'D', num: '1st', freq: 293.66 },
+        ]
+      }
+    };
+
+    let currentTuning = 'standard';
+
+    function setTuning(key) {
+      currentTuning = key;
+      const tuning = TUNINGS[key];
+
+      // Update buttons
+      document.querySelectorAll('.tuning-btn').forEach(b => b.classList.remove('active'));
+      event.target.classList.add('active');
+
+      // Update description
+      document.getElementById('tuningDesc').textContent = tuning.desc;
+
+      // Rebuild string buttons
+      renderStrings(tuning.strings);
+    }
+
+    function renderStrings(strings) {
+      const grid = document.getElementById('stringsGrid');
+      grid.innerHTML = '';
+      strings.forEach((s, i) => {
+        const strNum = 6 - i;
+        const btn = document.createElement('button');
+        btn.className = 'string-btn';
+        btn.id = 'str' + strNum;
+        btn.onclick = () => playReferenceNote(s.freq, strNum);
+        btn.innerHTML = `
+          <span class="string-note">${s.note}</span>
+          <span class="string-num">${s.num}</span>
+          <span class="string-freq">${Math.round(s.freq)} Hz</span>
+        `;
+        grid.appendChild(btn);
+      });
+    }
+
+    // Init with standard tuning
+    renderStrings(TUNINGS.standard.strings);
+
+    // ── NOTES & FREQUENCIES ──
+    const NOTE_STRINGS = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+
+    function freqToNote(freq) {
+      if (freq <= 0) return null;
+      const noteNum  = 12 * (Math.log2(freq / 440)) + 69;
+      const rounded  = Math.round(noteNum);
+      const cents    = Math.round((noteNum - rounded) * 100);
+      const noteName = NOTE_STRINGS[((rounded % 12) + 12) % 12];
+      const octave   = Math.floor(rounded / 12) - 1;
+      return { name: noteName, octave, cents, freq };
+    }
+
+    // ── AUTOCORRELATION PITCH DETECTION ──
+    function autoCorrelate(buf, sampleRate) {
+      const SIZE = buf.length;
+      const rms  = Math.sqrt(buf.reduce((s, v) => s + v * v, 0) / SIZE);
+      if (rms < 0.01) return -1;
+
+      let r1 = 0, r2 = SIZE - 1;
+      const thres = 0.2;
+      for (let i = 0; i < SIZE / 2; i++) { if (Math.abs(buf[i]) < thres) { r1 = i; break; } }
+      for (let i = 1; i < SIZE / 2; i++) { if (Math.abs(buf[SIZE - i]) < thres) { r2 = SIZE - i; break; } }
+
+      const buf2 = buf.slice(r1, r2);
+      const c    = new Float32Array(buf2.length).fill(0);
+      for (let i = 0; i < buf2.length; i++)
+        for (let j = 0; j < buf2.length - i; j++)
+          c[i] += buf2[j] * buf2[j + i];
+
+      let d = 0;
+      while (d < c.length && c[d] > c[d + 1]) d++;
+
+      let maxval = -1, maxpos = -1;
+      for (let i = d; i < c.length; i++) {
+        if (c[i] > maxval) { maxval = c[i]; maxpos = i; }
+      }
+
+      let T0 = maxpos;
+      const x1 = c[T0 - 1], x2 = c[T0], x3 = c[T0 + 1];
+      const a  = (x1 + x3 - 2 * x2) / 2;
+      const b  = (x3 - x1) / 2;
+      if (a) T0 = T0 - b / (2 * a);
+
+      return sampleRate / T0;
+    }
+
+    // ── STATE ──
+    let isListening   = false;
+    let audioCtx      = null;
+    let analyser      = null;
+    let source        = null;
+    let stream        = null;
+    let animFrameId   = null;
+    let smoothedCents = 0;
+
+    // ── NEEDLE ──
+    function setNeedle(cents) {
+      // Smooth the needle
+      smoothedCents += (cents - smoothedCents) * 0.15;
+      const clamp  = Math.max(-50, Math.min(50, smoothedCents));
+      const deg    = clamp * 1.6; // ±50 cents → ±80 degrees
+      document.getElementById('needle').setAttribute('transform', `rotate(${deg}, 180, 100)`);
+
+      // Color the in-tune arc
+      const arc   = document.getElementById('inTuneArc');
+      const inTune = Math.abs(clamp) < 5;
+      arc.setAttribute('stroke', inTune ? 'rgba(26,223,140,0.5)' : 'rgba(201,168,76,0)');
+    }
+
+    // ── DISPLAY UPDATE ──
+    function updateDisplay(noteData) {
+      const nameEl   = document.getElementById('noteName');
+      const freqEl   = document.getElementById('noteFreq');
+      const centsEl  = document.getElementById('centsLabel');
+      const statusEl = document.getElementById('tunerStatus');
+
+      if (!noteData) {
+        nameEl.textContent  = '—';
+        nameEl.className    = 'note-name';
+        freqEl.textContent  = 'play a string…';
+        centsEl.textContent = '— cents';
+        centsEl.className   = 'cents-label';
+        setNeedle(0);
+        return;
+      }
+
+      const { name, octave, cents, freq } = noteData;
+      const inTune = Math.abs(cents) <= 5;
+      const sharp  = cents > 5;
+
+      nameEl.textContent = name + octave;
+      nameEl.className   = 'note-name ' + (inTune ? 'in-tune' : sharp ? 'sharp' : 'flat');
+
+      freqEl.textContent  = freq.toFixed(1) + ' Hz';
+      centsEl.className   = 'cents-label ' + (inTune ? 'in-tune' : 'off');
+
+      if (inTune) {
+        centsEl.textContent  = '✓ In Tune';
+        statusEl.textContent = 'in tune';
+        statusEl.className   = 'tuner-status in-tune';
+      } else {
+        const dir = sharp ? 'sharp' : 'flat';
+        centsEl.textContent  = (cents > 0 ? '+' : '') + cents + ' cents (' + dir + ')';
+        statusEl.textContent = 'listening…';
+        statusEl.className   = 'tuner-status listening';
+      }
+
+      setNeedle(cents);
+    }
+
+    // ── ANALYSIS LOOP ──
+    let silenceFrames = 0;
+    function analyse() {
+      animFrameId = requestAnimationFrame(analyse);
+      const buf = new Float32Array(analyser.fftSize);
+      analyser.getFloatTimeDomainData(buf);
+      const freq = autoCorrelate(buf, audioCtx.sampleRate);
+      if (freq > 60 && freq < 1200) {
+        silenceFrames = 0;
+        updateDisplay(freqToNote(freq));
+      } else {
+        silenceFrames++;
+        if (silenceFrames > 30) updateDisplay(null);
+      }
+    }
+
+    // ── TOGGLE TUNER ──
+    async function toggleTuner() {
+      if (isListening) {
+        stopTuner();
+      } else {
+        await startTuner();
+      }
+    }
+
+    async function startTuner() {
+      try {
+        stream   = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        analyser = audioCtx.createAnalyser();
+        analyser.fftSize = 2048;
+        source   = audioCtx.createMediaStreamSource(stream);
+        source.connect(analyser);
+
+        isListening = true;
+        const btn  = document.getElementById('tuneBtn');
+        const text = document.getElementById('btnText');
+        btn.classList.add('active');
+        text.textContent = 'Stop Tuning';
+        document.getElementById('tunerStatus').textContent = 'listening…';
+        document.getElementById('tunerStatus').className   = 'tuner-status listening';
+
+        analyse();
+      } catch (err) {
+        document.getElementById('tunerStatus').textContent = 'microphone access denied';
+        document.getElementById('noteFreq').textContent    = 'please allow microphone access';
+      }
+    }
+
+    function stopTuner() {
+      isListening = false;
+      cancelAnimationFrame(animFrameId);
+      if (source)   { source.disconnect(); source = null; }
+      if (stream)   { stream.getTracks().forEach(t => t.stop()); stream = null; }
+      if (audioCtx) { audioCtx.close(); audioCtx = null; }
+
+      const btn  = document.getElementById('tuneBtn');
+      const text = document.getElementById('btnText');
+      btn.classList.remove('active');
+      text.textContent = 'Start Tuning';
+
+      document.getElementById('noteName').textContent  = '—';
+      document.getElementById('noteName').className    = 'note-name';
+      document.getElementById('noteFreq').textContent  = 'tap the button to start';
+      document.getElementById('centsLabel').textContent = '— cents';
+      document.getElementById('centsLabel').className   = 'cents-label';
+      document.getElementById('tunerStatus').textContent = 'ready';
+      document.getElementById('tunerStatus').className   = 'tuner-status';
+      setNeedle(0);
+    }
+
+    // ── REFERENCE TONE ──
+    function playReferenceNote(freq, strNum) {
+      const ctx  = new (window.AudioContext || window.webkitAudioContext)();
+      const osc  = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.type      = 'triangle';
+      osc.frequency.setValueAtTime(freq, ctx.currentTime);
+      gain.gain.setValueAtTime(0.4, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 2.5);
+      osc.start();
+      osc.stop(ctx.currentTime + 2.5);
+
+      // Highlight active string
+      document.querySelectorAll('.string-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById('str' + strNum).classList.add('active');
+      setTimeout(() => document.getElementById('str' + strNum).classList.remove('active'), 2500);
+    }
+
+    // ── DRAW TICK MARKS ──
+    (function drawTicks() {
+      const svg   = document.getElementById('ticks');
+      const cx    = 180, cy = 100, r = 130;
+      for (let c = -50; c <= 50; c += 10) {
+        const deg  = c * 1.6;
+        const rad  = (deg - 90) * Math.PI / 180;
+        const isMajor = c % 10 === 0;
+        const len  = isMajor ? 12 : 6;
+        const x1   = cx + (r - len) * Math.cos(rad);
+        const y1   = cy + (r - len) * Math.sin(rad);
+        const x2   = cx + r * Math.cos(rad);
+        const y2   = cy + r * Math.sin(rad);
+        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        line.setAttribute('x1', x1); line.setAttribute('y1', y1);
+        line.setAttribute('x2', x2); line.setAttribute('y2', y2);
+        line.setAttribute('stroke', c === 0 ? 'rgba(201,168,76,0.6)' : 'rgba(143,163,191,0.25)');
+        line.setAttribute('stroke-width', isMajor ? '2' : '1');
+        line.setAttribute('stroke-linecap', 'round');
+        svg.appendChild(line);
+      }
+    })();
+  </script>
+
+</body>
+</html>
