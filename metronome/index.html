@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>METRO</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app">
+    <div class="header">
+      <h1>METRO</h1>
+      <div class="header-line"></div>
+
+      <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme" title="Toggle light/dark mode">
+        <span id="themeToggleIcon">☾</span>
+      </button>
+
+      <span class="header-tag">v3</span>
+    </div>
+
+    <div class="bpm-display">
+      <div class="bpm-label">Beats per minute</div>
+
+      <div class="bpm-row">
+        <div>
+          <div id="bpmDisplay">120</div>
+          <div class="bpm-tempo-label" id="tempoLabel">Moderato</div>
+        </div>
+
+        <div class="bpm-controls">
+          <div class="bpm-nudge">
+            <button class="nudge-btn" id="bpmDown" type="button">−</button>
+            <button class="nudge-btn" id="bpmUp" type="button">+</button>
+          </div>
+          <input id="bpm" type="number" min="30" max="300" value="120" />
+        </div>
+      </div>
+
+      <div class="slider-row">
+        <input id="bpmSlider" type="range" min="30" max="300" value="120" />
+      </div>
+    </div>
+
+    <div class="quick-buttons">
+      <button class="quickBpmBtn" type="button" data-bpm="60">60</button>
+      <button class="quickBpmBtn" type="button" data-bpm="80">80</button>
+      <button class="quickBpmBtn" type="button" data-bpm="100">100</button>
+      <button class="quickBpmBtn" type="button" data-bpm="120">120</button>
+      <button class="quickBpmBtn" type="button" data-bpm="160">160</button>
+    </div>
+
+    <div class="settings-grid">
+      <div class="setting-block">
+        <div class="setting-label">Time Sig</div>
+        <select id="timeSignature">
+          <option value="4">4 / 4</option>
+          <option value="3">3 / 4</option>
+          <option value="2">2 / 4</option>
+          <option value="5">5 / 4</option>
+          <option value="6">6 / 8</option>
+          <option value="7">7 / 4</option>
+        </select>
+      </div>
+
+      <div class="setting-block">
+        <div class="setting-label">Subdivision</div>
+        <select id="subdivision">
+          <option value="1">Quarter ♩</option>
+          <option value="2">8th ♪</option>
+          <option value="4">16th ♬</option>
+        </select>
+      </div>
+
+      <div class="setting-block">
+        <div class="setting-label">Sound</div>
+        <select id="soundSelect">
+          <option value="wood">Wood Block</option>
+          <option value="click">Sharp Click</option>
+          <option value="beep">Soft Beep</option>
+          <option value="cowbell">Cowbell</option>
+        </select>
+      </div>
+
+      <div class="setting-block">
+        <div class="setting-label">Volume <span class="range-val" id="volumeValue">70%</span></div>
+        <input id="volume" type="range" min="0" max="100" value="70" />
+      </div>
+
+      <div class="setting-block full">
+        <div class="setting-label setting-label-row">
+          <span>Swing (8ths)</span>
+          <span class="range-val" id="swingValue">50%</span>
+        </div>
+        <input id="swing" type="range" min="50" max="75" value="50" />
+      </div>
+    </div>
+
+    <div class="beat-section">
+      <div class="beat-counter-wrap">
+        <div id="beatCounter">1</div>
+      </div>
+
+      <div id="beatDots" class="beat-dots"></div>
+      <div id="status">Stopped</div>
+    </div>
+
+    <div class="transport">
+      <button class="btn btn-start" id="startBtn" type="button">▶ Start</button>
+      <button class="btn btn-stop" id="stopBtn" type="button">■ Stop</button>
+    </div>
+
+    <div class="secondary-transport">
+      <button class="btn-tap" id="tapBtn" type="button">Tap Tempo</button>
+      <button class="btn-reset" id="resetTapBtn" type="button">Reset Tap</button>
+    </div>
+  </div>
+
+  <script src="audio.js"></script>
+  <script src="ui.js"></script>
+  <script src="metronome.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
