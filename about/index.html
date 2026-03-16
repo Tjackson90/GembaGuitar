@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>About — GembaGuitar</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="../css/gemba.css"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy:       #0b1e3d;
+      --navy-mid:   #122a52;
+      --navy-light: #1a3a6e;
+      --gold:       #c9a84c;
+      --gold-light: #e8c96a;
+      --gold-glow:  rgba(201,168,76,0.2);
+      --cream:      #f5f0e8;
+      --muted:      #8fa3bf;
+      --border:     rgba(201,168,76,0.15);
+    }
+
+    body {
+      background: var(--navy);
+      color: var(--cream);
+      font-family: 'DM Sans', sans-serif;
+      line-height: 1.8;
+      padding-top: 72px;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      background: var(--navy-mid);
+      border-bottom: 1px solid var(--border);
+      padding: 80px 48px 72px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 60% 80% at 50% 100%, rgba(201,168,76,0.05) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(201,168,76,0.1);
+      border: 1px solid rgba(201,168,76,0.3);
+      border-radius: 100px;
+      padding: 5px 16px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 20px;
+    }
+
+    .hero h1 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(48px, 8vw, 80px);
+      letter-spacing: 2px;
+      line-height: 1;
+      margin-bottom: 20px;
+    }
+
+    .hero h1 em {
+      font-family: 'DM Serif Display', serif;
+      font-style: italic;
+      color: var(--gold);
+    }
+
+    .hero-lead {
+      font-size: 19px;
+      color: var(--muted);
+      max-width: 560px;
+      margin: 0 auto;
+      font-weight: 300;
+      line-height: 1.7;
+    }
+
+    .hero-lead strong {
+      color: var(--cream);
+      font-weight: 600;
+    }
+
+    /* ── CONTENT ── */
+    .content {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 80px 48px;
+    }
+
+    /* ── STORY SECTION ── */
+    .story-block {
+      margin-bottom: 64px;
+    }
+
+    .block-tag {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 12px;
+    }
+
+    .block-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(28px, 4vw, 42px);
+      letter-spacing: 1px;
+      line-height: 1.1;
+      margin-bottom: 24px;
+    }
+
+    .block-title em {
+      font-family: 'DM Serif Display', serif;
+      font-style: italic;
+      color: var(--gold);
+      font-size: 0.9em;
+    }
+
+    .story-block p {
+      font-size: 16px;
+      color: var(--muted);
+      margin-bottom: 18px;
+    }
+
+    .story-block p strong {
+      color: var(--cream);
+      font-weight: 600;
+    }
+
+    /* ── PULL QUOTE ── */
+    .pull-quote {
+      border-left: 3px solid var(--gold);
+      padding: 20px 28px;
+      margin: 36px 0;
+      background: rgba(201,168,76,0.04);
+      border-radius: 0 12px 12px 0;
+    }
+
+    .pull-quote p {
+      font-family: 'DM Serif Display', serif;
+      font-style: italic;
+      font-size: 20px;
+      color: var(--cream) !important;
+      line-height: 1.6;
+      margin: 0 !important;
+    }
+
+    /* ── DIVIDER ── */
+    .divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 64px 0;
+    }
+
+    /* ── MISSION CARDS ── */
+    .mission-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin: 32px 0;
+    }
+
+    .mission-card {
+      background: var(--navy-mid);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 24px;
+    }
+
+    .mission-card-icon {
+      font-size: 24px;
+      margin-bottom: 12px;
+    }
+
+    .mission-card h4 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 20px;
+      letter-spacing: 1px;
+      margin-bottom: 8px;
+      color: var(--cream);
+    }
+
+    .mission-card p {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.6;
+      margin: 0 !important;
+    }
+
+    /* ── VALUES LIST ── */
+    .values-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin: 28px 0;
+    }
+
+    .values-list li {
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+    }
+
+    .value-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: rgba(201,168,76,0.1);
+      border: 1px solid rgba(201,168,76,0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .value-text strong {
+      display: block;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--cream);
+      margin-bottom: 3px;
+    }
+
+    .value-text span {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    /* ── CTA BANNER ── */
+    .cta-banner {
+      background: linear-gradient(135deg, var(--navy-light), var(--navy-mid));
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 48px 40px;
+      text-align: center;
+      margin-top: 16px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cta-banner::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+      opacity: 0.5;
+    }
+
+    .cta-banner h3 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 36px;
+      letter-spacing: 1px;
+      margin-bottom: 12px;
+    }
+
+    .cta-banner h3 em {
+      font-family: 'DM Serif Display', serif;
+      font-style: italic;
+      color: var(--gold);
+    }
+
+    .cta-banner p {
+      color: var(--muted);
+      font-size: 15px;
+      max-width: 420px;
+      margin: 0 auto 28px;
+    }
+
+    .cta-buttons {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn-gold {
+      background: var(--gold);
+      color: var(--navy);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      padding: 12px 24px;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: background 0.2s, transform 0.15s;
+    }
+
+    .btn-gold:hover {
+      background: var(--gold-light);
+      transform: translateY(-2px);
+    }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--cream);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      padding: 12px 24px;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.15);
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: border-color 0.2s, transform 0.15s;
+    }
+
+    .btn-outline:hover {
+      border-color: var(--gold);
+      color: var(--gold);
+      transform: translateY(-2px);
+    }
+
+    @media (max-width: 768px) {
+      .hero { padding: 56px 24px; }
+      .content { padding: 48px 24px; }
+      .mission-grid { grid-template-columns: 1fr; }
+      .cta-banner { padding: 36px 24px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="gemba-nav">
+    <a href="/" class="gemba-nav-logo">
+      <svg class="gemba-nav-mark" viewBox="0 0 32 32" fill="none">
+        <rect width="32" height="32" rx="8" fill="#122a52"/>
+        <line x1="7" y1="9"  x2="25" y2="9"  stroke="#c9a84c" stroke-width="1.5" stroke-linecap="round" opacity="0.4"/>
+        <line x1="7" y1="16" x2="25" y2="16" stroke="#c9a84c" stroke-width="1.5" stroke-linecap="round" opacity="0.4"/>
+        <line x1="7" y1="23" x2="25" y2="23" stroke="#c9a84c" stroke-width="1.5" stroke-linecap="round" opacity="0.4"/>
+        <line x1="16" y1="5" x2="16" y2="27" stroke="#c9a84c" stroke-width="2" stroke-linecap="round"/>
+        <circle cx="16" cy="16" r="3.5" fill="#c9a84c"/>
+        <circle cx="16" cy="5"  r="2"   fill="#e8c96a"/>
+      </svg>
+      <div class="gemba-nav-text">
+        <strong>GembaGuitar</strong>
+        <span>Play. Learn. Master.</span>
+      </div>
+    </a>
+    <ul class="gemba-nav-links">
+      <li><a href="/chord-generator">Chords</a></li>
+      <li><a href="/metronome">Metronome</a></li>
+      <li><a href="/tuner">Tuner</a></li>
+      <li><a href="/learn">Learn</a></li>
+      <li><a href="/about" class="active">About</a></li>
+    </ul>
+    <a href="/" class="gemba-nav-home">← Home</a>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-tag">Our Story</div>
+    <h1>Built by a Self-Taught<br/><em>Guitarist</em></h1>
+    <p class="hero-lead">
+      GembaGuitar exists because <strong>learning guitar on your own is harder than it needs to be.</strong>
+      We're here to change that — one free tool at a time.
+    </p>
+  </section>
+
+  <div class="content">
+
+    <!-- ── THE STORY ── -->
+    <div class="story-block">
+      <div class="block-tag">How It Started</div>
+      <h2 class="block-title">A Guitar, A Lockdown, and <em>No Idea What I Was Doing</em></h2>
+
+      <p>In 2020, the world stopped. Like a lot of people, I found myself at home with more time than I knew what to do with. I picked up a guitar — something I'd always wanted to learn but never made time for — and decided that 30 was as good an age as any to start.</p>
+
+      <p>There were no teachers, no classes, no structured plan. Just YouTube videos, forum threads, and a lot of trial and error. I taught myself everything — how to hold the instrument, how to read chord diagrams, how to actually make my fingers do what my brain was telling them to do.</p>
+
+      <div class="pull-quote">
+        <p>"I wasn't trying to become a professional. I just wanted to play songs I loved. Turns out that's a perfectly valid reason to learn guitar."</p>
+      </div>
+
+      <p>The frustrating part wasn't the difficulty — it was the <strong>scattered resources</strong>. Good tools lived on different sites. Learning content was buried in hours of video. There was no single place built specifically for someone like me — a self-taught adult learner figuring it out as they go.</p>
+
+      <p>So I built one.</p>
+    </div>
+
+    <hr class="divider"/>
+
+    <!-- ── WHY GEMBA ── -->
+    <div class="story-block">
+      <div class="block-tag">The Name</div>
+      <h2 class="block-title">Why <em>Gemba?</em></h2>
+
+      <p><strong>Gemba</strong> is a Japanese concept meaning <em>"the actual place"</em> — the real location where the work happens. In manufacturing, it means getting on the factory floor instead of just reading reports. In music, it means actually picking up the guitar instead of just watching someone else play.</p>
+
+      <p>That's the whole philosophy of this site. <strong>Stop overthinking, start playing.</strong> The best way to learn guitar is to get your hands on one and make some noise. Everything here is designed to support that — tools that work in the moment, content that gets you playing faster, no gatekeeping, no fluff.</p>
+    </div>
+
+    <hr class="divider"/>
+
+    <!-- ── MISSION ── -->
+    <div class="story-block">
+      <div class="block-tag">The Mission</div>
+      <h2 class="block-title">Built For Players Who <em>Teach Themselves</em></h2>
+
+      <p>GembaGuitar is for the self-taught guitarist. The person who learns songs by ear, who Googles chord names at midnight, who pauses YouTube videos frame by frame to figure out a finger position. You don't need lessons to love guitar — you just need the right resources.</p>
+
+      <div class="mission-grid">
+        <div class="mission-card">
+          <div class="mission-card-icon">🎸</div>
+          <h4>Free. Always.</h4>
+          <p>Every tool on this site is free. No paywalls, no subscriptions, no ads interrupting your practice.</p>
+        </div>
+        <div class="mission-card">
+          <div class="mission-card-icon">🎯</div>
+          <h4>Built for Beginners</h4>
+          <p>No jargon, no assumptions. Everything is designed for someone just starting out or still finding their way.</p>
+        </div>
+        <div class="mission-card">
+          <div class="mission-card-icon">🔧</div>
+          <h4>Real Tools</h4>
+          <p>A tuner, metronome, and chord generator — the three things every guitarist needs in every practice session.</p>
+        </div>
+        <div class="mission-card">
+          <div class="mission-card-icon">🚀</div>
+          <h4>Always Growing</h4>
+          <p>New tools, chord libraries, lessons, and videos are being built. This is just the beginning.</p>
+        </div>
+      </div>
+
+      <ul class="values-list">
+        <li>
+          <div class="value-icon">🎵</div>
+          <div class="value-text">
+            <strong>No gatekeeping</strong>
+            <span>You don't need formal training to be a real guitarist. If you play guitar, you're a guitarist. Period.</span>
+          </div>
+        </li>
+        <li>
+          <div class="value-icon">⚡</div>
+          <div class="value-text">
+            <strong>Quick wins matter</strong>
+            <span>The fastest way to stick with guitar is to play real songs fast. Everything here is built around that idea.</span>
+          </div>
+        </li>
+        <li>
+          <div class="value-icon">🤝</div>
+          <div class="value-text">
+            <strong>Built by a learner, for learners</strong>
+            <span>I'm still on this journey too. Everything I build comes from real experience — not a textbook.</span>
+          </div>
+        </li>
+      </ul>
+    </div>
+
+    <!-- CTA -->
+    <div class="cta-banner">
+      <h3>Ready to <em>Start Playing?</em></h3>
+      <p>Jump into the beginner path or go straight to the tools — everything is free and ready to use right now.</p>
+      <div class="cta-buttons">
+        <a href="/learn" class="btn-gold">Start the Beginner Path →</a>
+        <a href="/chord-generator" class="btn-outline">Explore the Tools</a>
+      </div>
+    </div>
+
+  </div>
+
+</body>
+</html>

@@ -687,10 +687,12 @@
     function autoCorrelate(buf, sampleRate) {
       const SIZE = buf.length;
       const rms  = Math.sqrt(buf.reduce((s, v) => s + v * v, 0) / SIZE);
-      if (rms < 0.01) return -1;
+
+      // Raised threshold — ignore background noise below this level
+      if (rms < 0.04) return -1;
 
       let r1 = 0, r2 = SIZE - 1;
-      const thres = 0.2;
+      const thres = 0.3;
       for (let i = 0; i < SIZE / 2; i++) { if (Math.abs(buf[i]) < thres) { r1 = i; break; } }
       for (let i = 1; i < SIZE / 2; i++) { if (Math.abs(buf[SIZE - i]) < thres) { r2 = SIZE - i; break; } }
 
@@ -708,6 +710,9 @@
         if (c[i] > maxval) { maxval = c[i]; maxpos = i; }
       }
 
+      // Confidence check — signal must be strong enough to be a real note
+      if (maxval < 0.4) return -1;
+
       let T0 = maxpos;
       const x1 = c[T0 - 1], x2 = c[T0], x3 = c[T0 + 1];
       const a  = (x1 + x3 - 2 * x2) / 2;
@@ -715,6 +720,25 @@
       if (a) T0 = T0 - b / (2 * a);
 
       return sampleRate / T0;
+    }
+
+    // ── STABILITY FILTER ──
+    // Only show a note if we detect it consistently across multiple frames
+    let stableNote = null;
+    let stableCount = 0;
+    const STABLE_FRAMES = 4; // must detect same note for 4 frames before displaying
+
+    function getStableNote(noteData) {
+      if (!noteData) { stableNote = null; stableCount = 0; return null; }
+      if (stableNote && noteData.name === stableNote.name) {
+        stableCount++;
+        stableNote = noteData; // update with latest cents
+        return stableCount >= STABLE_FRAMES ? stableNote : null;
+      } else {
+        stableNote = noteData;
+        stableCount = 1;
+        return null;
+      }
     }
 
     // ── STATE ──
@@ -790,10 +814,16 @@
       const freq = autoCorrelate(buf, audioCtx.sampleRate);
       if (freq > 60 && freq < 1200) {
         silenceFrames = 0;
-        updateDisplay(freqToNote(freq));
+        const noteData = freqToNote(freq);
+        const stable   = getStableNote(noteData);
+        if (stable) updateDisplay(stable);
       } else {
         silenceFrames++;
-        if (silenceFrames > 30) updateDisplay(null);
+        if (silenceFrames > 30) {
+          stableNote  = null;
+          stableCount = 0;
+          updateDisplay(null);
+        }
       }
     }
 
@@ -808,12 +838,36 @@
 
     async function startTuner() {
       try {
-        stream   = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+        stream = await navigator.mediaDevices.getUserMedia({
+          audio: {
+            echoCancellation: true,
+            noiseSuppression: true,
+            autoGainControl:  false
+          },
+          video: false
+        });
+
         audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         analyser = audioCtx.createAnalyser();
-        analyser.fftSize = 2048;
-        source   = audioCtx.createMediaStreamSource(stream);
-        source.connect(analyser);
+        analyser.fftSize = 4096;
+
+        // Highpass — cuts everything below 70Hz (below low E string)
+        const highpass = audioCtx.createBiquadFilter();
+        highpass.type            = 'highpass';
+        highpass.frequency.value = 70;
+        highpass.Q.value         = 0.7;
+
+        // Lowpass — cuts everything above 1400Hz (above high E harmonics)
+        const lowpass = audioCtx.createBiquadFilter();
+        lowpass.type            = 'lowpass';
+        lowpass.frequency.value = 1400;
+        lowpass.Q.value         = 0.7;
+
+        // Chain: mic → highpass → lowpass → analyser
+        source = audioCtx.createMediaStreamSource(stream);
+        source.connect(highpass);
+        highpass.connect(lowpass);
+        lowpass.connect(analyser);
 
         isListening = true;
         const btn  = document.getElementById('tuneBtn');
@@ -825,8 +879,9 @@
 
         analyse();
       } catch (err) {
-        document.getElementById('tunerStatus').textContent = 'microphone access denied';
-        document.getElementById('noteFreq').textContent    = 'please allow microphone access';
+        console.error('Tuner error:', err.name, err.message);
+        document.getElementById('tunerStatus').textContent = err.name;
+        document.getElementById('noteFreq').textContent    = err.message;
       }
     }
 
