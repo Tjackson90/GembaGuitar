@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>GembaGuitar — Tools for Self-Taught Guitarists</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy:       #0b1e3d;
+      --navy-mid:   #122a52;
+      --navy-light: #1a3a6e;
+      --gold:       #c9a84c;
+      --gold-light: #e8c96a;
+      --cream:      #f5f0e8;
+      --white:      #ffffff;
+      --muted:      #8fa3bf;
+      --font-display: 'Bebas Neue', sans-serif;
+      --font-serif:   'DM Serif Display', serif;
+      --font-body:    'DM Sans', sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--navy);
+      color: var(--white);
+      font-family: var(--font-body);
+      overflow-x: hidden;
+    }
+
+    /* ── NOISE TEXTURE OVERLAY ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.4;
+    }
+
+    /* ── NAVBAR ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 48px;
+      height: 72px;
+      background: rgba(11, 30, 61, 0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(201, 168, 76, 0.15);
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+    }
+
+    /* SVG LOGO MARK — tuning fork + string */
+    .logo-mark {
+      width: 38px;
+      height: 38px;
+      flex-shrink: 0;
+    }
+
+    .logo-text {
+      display: flex;
+      flex-direction: column;
+      line-height: 1;
+    }
+
+    .logo-text span:first-child {
+      font-family: var(--font-display);
+      font-size: 22px;
+      letter-spacing: 2px;
+      color: var(--white);
+    }
+
+    .logo-text span:last-child {
+      font-family: var(--font-body);
+      font-size: 9px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-top: 2px;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      list-style: none;
+    }
+
+    .nav-links > li {
+      position: relative;
+    }
+
+    .nav-links > li > a,
+    .nav-links > li > button {
+      background: none;
+      border: none;
+      color: rgba(255,255,255,0.8);
+      font-family: var(--font-body);
+      font-size: 14px;
+      font-weight: 500;
+      letter-spacing: 0.5px;
+      padding: 8px 16px;
+      cursor: pointer;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      border-radius: 6px;
+      transition: color 0.2s, background 0.2s;
+    }
+
+    .nav-links > li > a:hover,
+    .nav-links > li > button:hover {
+      color: var(--white);
+      background: rgba(255,255,255,0.06);
+    }
+
+    .nav-links > li > button .chevron {
+      width: 14px;
+      height: 14px;
+      transition: transform 0.2s;
+    }
+
+    .nav-links > li:hover > button .chevron {
+      transform: rotate(180deg);
+    }
+
+    /* DROPDOWN */
+    .dropdown {
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--navy-mid);
+      border: 1px solid rgba(201, 168, 76, 0.2);
+      border-radius: 12px;
+      padding: 8px;
+      min-width: 200px;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateX(-50%) translateY(-8px);
+      transition: opacity 0.2s, transform 0.2s;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+    }
+
+    .nav-links > li:hover .dropdown {
+      opacity: 1;
+      pointer-events: all;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .dropdown a {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      color: rgba(255,255,255,0.75);
+      text-decoration: none;
+      font-size: 14px;
+      border-radius: 8px;
+      transition: background 0.15s, color 0.15s;
+    }
+
+    .dropdown a:hover {
+      background: rgba(201, 168, 76, 0.1);
+      color: var(--gold-light);
+    }
+
+    .dropdown-icon {
+      width: 32px;
+      height: 32px;
+      background: rgba(201, 168, 76, 0.12);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .dropdown-icon svg {
+      width: 16px;
+      height: 16px;
+      stroke: var(--gold);
+    }
+
+    .dropdown-label {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .dropdown-label strong {
+      font-weight: 600;
+      color: var(--white);
+      font-size: 13px;
+    }
+
+    .dropdown-label span {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 1px;
+    }
+
+    .nav-cta {
+      background: var(--gold) !important;
+      color: var(--navy) !important;
+      font-weight: 600 !important;
+      padding: 8px 20px !important;
+      border-radius: 8px !important;
+      border: none;
+      transition: background 0.2s !important;
+    }
+
+    .nav-cta:hover {
+      background: var(--gold-light) !important;
+    }
+
+    /* HAMBURGER */
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 8px;
+    }
+
+    .hamburger span {
+      display: block;
+      width: 24px;
+      height: 2px;
+      background: var(--white);
+      border-radius: 2px;
+      transition: 0.3s;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      padding: 120px 48px 80px;
+      overflow: hidden;
+    }
+
+    /* Background guitar fretboard graphic */
+    .hero-bg {
+      position: absolute;
+      right: -60px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 55%;
+      opacity: 0.07;
+      pointer-events: none;
+    }
+
+    /* Radial glow */
+    .hero::after {
+      content: '';
+      position: absolute;
+      top: 30%;
+      left: 20%;
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(26,58,110,0.8) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 1;
+      max-width: 680px;
+    }
+
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(201, 168, 76, 0.12);
+      border: 1px solid rgba(201, 168, 76, 0.3);
+      border-radius: 100px;
+      padding: 6px 16px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 28px;
+      animation: fadeUp 0.6s ease both;
+    }
+
+    .hero-eyebrow::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      background: var(--gold);
+      border-radius: 50%;
+    }
+
+    .hero-title {
+      font-family: var(--font-display);
+      font-size: clamp(56px, 8vw, 96px);
+      line-height: 0.95;
+      letter-spacing: 1px;
+      color: var(--white);
+      margin-bottom: 12px;
+      animation: fadeUp 0.6s ease 0.1s both;
+    }
+
+    .hero-title em {
+      font-family: var(--font-serif);
+      font-style: italic;
+      color: var(--gold);
+      font-size: 0.85em;
+    }
+
+    .hero-subtitle {
+      font-size: 18px;
+      line-height: 1.7;
+      color: var(--muted);
+      max-width: 480px;
+      margin-bottom: 48px;
+      font-weight: 300;
+      animation: fadeUp 0.6s ease 0.2s both;
+    }
+
+    .hero-subtitle strong {
+      color: var(--white);
+      font-weight: 500;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      animation: fadeUp 0.6s ease 0.3s both;
+    }
+
+    .btn-primary {
+      background: var(--gold);
+      color: var(--navy);
+      font-family: var(--font-body);
+      font-size: 15px;
+      font-weight: 600;
+      padding: 14px 32px;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: background 0.2s, transform 0.2s;
+    }
+
+    .btn-primary:hover {
+      background: var(--gold-light);
+      transform: translateY(-2px);
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--white);
+      font-family: var(--font-body);
+      font-size: 15px;
+      font-weight: 500;
+      padding: 14px 32px;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.2);
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: border-color 0.2s, background 0.2s, transform 0.2s;
+    }
+
+    .btn-secondary:hover {
+      border-color: rgba(255,255,255,0.5);
+      background: rgba(255,255,255,0.05);
+      transform: translateY(-2px);
+    }
+
+    /* HERO STATS */
+    .hero-stats {
+      display: flex;
+      gap: 40px;
+      margin-top: 64px;
+      padding-top: 40px;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      animation: fadeUp 0.6s ease 0.4s both;
+    }
+
+    .stat {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .stat-number {
+      font-family: var(--font-display);
+      font-size: 36px;
+      color: var(--gold);
+      letter-spacing: 1px;
+    }
+
+    .stat-label {
+      font-size: 12px;
+      color: var(--muted);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-top: 2px;
+    }
+
+    /* ── TOOLS SECTION ── */
+    .tools-section {
+      position: relative;
+      z-index: 1;
+      padding: 100px 48px;
+      background: var(--navy-mid);
+    }
+
+    .section-header {
+      text-align: center;
+      margin-bottom: 64px;
+    }
+
+    .section-tag {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 16px;
+    }
+
+    .section-title {
+      font-family: var(--font-display);
+      font-size: clamp(36px, 5vw, 56px);
+      letter-spacing: 1px;
+      margin-bottom: 16px;
+    }
+
+    .section-desc {
+      font-size: 16px;
+      color: var(--muted);
+      max-width: 480px;
+      margin: 0 auto;
+      line-height: 1.7;
+    }
+
+    .tools-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .tool-card {
+      background: var(--navy);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 16px;
+      padding: 32px;
+      text-decoration: none;
+      color: var(--white);
+      transition: transform 0.25s, border-color 0.25s, box-shadow 0.25s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .tool-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--gold), transparent);
+      opacity: 0;
+      transition: opacity 0.25s;
+    }
+
+    .tool-card:hover {
+      transform: translateY(-6px);
+      border-color: rgba(201, 168, 76, 0.25);
+      box-shadow: 0 24px 48px rgba(0,0,0,0.3);
+    }
+
+    .tool-card:hover::before {
+      opacity: 1;
+    }
+
+    .tool-icon {
+      width: 52px;
+      height: 52px;
+      background: rgba(201, 168, 76, 0.1);
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+
+    .tool-icon svg {
+      width: 26px;
+      height: 26px;
+      stroke: var(--gold);
+    }
+
+    .tool-card h3 {
+      font-family: var(--font-display);
+      font-size: 26px;
+      letter-spacing: 1px;
+      margin-bottom: 10px;
+    }
+
+    .tool-card p {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.7;
+      margin-bottom: 24px;
+    }
+
+    .tool-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--gold);
+      letter-spacing: 0.5px;
+    }
+
+    .tool-link svg {
+      width: 14px;
+      height: 14px;
+      stroke: var(--gold);
+      transition: transform 0.2s;
+    }
+
+    .tool-card:hover .tool-link svg {
+      transform: translateX(4px);
+    }
+
+    /* ── START HERE BANNER ── */
+    .start-here {
+      position: relative;
+      z-index: 1;
+      padding: 80px 48px;
+      background: linear-gradient(135deg, var(--navy-light) 0%, var(--navy) 100%);
+      border-top: 1px solid rgba(201, 168, 76, 0.1);
+      border-bottom: 1px solid rgba(201, 168, 76, 0.1);
+      text-align: center;
+    }
+
+    .start-here h2 {
+      font-family: var(--font-display);
+      font-size: clamp(36px, 5vw, 52px);
+      letter-spacing: 1px;
+      margin-bottom: 16px;
+    }
+
+    .start-here h2 em {
+      font-family: var(--font-serif);
+      font-style: italic;
+      color: var(--gold);
+    }
+
+    .start-here p {
+      font-size: 17px;
+      color: var(--muted);
+      max-width: 500px;
+      margin: 0 auto 40px;
+      line-height: 1.7;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      position: relative;
+      z-index: 1;
+      background: #070f1e;
+      padding: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 24px;
+      border-top: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .footer-logo span:first-child {
+      font-family: var(--font-display);
+      font-size: 20px;
+      letter-spacing: 2px;
+      color: var(--white);
+    }
+
+    .footer-logo span:last-child {
+      display: block;
+      font-size: 11px;
+      color: var(--muted);
+      letter-spacing: 2px;
+      margin-top: 4px;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+
+    .footer-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 13px;
+      transition: color 0.2s;
+    }
+
+    .footer-links a:hover {
+      color: var(--gold);
+    }
+
+    .footer-copy {
+      font-size: 12px;
+      color: rgba(143, 163, 191, 0.5);
+    }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── MOBILE ── */
+    @media (max-width: 768px) {
+      nav { padding: 0 20px; }
+
+      .nav-links { display: none; }
+      .hamburger { display: flex; }
+
+      .hero { padding: 100px 24px 60px; }
+      .hero-stats { gap: 24px; }
+
+      .tools-section { padding: 64px 24px; }
+      .start-here { padding: 60px 24px; }
+      footer { padding: 40px 24px; flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── NAVBAR ── -->
+  <nav>
+    <a href="/" class="logo">
+      <!-- Logo Mark: stylized G + fret line -->
+      <svg class="logo-mark" viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect width="38" height="38" rx="10" fill="#122a52"/>
+        <!-- Fret lines -->
+        <line x1="8" y1="10" x2="30" y2="10" stroke="#c9a84c" stroke-width="1.5" stroke-linecap="round" opacity="0.4"/>
+        <line x1="8" y1="19" x2="30" y2="19" stroke="#c9a84c" stroke-width="1.5" stroke-linecap="round" opacity="0.4"/>
+        <line x1="8" y1="28" x2="30" y2="28" stroke="#c9a84c" stroke-width="1.5" stroke-linecap="round" opacity="0.4"/>
+        <!-- String (vertical) -->
+        <line x1="19" y1="6" x2="19" y2="32" stroke="#c9a84c" stroke-width="2" stroke-linecap="round"/>
+        <!-- Fingering dot -->
+        <circle cx="19" cy="19" r="4" fill="#c9a84c"/>
+        <!-- Tuner peg -->
+        <circle cx="19" cy="6" r="2.5" fill="#e8c96a"/>
+      </svg>
+      <div class="logo-text">
+        <span>GembaGuitar</span>
+        <span>Play. Learn. Master.</span>
+      </div>
+    </a>
+
+    <ul class="nav-links">
+      <li>
+        <button>
+          Tools
+          <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 12 15 18 9"/>
+          </svg>
+        </button>
+        <div class="dropdown">
+          <a href="/chord-generator">
+            <div class="dropdown-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+                <rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>
+              </svg>
+            </div>
+            <div class="dropdown-label">
+              <strong>Chord Generator</strong>
+              <span>Visualize any chord</span>
+            </div>
+          </a>
+          <a href="/metronome">
+            <div class="dropdown-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="12 2 2 20 22 20"/><line x1="12" y1="9" x2="16" y2="17"/>
+              </svg>
+            </div>
+            <div class="dropdown-label">
+              <strong>Metronome</strong>
+              <span>Stay in time</span>
+            </div>
+          </a>
+          <a href="/tuner">
+            <div class="dropdown-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>
+              </svg>
+            </div>
+            <div class="dropdown-label">
+              <strong>Tuner</strong>
+              <span>Get in tune fast</span>
+            </div>
+          </a>
+        </div>
+      </li>
+      <li><a href="/learn">Learn</a></li>
+      <li><a href="/videos">Videos</a></li>
+      <li><a href="/about">About</a></li>
+      <li><a href="/chord-generator" class="nav-cta">Try the Tools →</a></li>
+    </ul>
+
+    <button class="hamburger" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <!-- ── HERO ── -->
+  <section class="hero">
+    <!-- Fretboard SVG background -->
+    <svg class="hero-bg" viewBox="0 0 500 800" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- Strings -->
+      <line x1="60"  y1="0" x2="60"  y2="800" stroke="white" stroke-width="1"/>
+      <line x1="148" y1="0" x2="148" y2="800" stroke="white" stroke-width="1.2"/>
+      <line x1="236" y1="0" x2="236" y2="800" stroke="white" stroke-width="1.5"/>
+      <line x1="324" y1="0" x2="324" y2="800" stroke="white" stroke-width="1.8"/>
+      <line x1="412" y1="0" x2="412" y2="800" stroke="white" stroke-width="2"/>
+      <line x1="480" y1="0" x2="480" y2="800" stroke="white" stroke-width="2.2"/>
+      <!-- Frets -->
+      <line x1="0" y1="80"  x2="500" y2="80"  stroke="white" stroke-width="3"/>
+      <line x1="0" y1="180" x2="500" y2="180" stroke="white" stroke-width="2"/>
+      <line x1="0" y1="270" x2="500" y2="270" stroke="white" stroke-width="2"/>
+      <line x1="0" y1="350" x2="500" y2="350" stroke="white" stroke-width="2"/>
+      <line x1="0" y1="430" x2="500" y2="430" stroke="white" stroke-width="2"/>
+      <line x1="0" y1="510" x2="500" y2="510" stroke="white" stroke-width="2"/>
+      <line x1="0" y1="590" x2="500" y2="590" stroke="white" stroke-width="2"/>
+      <line x1="0" y1="670" x2="500" y2="670" stroke="white" stroke-width="2"/>
+      <!-- Fret markers -->
+      <circle cx="192" cy="225" r="10" fill="white" opacity="0.6"/>
+      <circle cx="192" cy="390" r="10" fill="white" opacity="0.6"/>
+      <circle cx="148" cy="550" r="10" fill="white" opacity="0.6"/>
+      <circle cx="236" cy="550" r="10" fill="white" opacity="0.6"/>
+    </svg>
+
+    <div class="hero-content">
+      <div class="hero-eyebrow">For Self-Taught Guitarists</div>
+      <h1 class="hero-title">
+        Learn Guitar<br/>
+        <em>Your Way</em>
+      </h1>
+      <p class="hero-subtitle">
+        Free tools built for players who teach themselves.
+        <strong>No lessons required.</strong> Just you, your guitar, and everything you need to get better.
+      </p>
+      <div class="hero-actions">
+        <a href="/chord-generator" class="btn-primary">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="5 3 19 12 5 21 5 3"/>
+          </svg>
+          Explore the Tools
+        </a>
+        <a href="/learn" class="btn-secondary">
+          Start Here for Beginners
+        </a>
+      </div>
+      <div class="hero-stats">
+        <div class="stat">
+          <span class="stat-number">100+</span>
+          <span class="stat-label">Chord Diagrams</span>
+        </div>
+        <div class="stat">
+          <span class="stat-number">3</span>
+          <span class="stat-label">Free Tools</span>
+        </div>
+        <div class="stat">
+          <span class="stat-number">Free</span>
+          <span class="stat-label">Always</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── TOOLS ── -->
+  <section class="tools-section">
+    <div class="section-header">
+      <p class="section-tag">The Toolkit</p>
+      <h2 class="section-title">Everything You Need to Practice</h2>
+      <p class="section-desc">Three essential tools, built specifically for self-taught guitarists. No sign-up. No cost. Just play.</p>
+    </div>
+    <div class="tools-grid">
+
+      <a href="/chord-generator" class="tool-card">
+        <div class="tool-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+            <rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>
+          </svg>
+        </div>
+        <h3>Chord Generator</h3>
+        <p>Instantly visualize any chord with clean fretboard diagrams. Search by name, see finger placement, and learn variations.</p>
+        <span class="tool-link">
+          Open Tool
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+          </svg>
+        </span>
+      </a>
+
+      <a href="/metronome" class="tool-card">
+        <div class="tool-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="12 2 2 20 22 20"/><line x1="12" y1="9" x2="16" y2="17"/>
+          </svg>
+        </div>
+        <h3>Metronome</h3>
+        <p>A fully-featured metronome to keep your timing tight. Adjustable BPM, tap tempo, and time signatures for every practice session.</p>
+        <span class="tool-link">
+          Open Tool
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+          </svg>
+        </span>
+      </a>
+
+      <a href="/tuner" class="tool-card">
+        <div class="tool-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>
+          </svg>
+        </div>
+        <h3>Tuner</h3>
+        <p>Get perfectly in tune before every session. Uses your microphone to detect pitch in real time. No extra app needed.</p>
+        <span class="tool-link">
+          Coming Soon
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+          </svg>
+        </span>
+      </a>
+
+    </div>
+  </section>
+
+  <!-- ── START HERE BANNER ── -->
+  <section class="start-here">
+    <h2>Not Sure <em>Where to Begin?</em></h2>
+    <p>Start with the 10 chords that unlock hundreds of songs. No theory required — just practical, hands-on learning.</p>
+    <a href="/learn" class="btn-primary">Start the Beginner Path →</a>
+  </section>
+
+  <!-- ── FOOTER ── -->
+  <footer>
+    <div class="footer-logo">
+      <span>GembaGuitar</span>
+      <span>Play. Learn. Master.</span>
+    </div>
+    <div class="footer-links">
+      <a href="/chord-generator">Chord Generator</a>
+      <a href="/metronome">Metronome</a>
+      <a href="/tuner">Tuner</a>
+      <a href="/learn">Learn</a>
+      <a href="/about">About</a>
+    </div>
+    <span class="footer-copy">© 2025 GembaGuitar. All rights reserved.</span>
+  </footer>
+
+</body>
+</html>
