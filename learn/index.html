@@ -1,0 +1,1064 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Beginner Path — GembaGuitar</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="../css/gemba.css"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy:       #0b1e3d;
+      --navy-mid:   #122a52;
+      --navy-light: #1a3a6e;
+      --gold:       #c9a84c;
+      --gold-light: #e8c96a;
+      --gold-glow:  rgba(201,168,76,0.2);
+      --cream:      #f5f0e8;
+      --muted:      #8fa3bf;
+      --border:     rgba(201,168,76,0.15);
+      --green:      #1adf8c;
+    }
+
+    body {
+      background: var(--navy);
+      color: var(--cream);
+      font-family: 'DM Sans', sans-serif;
+      line-height: 1.7;
+      padding-top: 72px;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      background: var(--navy-mid);
+      border-bottom: 1px solid var(--border);
+      padding: 72px 48px 64px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 70% 60% at 50% 100%, rgba(201,168,76,0.06) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(201,168,76,0.1);
+      border: 1px solid rgba(201,168,76,0.3);
+      border-radius: 100px;
+      padding: 5px 16px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 20px;
+    }
+
+    .hero h1 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(48px, 8vw, 80px);
+      letter-spacing: 2px;
+      line-height: 1;
+      margin-bottom: 16px;
+    }
+
+    .hero h1 em {
+      font-family: 'DM Serif Display', serif;
+      font-style: italic;
+      color: var(--gold);
+    }
+
+    .hero p {
+      font-size: 17px;
+      color: var(--muted);
+      max-width: 520px;
+      margin: 0 auto 40px;
+    }
+
+    /* Progress steps */
+    .progress-steps {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0;
+      flex-wrap: wrap;
+      max-width: 700px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 1;
+    }
+
+    .step-pill {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      border-radius: 100px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--muted);
+      white-space: nowrap;
+      text-decoration: none;
+      transition: border-color 0.2s, color 0.2s;
+    }
+
+    .step-pill:hover {
+      border-color: var(--gold);
+      color: var(--gold);
+    }
+
+    .step-pill .num {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: var(--navy-light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      color: var(--gold);
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .step-arrow {
+      color: rgba(255,255,255,0.15);
+      font-size: 16px;
+      padding: 0 4px;
+    }
+
+    /* ── MAIN CONTENT ── */
+    .content {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 80px 48px;
+    }
+
+    /* ── SECTION ── */
+    .lesson {
+      margin-bottom: 80px;
+      scroll-margin-top: 100px;
+    }
+
+    .lesson-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 20px;
+      margin-bottom: 32px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .lesson-num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 64px;
+      line-height: 1;
+      color: rgba(201,168,76,0.2);
+      letter-spacing: 2px;
+      flex-shrink: 0;
+      width: 72px;
+    }
+
+    .lesson-meta {}
+
+    .lesson-tag {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 6px;
+    }
+
+    .lesson h2 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(28px, 4vw, 40px);
+      letter-spacing: 1px;
+      line-height: 1.1;
+    }
+
+    .lesson p {
+      font-size: 15px;
+      color: var(--muted);
+      margin-bottom: 16px;
+    }
+
+    .lesson p strong {
+      color: var(--cream);
+      font-weight: 600;
+    }
+
+    /* ── TIP BOX ── */
+    .tip-box {
+      background: rgba(201,168,76,0.06);
+      border: 1px solid rgba(201,168,76,0.2);
+      border-left: 3px solid var(--gold);
+      border-radius: 0 12px 12px 0;
+      padding: 16px 20px;
+      margin: 20px 0;
+      font-size: 14px;
+      color: var(--muted);
+    }
+
+    .tip-box strong {
+      color: var(--gold);
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    /* ── TOOL LINK BOX ── */
+    .tool-box {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      background: var(--navy-mid);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin: 24px 0;
+      text-decoration: none;
+      color: var(--cream);
+      transition: border-color 0.2s, transform 0.2s;
+    }
+
+    .tool-box:hover {
+      border-color: var(--gold);
+      transform: translateX(4px);
+    }
+
+    .tool-box-icon {
+      width: 40px;
+      height: 40px;
+      background: rgba(201,168,76,0.1);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .tool-box-icon svg {
+      width: 20px;
+      height: 20px;
+      stroke: var(--gold);
+    }
+
+    .tool-box-text strong {
+      display: block;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--cream);
+    }
+
+    .tool-box-text span {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .tool-box-arrow {
+      margin-left: auto;
+      color: var(--gold);
+      font-size: 18px;
+    }
+
+    /* ── HOW TO READ DIAGRAM ── */
+    .diagram-explainer {
+      background: var(--navy-mid);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px;
+      margin: 24px 0;
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 32px;
+      align-items: start;
+    }
+
+    .diagram-explainer-labels {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .diagram-label-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .label-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .label-dot.gold  { background: var(--gold); }
+    .label-dot.open  { border: 2px solid var(--muted); background: transparent; }
+    .label-dot.muted { background: var(--muted); border-radius: 2px; }
+
+    /* ── CHORD GRID ── */
+    .chord-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 20px;
+      margin: 32px 0;
+    }
+
+    .chord-card {
+      background: var(--navy-mid);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 20px 16px;
+      text-align: center;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+
+    .chord-card:hover {
+      border-color: rgba(201,168,76,0.4);
+      transform: translateY(-3px);
+    }
+
+    .chord-card-name {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 24px;
+      letter-spacing: 1px;
+      color: var(--gold);
+      margin-bottom: 4px;
+    }
+
+    .chord-card-desc {
+      font-size: 11px;
+      color: var(--muted);
+      margin-bottom: 14px;
+      letter-spacing: 0.5px;
+    }
+
+    .chord-diagram-wrap {
+      display: flex;
+      justify-content: center;
+    }
+
+    .chord-tip {
+      font-size: 11px;
+      color: rgba(143,163,191,0.7);
+      margin-top: 10px;
+      line-height: 1.4;
+      font-style: italic;
+    }
+
+    /* ── SONGS LIST ── */
+    .songs-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 14px;
+      margin: 24px 0;
+    }
+
+    .song-card {
+      background: var(--navy-mid);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px 18px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .song-difficulty {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      flex-shrink: 0;
+    }
+
+    .song-difficulty.easy {
+      background: rgba(26,223,140,0.12);
+      color: var(--green);
+      border: 1px solid rgba(26,223,140,0.2);
+    }
+
+    .song-difficulty.medium {
+      background: rgba(201,168,76,0.12);
+      color: var(--gold);
+      border: 1px solid rgba(201,168,76,0.2);
+    }
+
+    .song-info strong {
+      display: block;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--cream);
+    }
+
+    .song-info span {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .song-chords {
+      margin-left: auto;
+      font-size: 11px;
+      color: var(--muted);
+      font-family: 'DM Sans', monospace;
+      white-space: nowrap;
+    }
+
+    /* ── STEPS LIST ── */
+    .steps-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      margin: 20px 0;
+    }
+
+    .steps-list li {
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+      font-size: 15px;
+      color: var(--muted);
+    }
+
+    .steps-list li .step-n {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: rgba(201,168,76,0.1);
+      border: 1px solid rgba(201,168,76,0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--gold);
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .steps-list li strong {
+      color: var(--cream);
+    }
+
+    /* ── NEXT STEPS BANNER ── */
+    .next-banner {
+      background: linear-gradient(135deg, var(--navy-light), var(--navy-mid));
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 40px;
+      text-align: center;
+      margin-top: 40px;
+    }
+
+    .next-banner h3 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 36px;
+      letter-spacing: 1px;
+      margin-bottom: 12px;
+    }
+
+    .next-banner h3 em {
+      font-family: 'DM Serif Display', serif;
+      font-style: italic;
+      color: var(--gold);
+    }
+
+    .next-banner p {
+      color: var(--muted);
+      font-size: 15px;
+      margin-bottom: 28px;
+    }
+
+    .next-tools {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn-gold {
+      background: var(--gold);
+      color: var(--navy);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      padding: 12px 24px;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: background 0.2s, transform 0.15s;
+    }
+
+    .btn-gold:hover {
+      background: var(--gold-light);
+      transform: translateY(-2px);
+    }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--cream);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      padding: 12px 24px;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.15);
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: border-color 0.2s, transform 0.15s;
+    }
+
+    .btn-outline:hover {
+      border-color: var(--gold);
+      color: var(--gold);
+      transform: translateY(-2px);
+    }
+
+    @media (max-width: 768px) {
+      .hero { padding: 48px 24px; }
+      .content { padding: 48px 24px; }
+      .diagram-explainer { grid-template-columns: 1fr; }
+      .lesson-header { flex-direction: column; gap: 8px; }
+      .lesson-num { font-size: 40px; width: auto; }
+      .step-arrow { display: none; }
+      .progress-steps { gap: 8px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="gemba-nav">
+    <a href="/" class="gemba-nav-logo">
+      <svg class="gemba-nav-mark" viewBox="0 0 32 32" fill="none">
+        <rect width="32" height="32" rx="8" fill="#122a52"/>
+        <line x1="7" y1="9"  x2="25" y2="9"  stroke="#c9a84c" stroke-width="1.5" stroke-linecap="round" opacity="0.4"/>
+        <line x1="7" y1="16" x2="25" y2="16" stroke="#c9a84c" stroke-width="1.5" stroke-linecap="round" opacity="0.4"/>
+        <line x1="7" y1="23" x2="25" y2="23" stroke="#c9a84c" stroke-width="1.5" stroke-linecap="round" opacity="0.4"/>
+        <line x1="16" y1="5" x2="16" y2="27" stroke="#c9a84c" stroke-width="2" stroke-linecap="round"/>
+        <circle cx="16" cy="16" r="3.5" fill="#c9a84c"/>
+        <circle cx="16" cy="5"  r="2"   fill="#e8c96a"/>
+      </svg>
+      <div class="gemba-nav-text">
+        <strong>GembaGuitar</strong>
+        <span>Play. Learn. Master.</span>
+      </div>
+    </a>
+    <ul class="gemba-nav-links">
+      <li><a href="/chord-generator">Chords</a></li>
+      <li><a href="/metronome">Metronome</a></li>
+      <li><a href="/tuner">Tuner</a></li>
+      <li><a href="/learn" class="active">Learn</a></li>
+    </ul>
+    <a href="/" class="gemba-nav-home">← Home</a>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-tag">Beginner Path</div>
+    <h1>Start Playing Guitar <em>Today</em></h1>
+    <p>No experience needed. Follow these steps in order and you'll be playing real songs faster than you think.</p>
+    <div class="progress-steps">
+      <a href="#hold" class="step-pill"><span class="num">1</span> Hold Your Guitar</a>
+      <span class="step-arrow">→</span>
+      <a href="#read" class="step-pill"><span class="num">2</span> Read Diagrams</a>
+      <span class="step-arrow">→</span>
+      <a href="#chords" class="step-pill"><span class="num">3</span> Learn 10 Chords</a>
+      <span class="step-arrow">→</span>
+      <a href="#songs" class="step-pill"><span class="num">4</span> Play Songs</a>
+    </div>
+  </section>
+
+  <div class="content">
+
+    <!-- ── STEP 1: HOW TO HOLD ── -->
+    <div class="lesson" id="hold">
+      <div class="lesson-header">
+        <div class="lesson-num">01</div>
+        <div class="lesson-meta">
+          <div class="lesson-tag">Getting Started</div>
+          <h2>How to Hold Your Guitar & Pick</h2>
+        </div>
+      </div>
+
+      <p><strong>Sitting position:</strong> Rest the guitar on your dominant-hand thigh with the body against your stomach. Keep your back straight — slouching leads to bad habits and hand strain over time.</p>
+
+      <p><strong>Your fretting hand:</strong> Curl your fingers so they come down on the strings from above, like you're holding a ball. Your thumb should rest on the back of the neck, roughly behind your middle finger. Keep your wrist slightly away from the neck — a collapsed wrist makes chord shapes much harder.</p>
+
+      <p><strong>Your picking hand:</strong> Hold the pick between your thumb and the side of your index finger, leaving about 5–8mm of the pick exposed. Too much pick = sloppy sound. Too little = you'll drop it constantly.</p>
+
+      <div class="tip-box">
+        <strong>💡 Pro Tip</strong>
+        Press your fingertips just behind the fret wire, not on top of it. This gives you a clean note with less pressure — your fingers will thank you.
+      </div>
+
+      <ul class="steps-list">
+        <li><span class="step-n">1</span><div>Sit comfortably with the guitar resting against your body</div></li>
+        <li><span class="step-n">2</span><div>Curve your fretting hand fingers — flat fingers mute neighboring strings</div></li>
+        <li><span class="step-n">3</span><div>Keep your thumb behind the neck, not hooked over the top</div></li>
+        <li><span class="step-n">4</span><div>Relax your grip — tension is the enemy of speed and accuracy</div></li>
+      </ul>
+
+      <div class="tip-box">
+        <strong>🎯 Before Every Practice</strong>
+        Tune up first — always. Playing an out-of-tune guitar trains your ear wrong from day one.
+      </div>
+
+      <a href="/tuner" class="tool-box">
+        <div class="tool-box-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>
+          </svg>
+        </div>
+        <div class="tool-box-text">
+          <strong>Open the GembaGuitar Tuner</strong>
+          <span>Free browser tuner — no app needed</span>
+        </div>
+        <span class="tool-box-arrow">→</span>
+      </a>
+    </div>
+
+    <!-- ── STEP 2: READ DIAGRAMS ── -->
+    <div class="lesson" id="read">
+      <div class="lesson-header">
+        <div class="lesson-num">02</div>
+        <div class="lesson-meta">
+          <div class="lesson-tag">Fundamentals</div>
+          <h2>How to Read Chord Diagrams</h2>
+        </div>
+      </div>
+
+      <p>Chord diagrams are the map that tells you where to put your fingers. Once you can read them, you can learn any chord from any source — books, websites, apps, all use the same format.</p>
+
+      <div class="diagram-explainer">
+        <div>
+          <svg width="110" height="150" viewBox="0 0 110 150">
+            <!-- Nut -->
+            <rect x="15" y="28" width="80" height="5" fill="#c9a84c" rx="1"/>
+            <!-- Strings (vertical) -->
+            <line x1="15" y1="33" x2="15" y2="128" stroke="rgba(245,240,232,0.3)" stroke-width="1.5"/>
+            <line x1="31" y1="33" x2="31" y2="128" stroke="rgba(245,240,232,0.3)" stroke-width="1.5"/>
+            <line x1="47" y1="33" x2="47" y2="128" stroke="rgba(245,240,232,0.3)" stroke-width="1.5"/>
+            <line x1="63" y1="33" x2="63" y2="128" stroke="rgba(245,240,232,0.3)" stroke-width="1.5"/>
+            <line x1="79" y1="33" x2="79" y2="128" stroke="rgba(245,240,232,0.3)" stroke-width="1.5"/>
+            <line x1="95" y1="33" x2="95" y2="128" stroke="rgba(245,240,232,0.3)" stroke-width="1.5"/>
+            <!-- Frets (horizontal) -->
+            <line x1="15" y1="52" x2="95" y2="52" stroke="rgba(245,240,232,0.15)" stroke-width="1"/>
+            <line x1="15" y1="71" x2="95" y2="71" stroke="rgba(245,240,232,0.15)" stroke-width="1"/>
+            <line x1="15" y1="90" x2="95" y2="90" stroke="rgba(245,240,232,0.15)" stroke-width="1"/>
+            <line x1="15" y1="109" x2="95" y2="109" stroke="rgba(245,240,232,0.15)" stroke-width="1"/>
+            <line x1="15" y1="128" x2="95" y2="128" stroke="rgba(245,240,232,0.15)" stroke-width="1"/>
+            <!-- X (muted) -->
+            <text x="15" y="22" text-anchor="middle" font-size="12" fill="rgba(143,163,191,0.7)" font-family="DM Sans">×</text>
+            <!-- O (open) -->
+            <circle cx="31" cy="18" r="5" fill="none" stroke="rgba(143,163,191,0.7)" stroke-width="1.5"/>
+            <circle cx="79" cy="18" r="5" fill="none" stroke="rgba(143,163,191,0.7)" stroke-width="1.5"/>
+            <circle cx="95" cy="18" r="5" fill="none" stroke="rgba(143,163,191,0.7)" stroke-width="1.5"/>
+            <!-- Finger dots (C chord: x32010) -->
+            <circle cx="47" cy="61" r="8" fill="#c9a84c"/>
+            <circle cx="63" cy="42" r="8" fill="#c9a84c"/>
+            <circle cx="79" cy="52" r="0"/>
+            <circle cx="95" cy="42" r="0"/>
+            <!-- finger on B string fret 1 -->
+            <circle cx="79" cy="42" r="8" fill="#c9a84c"/>
+            <!-- Labels -->
+            <text x="47" y="65" text-anchor="middle" font-size="9" fill="#0b1e3d" font-family="DM Sans" font-weight="700">3</text>
+            <text x="63" y="46" text-anchor="middle" font-size="9" fill="#0b1e3d" font-family="DM Sans" font-weight="700">2</text>
+            <text x="79" y="46" text-anchor="middle" font-size="9" fill="#0b1e3d" font-family="DM Sans" font-weight="700">1</text>
+          </svg>
+        </div>
+        <div class="diagram-explainer-labels">
+          <p style="font-size:13px; color: var(--cream); font-weight:600; margin-bottom:8px;">Reading the diagram:</p>
+          <div class="diagram-label-item">
+            <div class="label-dot open"></div>
+            <span><strong style="color:var(--cream)">O</strong> above a string = play it open (no fingers)</span>
+          </div>
+          <div class="diagram-label-item">
+            <div class="label-dot muted" style="width:12px;height:12px;border-radius:2px;background:var(--muted)"></div>
+            <span><strong style="color:var(--cream)">×</strong> above a string = don't play that string</span>
+          </div>
+          <div class="diagram-label-item">
+            <div class="label-dot gold"></div>
+            <span>Filled dots = where to press your fingers</span>
+          </div>
+          <div class="diagram-label-item">
+            <div style="width:12px;height:2px;background:var(--gold);border-radius:1px;flex-shrink:0"></div>
+            <span>Thick top bar = the nut (top of the neck)</span>
+          </div>
+          <div class="diagram-label-item">
+            <div style="width:12px;height:12px;background:rgba(201,168,76,0.1);border:1px solid var(--gold);border-radius:2px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:8px;color:var(--gold)">1</div>
+            <span>Numbers inside dots = which finger to use</span>
+          </div>
+        </div>
+      </div>
+
+      <p><strong>Finger numbering:</strong> Index = 1, Middle = 2, Ring = 3, Pinky = 4. The vertical lines are strings (left = thickest/lowest, right = thinnest/highest). Horizontal lines are frets.</p>
+
+      <a href="/chord-generator" class="tool-box">
+        <div class="tool-box-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+            <rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>
+          </svg>
+        </div>
+        <div class="tool-box-text">
+          <strong>Explore the Chord Generator</strong>
+          <span>Look up any chord with interactive diagrams</span>
+        </div>
+        <span class="tool-box-arrow">→</span>
+      </a>
+    </div>
+
+    <!-- ── STEP 3: 10 CHORDS ── -->
+    <div class="lesson" id="chords">
+      <div class="lesson-header">
+        <div class="lesson-num">03</div>
+        <div class="lesson-meta">
+          <div class="lesson-tag">The Core 10</div>
+          <h2>The 10 Chords That Unlock Hundreds of Songs</h2>
+        </div>
+      </div>
+
+      <p>These are all <strong>open chords</strong> — no barre chords, no complex stretches. Master these 10 and you can play the majority of popular songs across rock, pop, folk, and country.</p>
+
+      <div class="tip-box">
+        <strong>💡 How to Practice</strong>
+        Don't try to learn all 10 at once. Start with Em and Am — they're the easiest. Add one new chord per practice session once you can switch between your current chords smoothly.
+      </div>
+
+      <div class="chord-grid" id="chordGrid"></div>
+
+      <a href="/chord-generator" class="tool-box">
+        <div class="tool-box-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+            <rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>
+          </svg>
+        </div>
+        <div class="tool-box-text">
+          <strong>Need more chord variations?</strong>
+          <span>Search any chord in the Chord Generator</span>
+        </div>
+        <span class="tool-box-arrow">→</span>
+      </a>
+
+      <div class="tip-box" style="margin-top:24px">
+        <strong>🎯 Practice with the Metronome</strong>
+        Once you know a chord shape, practice switching between two chords in time. Start at 60 BPM and increase by 5 each time you nail 8 clean switches in a row.
+      </div>
+
+      <a href="/metronome" class="tool-box">
+        <div class="tool-box-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="12 2 2 20 22 20"/><line x1="12" y1="9" x2="16" y2="17"/>
+          </svg>
+        </div>
+        <div class="tool-box-text">
+          <strong>Open the Metronome</strong>
+          <span>Practice chord changes in time</span>
+        </div>
+        <span class="tool-box-arrow">→</span>
+      </a>
+    </div>
+
+    <!-- ── STEP 4: FIRST SONGS ── -->
+    <div class="lesson" id="songs">
+      <div class="lesson-header">
+        <div class="lesson-num">04</div>
+        <div class="lesson-meta">
+          <div class="lesson-tag">Apply What You Know</div>
+          <h2>Your First Songs to Learn</h2>
+        </div>
+      </div>
+
+      <p>The fastest way to get better is to play actual songs. These are all achievable with the 10 chords above — no barre chords, no complex techniques. Just real music you can play.</p>
+
+      <div class="songs-grid">
+        <div class="song-card">
+          <div class="song-difficulty easy">EASY</div>
+          <div class="song-info">
+            <strong>Knockin' on Heaven's Door</strong>
+            <span>Bob Dylan</span>
+          </div>
+          <div class="song-chords">G D Am</div>
+        </div>
+        <div class="song-card">
+          <div class="song-difficulty easy">EASY</div>
+          <div class="song-info">
+            <strong>Horse With No Name</strong>
+            <span>America</span>
+          </div>
+          <div class="song-chords">Em D</div>
+        </div>
+        <div class="song-card">
+          <div class="song-difficulty easy">EASY</div>
+          <div class="song-info">
+            <strong>Wonderwall</strong>
+            <span>Oasis</span>
+          </div>
+          <div class="song-chords">Em G D A</div>
+        </div>
+        <div class="song-card">
+          <div class="song-difficulty easy">EASY</div>
+          <div class="song-info">
+            <strong>Brown Eyed Girl</strong>
+            <span>Van Morrison</span>
+          </div>
+          <div class="song-chords">G C D Em</div>
+        </div>
+        <div class="song-card">
+          <div class="song-difficulty medium">MED</div>
+          <div class="song-info">
+            <strong>Leaving on a Jet Plane</strong>
+            <span>John Denver</span>
+          </div>
+          <div class="song-chords">G C D</div>
+        </div>
+        <div class="song-card">
+          <div class="song-difficulty medium">MED</div>
+          <div class="song-info">
+            <strong>House of the Rising Sun</strong>
+            <span>The Animals</span>
+          </div>
+          <div class="song-chords">Am C D F</div>
+        </div>
+        <div class="song-card">
+          <div class="song-difficulty medium">MED</div>
+          <div class="song-info">
+            <strong>Country Roads</strong>
+            <span>John Denver</span>
+          </div>
+          <div class="song-chords">G D Em C</div>
+        </div>
+        <div class="song-card">
+          <div class="song-difficulty medium">MED</div>
+          <div class="song-info">
+            <strong>Wish You Were Here</strong>
+            <span>Pink Floyd</span>
+          </div>
+          <div class="song-chords">G C D Am</div>
+        </div>
+      </div>
+
+      <div class="tip-box">
+        <strong>🎵 How to Learn a Song</strong>
+        Look up the chord names, find each chord shape, then practice switching between them slowly. Once the transitions feel natural, try playing along with the original recording.
+      </div>
+    </div>
+
+    <!-- NEXT STEPS -->
+    <div class="next-banner">
+      <h3>Ready to Go <em>Further?</em></h3>
+      <p>You've got the foundation. Now use the tools every practice session to build speed, accuracy, and ear training.</p>
+      <div class="next-tools">
+        <a href="/tuner" class="btn-gold">🎸 Tune Up</a>
+        <a href="/metronome" class="btn-outline">🥁 Open Metronome</a>
+        <a href="/chord-generator" class="btn-outline">🎵 Chord Generator</a>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // ── CHORD DATA ──
+    // strings: [str6, str5, str4, str3, str2, str1]
+    // -1 = muted, 0 = open, n = fret number
+    const CHORDS = [
+      {
+        name: 'Em',
+        full: 'E Minor',
+        desc: 'Start here — easiest chord',
+        strings: [0, 2, 2, 0, 0, 0],
+        fingers: [0, 2, 3, 0, 0, 0],
+        tip: 'Just 2 fingers. Strum all 6 strings.'
+      },
+      {
+        name: 'Am',
+        full: 'A Minor',
+        desc: 'Sounds great, very easy',
+        strings: [-1, 0, 2, 2, 1, 0],
+        fingers: [0, 0, 2, 3, 1, 0],
+        tip: 'Don\'t strum the 6th string.'
+      },
+      {
+        name: 'E',
+        full: 'E Major',
+        desc: 'Big, full sound',
+        strings: [0, 2, 2, 1, 0, 0],
+        fingers: [0, 2, 3, 1, 0, 0],
+        tip: 'Same shape as Em but add finger on G.'
+      },
+      {
+        name: 'A',
+        full: 'A Major',
+        desc: 'Used in countless songs',
+        strings: [-1, 0, 2, 2, 2, 0],
+        fingers: [0, 0, 1, 2, 3, 0],
+        tip: '3 fingers crammed together — keep them arched.'
+      },
+      {
+        name: 'D',
+        full: 'D Major',
+        desc: 'Bright and punchy',
+        strings: [-1, -1, 0, 2, 3, 2],
+        fingers: [0, 0, 0, 1, 3, 2],
+        tip: 'Only strum top 4 strings.'
+      },
+      {
+        name: 'G',
+        full: 'G Major',
+        desc: 'The most used chord',
+        strings: [3, 2, 0, 0, 0, 3],
+        fingers: [2, 1, 0, 0, 0, 3],
+        tip: 'Stretch your pinky to the 1st string.'
+      },
+      {
+        name: 'C',
+        full: 'C Major',
+        desc: 'Essential — pairs with G & Am',
+        strings: [-1, 3, 2, 0, 1, 0],
+        fingers: [0, 3, 2, 0, 1, 0],
+        tip: 'Don\'t strum the 6th string.'
+      },
+      {
+        name: 'Dm',
+        full: 'D Minor',
+        desc: 'Moody and emotional',
+        strings: [-1, -1, 0, 2, 3, 1],
+        fingers: [0, 0, 0, 2, 3, 1],
+        tip: 'Only strum top 4 strings.'
+      },
+      {
+        name: 'A7',
+        full: 'A Dominant 7',
+        desc: 'Easy 1-finger version',
+        strings: [-1, 0, 2, 0, 2, 0],
+        fingers: [0, 0, 2, 0, 1, 0],
+        tip: 'Only 2 fingers — great starter chord.'
+      },
+      {
+        name: 'G7',
+        full: 'G Dominant 7',
+        desc: 'Jazzy, pairs great with C',
+        strings: [3, 2, 0, 0, 0, 1],
+        fingers: [3, 2, 0, 0, 0, 1],
+        tip: 'Similar to G — just move pinky to 1st fret.'
+      }
+    ];
+
+    // ── SVG CHORD DIAGRAM RENDERER ──
+    function drawChordSVG(chord) {
+      const W = 100, H = 120;
+      const LEFT = 12, TOP = 24;
+      const STRING_SPACING = 14;
+      const FRET_SPACING = 17;
+      const STRINGS = 6;
+      const FRETS = 4;
+      const DOT_R = 7;
+
+      const maxFret = Math.max(...chord.strings.filter(s => s > 0));
+      const minFret = Math.min(...chord.strings.filter(s => s > 0));
+      const startFret = maxFret > 4 ? minFret : 1;
+      const showFretNum = startFret > 1;
+
+      let svg = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">`;
+
+      // Nut or fret number
+      if (startFret === 1) {
+        svg += `<rect x="${LEFT}" y="${TOP}" width="${STRING_SPACING * (STRINGS-1)}" height="4" fill="#c9a84c" rx="1"/>`;
+      } else {
+        svg += `<rect x="${LEFT}" y="${TOP}" width="${STRING_SPACING * (STRINGS-1)}" height="1.5" fill="rgba(245,240,232,0.3)"/>`;
+        svg += `<text x="${LEFT - 6}" y="${TOP + FRET_SPACING * 0.5 + 4}" text-anchor="end" font-size="9" fill="rgba(201,168,76,0.8)" font-family="DM Sans">${startFret}fr</text>`;
+      }
+
+      // Fret lines
+      for (let f = 1; f <= FRETS; f++) {
+        const y = TOP + 4 + f * FRET_SPACING;
+        svg += `<line x1="${LEFT}" y1="${y}" x2="${LEFT + STRING_SPACING*(STRINGS-1)}" y2="${y}" stroke="rgba(245,240,232,0.12)" stroke-width="1"/>`;
+      }
+
+      // String lines
+      for (let s = 0; s < STRINGS; s++) {
+        const x = LEFT + s * STRING_SPACING;
+        svg += `<line x1="${x}" y1="${TOP + 4}" x2="${x}" y2="${TOP + 4 + FRETS * FRET_SPACING}" stroke="rgba(245,240,232,0.25)" stroke-width="1.2"/>`;
+      }
+
+      // Open / muted indicators
+      for (let s = 0; s < STRINGS; s++) {
+        const x = LEFT + s * STRING_SPACING;
+        const val = chord.strings[s];
+        if (val === -1) {
+          svg += `<text x="${x}" y="${TOP - 4}" text-anchor="middle" font-size="11" fill="rgba(143,163,191,0.6)" font-family="DM Sans">×</text>`;
+        } else if (val === 0) {
+          svg += `<circle cx="${x}" cy="${TOP - 6}" r="4.5" fill="none" stroke="rgba(143,163,191,0.5)" stroke-width="1.5"/>`;
+        }
+      }
+
+      // Finger dots
+      for (let s = 0; s < STRINGS; s++) {
+        const fret = chord.strings[s];
+        if (fret > 0) {
+          const x = LEFT + s * STRING_SPACING;
+          const adjustedFret = fret - startFret + 1;
+          const y = TOP + 4 + (adjustedFret - 0.5) * FRET_SPACING;
+          svg += `<circle cx="${x}" cy="${y}" r="${DOT_R}" fill="#c9a84c"/>`;
+          const finger = chord.fingers ? chord.fingers[s] : 0;
+          if (finger > 0) {
+            svg += `<text x="${x}" y="${y + 3.5}" text-anchor="middle" font-size="8" fill="#0b1e3d" font-family="DM Sans" font-weight="700">${finger}</text>`;
+          }
+        }
+      }
+
+      svg += '</svg>';
+      return svg;
+    }
+
+    // ── RENDER CHORD GRID ──
+    const grid = document.getElementById('chordGrid');
+    CHORDS.forEach(chord => {
+      const card = document.createElement('div');
+      card.className = 'chord-card';
+      card.innerHTML = `
+        <div class="chord-card-name">${chord.name}</div>
+        <div class="chord-card-desc">${chord.full}</div>
+        <div class="chord-diagram-wrap">${drawChordSVG(chord)}</div>
+        <div class="chord-tip">${chord.tip}</div>
+      `;
+      grid.appendChild(card);
+    });
+  </script>
+
+</body>
+</html>
