@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Chord Diagram</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900;1000&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="shell">
+
+    <aside class="sidebar">
+
+      <div class="brand">
+        <div class="brand-icon">🎸</div>
+        <div>
+          <div class="brand-name">Chord Diagram</div>
+          <div class="brand-sub">personal tool</div>
+        </div>
+      </div>
+
+      <div class="theme-toggle-row">
+        <span class="theme-toggle-label">Dark mode</span>
+        <button id="themeToggle" class="theme-toggle" type="button" aria-pressed="false" aria-label="Toggle dark mode">
+          <span class="theme-toggle-thumb"></span>
+        </button>
+      </div>
+
+      <div class="group">
+        <div class="group-label">Structure</div>
+
+        <label class="field">
+          <span class="field-label">Title</span>
+          <input id="title" type="text" class="input" placeholder="e.g. Am, G7…" />
+        </label>
+
+        <div class="row-3">
+          <label class="field">
+            <span class="field-label">Start fret</span>
+            <input id="startFret" type="number" class="input" min="1" max="20" value="1" />
+          </label>
+          <label class="field">
+            <span class="field-label">Frets</span>
+            <input id="fretsVisible" type="number" class="input" min="3" max="12" value="5" />
+          </label>
+          <label class="field">
+            <span class="field-label">Strings</span>
+            <input id="strings" type="number" class="input" min="4" max="8" value="6" />
+          </label>
+        </div>
+
+        <label class="pill-check">
+          <input id="hidePosition" type="checkbox" />
+          <span class="checkmark"></span>
+          <span>Hide position label</span>
+        </label>
+
+        <label class="pill-check">
+          <input id="showFretMarkers" type="checkbox" checked />
+          <span class="checkmark"></span>
+          <span>Show fret markers</span>
+        </label>
+      </div>
+
+      <div class="group">
+        <div class="group-label">Appearance</div>
+
+        <div class="slider-list">
+          <div class="slider-row">
+            <span>Height</span>
+            <input id="height" type="range" min="220" max="520" value="300" />
+          </div>
+          <div class="slider-row">
+            <span>Dot size</span>
+            <input id="fingerSize" type="range" min="7" max="18" value="11" />
+          </div>
+          <div class="slider-row">
+            <span>Finger font</span>
+            <input id="fingerFontSize" type="range" min="9" max="18" value="12" />
+          </div>
+          <div class="slider-row">
+            <span>Title font</span>
+            <input id="titleFontSize" type="range" min="12" max="30" value="18" />
+          </div>
+          <div class="slider-row">
+            <span>Line width</span>
+            <input id="strokeWidth" type="range" min="1" max="6" value="2" />
+          </div>
+        </div>
+
+        <div class="color-row">
+          <label class="color-field">
+            <span>Ink</span>
+            <input id="fgColor" type="color" value="#111111" />
+          </label>
+          <label class="color-field">
+            <span>Paper</span>
+            <input id="bgColor" type="color" value="#ffffff" />
+          </label>
+        </div>
+      </div>
+
+      <div class="sidebar-btns">
+        <button id="btnClear" class="btn btn-ghost">Clear</button>
+        <button id="btnReset" class="btn btn-ghost">Reset</button>
+      </div>
+
+      <details class="debug">
+        <summary>Show state JSON</summary>
+        <pre id="stateDump"></pre>
+      </details>
+
+    </aside>
+
+    <main class="main">
+      <div class="diagram-unit">
+        <div class="chord-header">
+          <div class="chord-name-block">
+            <div class="chord-eyebrow">Detected chord</div>
+            <div class="chord-name" id="chordName">—</div>
+          </div>
+
+          <div class="export-btns">
+            <button id="btnSvg" class="btn btn-outline">↓ SVG</button>
+            <button id="btnPng" class="btn btn-primary">↓ PNG</button>
+          </div>
+        </div>
+
+        <div class="mount-shell">
+          <div id="mount" class="mount"></div>
+        </div>
+      </div>
+    </main>
+
+  </div>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
