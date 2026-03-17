@@ -3,15 +3,472 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Chord Diagram</title>
+  <title>Chord Diagram — GembaGuitar</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900;1000&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css" />
-  <link rel="stylesheet" href="../css/gemba.css">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --navy:       #0b1e3d;
+      --navy-mid:   #122a52;
+      --navy-light: #1a3a6e;
+      --gold:       #c9a84c;
+      --gold-lt:    #e8c96a;
+      --gold-glow:  rgba(201,168,76,0.22);
+      --cream:      #f5f0e8;
+      --muted:      #8fa3bf;
+      --faint:      rgba(143,163,191,0.5);
+      --bdr:        rgba(201,168,76,0.15);
+      --bdr2:       rgba(201,168,76,0.3);
+      --surface:    #122a52;
+      --surface2:   #1a3a6e;
+      --text:       #f5f0e8;
+      --accent:     #c9a84c;
+      --accent-lt:  rgba(201,168,76,0.12);
+      --accent-dk:  #b8923a;
+      --nav-h:      64px;
+      --sb-w:       272px;
+      --r-sm:       10px;
+      --r-md:       14px;
+      --r-xl:       24px;
+      --sh:         0 12px 40px rgba(0,0,0,.4), 0 2px 8px rgba(0,0,0,.2);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'DM Sans', system-ui, sans-serif;
+      background: var(--navy);
+      color: var(--text);
+      font-size: 14px;
+      line-height: 1.5;
+      min-height: 100dvh;
+      padding-top: var(--nav-h);
+    }
+
+    /* ── Navbar ── */
+    .gemba-nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: var(--nav-h);
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 28px;
+      background: rgba(11,30,61,0.97);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--bdr);
+    }
+
+    .nav-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+    .nav-mark  { width: 30px; height: 30px; flex-shrink: 0; }
+    .nav-text  { display: flex; flex-direction: column; line-height: 1; }
+    .nav-text strong { font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 2px; color: var(--cream); }
+    .nav-text span   { font-size: 8px; letter-spacing: 3px; text-transform: uppercase; color: var(--gold); margin-top: 2px; }
+
+    .nav-links { display: flex; align-items: center; gap: 2px; list-style: none; }
+    .nav-links a {
+      color: rgba(245,240,232,0.7);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 500;
+      padding: 6px 12px;
+      border-radius: 6px;
+      transition: color .2s, background .2s;
+    }
+    .nav-links a:hover  { color: var(--cream); background: rgba(255,255,255,0.06); }
+    .nav-links a.active { color: var(--gold); background: rgba(201,168,76,0.1); }
+
+    .nav-home {
+      color: rgba(245,240,232,0.7);
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 6px 14px;
+      border-radius: 7px;
+      border: 1px solid var(--bdr);
+      transition: border-color .2s, color .2s;
+      white-space: nowrap;
+    }
+    .nav-home:hover { border-color: var(--gold); color: var(--gold); }
+
+    /* ── Shell — Vertical (default) ── */
+    .shell { display: flex; min-height: calc(100dvh - var(--nav-h)); }
+
+    /* ── Sidebar ── */
+    .sidebar {
+      width: var(--sb-w);
+      flex-shrink: 0;
+      background: var(--surface);
+      border-right: 1px solid var(--bdr);
+      padding: 20px 16px 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      overflow-y: auto;
+      position: sticky;
+      top: var(--nav-h);
+      height: calc(100dvh - var(--nav-h));
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--bdr);
+    }
+
+    .brand-icon {
+      width: 36px; height: 36px;
+      border-radius: var(--r-md);
+      background: var(--accent-lt);
+      border: 1px solid var(--bdr);
+      display: grid; place-items: center;
+      font-size: 17px; flex-shrink: 0;
+    }
+
+    .brand-name { font-family: 'Bebas Neue', sans-serif; font-size: 17px; letter-spacing: 1.5px; color: var(--text); }
+    .brand-sub  { font-size: 9px; font-weight: 600; letter-spacing: 2.5px; text-transform: uppercase; color: var(--gold); margin-top: 2px; }
+
+    /* Layout toggle row */
+    .layout-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 12px;
+      border-radius: var(--r-md);
+      border: 1px solid var(--bdr);
+      background: var(--surface2);
+    }
+
+    .layout-row-label { font-size: 11px; font-weight: 600; color: var(--muted); }
+
+    .layout-btns { display: flex; gap: 4px; }
+
+    .lbtn {
+      width: 30px; height: 26px;
+      border-radius: 7px;
+      border: 1px solid var(--bdr);
+      background: var(--navy);
+      color: var(--muted);
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: border-color .15s, color .15s, background .15s;
+    }
+
+    .lbtn svg     { width: 13px; height: 13px; }
+    .lbtn:hover   { border-color: var(--gold); color: var(--gold); }
+    .lbtn.on      { background: var(--accent-lt); border-color: var(--gold); color: var(--gold); }
+
+    .sidebar-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .group { display: flex; flex-direction: column; gap: 7px; }
+
+    .group-label {
+      font-size: 9px; font-weight: 700;
+      letter-spacing: 2.5px; text-transform: uppercase;
+      color: var(--gold); margin-bottom: 1px;
+    }
+
+    .field { display: flex; flex-direction: column; gap: 3px; }
+
+    .field-label { font-size: 11px; font-weight: 600; color: var(--muted); }
+
+    .input {
+      background: var(--navy);
+      border: 1px solid var(--bdr);
+      border-radius: var(--r-sm);
+      color: var(--text);
+      padding: 7px 10px;
+      font-size: 13px;
+      font-family: inherit;
+      font-weight: 600;
+      outline: none; width: 100%;
+      transition: border-color .15s, box-shadow .15s;
+    }
+
+    .input:focus { border-color: var(--gold); box-shadow: 0 0 0 3px var(--gold-glow); }
+
+    .row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; }
+
+    .pill-check {
+      display: flex; align-items: center; gap: 8px;
+      padding: 8px 12px;
+      border-radius: var(--r-sm);
+      border: 1px solid var(--bdr);
+      background: var(--surface2);
+      cursor: pointer;
+      font-size: 12px; font-weight: 600; color: var(--text);
+      transition: border-color .15s;
+      user-select: none;
+    }
+
+    .pill-check:hover { border-color: var(--gold); }
+    .pill-check input { display: none; }
+
+    .checkmark {
+      width: 17px; height: 17px;
+      border-radius: 5px;
+      border: 1.5px solid var(--bdr2);
+      display: grid; place-items: center;
+      flex-shrink: 0;
+      transition: background .15s, border-color .15s;
+      background: var(--navy);
+    }
+
+    .checkmark::after {
+      content: '';
+      width: 4px; height: 8px;
+      border: 2px solid #0b1e3d;
+      border-top: none; border-left: none;
+      transform: rotate(45deg) translateY(-1px);
+      opacity: 0; transition: opacity .1s;
+    }
+
+    .pill-check input:checked ~ .checkmark { background: var(--gold); border-color: var(--gold); }
+    .pill-check input:checked ~ .checkmark::after { opacity: 1; }
+
+    .slider-list { display: flex; flex-direction: column; gap: 4px; }
+
+    .slider-row {
+      display: flex; align-items: center; gap: 10px;
+      padding: 7px 12px;
+      border-radius: var(--r-sm);
+      background: var(--surface2);
+      border: 1px solid var(--bdr);
+    }
+
+    .slider-row span { font-size: 11px; font-weight: 600; color: var(--muted); width: 68px; flex-shrink: 0; }
+
+    input[type="range"] {
+      flex: 1; -webkit-appearance: none;
+      height: 3px; border-radius: 2px;
+      background: rgba(201,168,76,0.2);
+      outline: none; cursor: pointer;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 14px; height: 14px; border-radius: 50%;
+      background: var(--gold);
+      border: 2px solid var(--navy);
+      box-shadow: 0 0 0 2px var(--gold-glow);
+      transition: transform .1s;
+    }
+
+    input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.25); }
+
+    .color-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+    .color-field { display: flex; flex-direction: column; gap: 3px; font-size: 11px; font-weight: 600; color: var(--muted); }
+
+    .color-field input[type="color"] {
+      width: 100%; height: 34px;
+      border-radius: var(--r-sm);
+      border: 1px solid var(--bdr);
+      padding: 3px;
+      background: var(--surface2);
+      cursor: pointer;
+    }
+
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 5px;
+      padding: 8px 14px;
+      border-radius: var(--r-md);
+      font-family: inherit; font-size: 12px; font-weight: 700;
+      cursor: pointer; border: 1px solid transparent;
+      letter-spacing: .3px; transition: all .15s; white-space: nowrap;
+    }
+
+    .btn:active { transform: scale(.97); }
+
+    .btn-ghost {
+      background: var(--surface2); border-color: var(--bdr); color: var(--muted);
+    }
+    .btn-ghost:hover { border-color: var(--bdr2); color: var(--text); }
+
+    .btn-outline {
+      background: transparent; border-color: var(--bdr2); color: var(--muted);
+    }
+    .btn-outline:hover { border-color: var(--gold); color: var(--gold); background: var(--accent-lt); }
+
+    .btn-primary {
+      background: var(--gold); border-color: var(--gold); color: #0b1e3d; font-weight: 700;
+      box-shadow: 0 2px 10px var(--gold-glow);
+    }
+    .btn-primary:hover { background: var(--gold-lt); border-color: var(--gold-lt); }
+
+    .sidebar-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+    /* ── Collapsible appearance ── */
+    .group-label-toggle {
+      display: flex; align-items: center; justify-content: space-between;
+      width: 100%; background: none; border: none; cursor: pointer; padding: 0;
+      font-size: 9px; font-weight: 700;
+      letter-spacing: 2.5px; text-transform: uppercase;
+      color: var(--gold); margin-bottom: 1px;
+    }
+
+    .group-label-toggle svg {
+      width: 10px; height: 7px;
+      stroke: var(--gold);
+      transition: transform .2s ease;
+      flex-shrink: 0;
+    }
+
+    .group-label-toggle.collapsed svg { transform: rotate(-90deg); }
+
+    #appearanceBody {
+      display: flex; flex-direction: column; gap: 4px;
+      overflow: hidden;
+      transition: max-height .25s ease, opacity .2s ease;
+      max-height: 600px;
+      opacity: 1;
+    }
+
+    #appearanceBody.collapsed { max-height: 0; opacity: 0; }
+
+    /* ── Orientation row — below diagram, always visible ── */
+    .orientation-row {
+      display: flex; align-items: center; justify-content: center;
+      gap: 10px; padding: 10px 14px;
+      background: var(--surface); border: 1px solid var(--bdr);
+      border-radius: var(--r-md); width: 100%;
+    }
+
+    .orientation-label { font-size: 11px; font-weight: 600; color: var(--muted); white-space: nowrap; }
+
+    .orientation-row .lbtn { display: flex; align-items: center; gap: 6px; padding: 0 10px; width: auto; font-size: 11px; font-weight: 600; }
+    .orientation-row .lbtn span { color: inherit; }
+
+    .debug { font-size: 11px; color: var(--muted); }
+    .debug summary { cursor: pointer; padding: 4px 0; font-weight: 600; color: var(--muted); }
+    .debug pre {
+      margin-top: 6px; padding: 8px;
+      border-radius: var(--r-sm);
+      background: var(--navy); border: 1px solid var(--bdr);
+      overflow: auto; max-height: 160px;
+      font-size: 10px; color: var(--muted);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* ── Main ── */
+    .main {
+      flex: 1; padding: 32px 36px;
+      display: flex; flex-direction: column;
+      align-items: center; min-width: 0; overflow-x: auto;
+    }
+
+    .diagram-unit { display: flex; flex-direction: column; gap: 16px; width: fit-content; max-width: 100%; align-items: center; }
+
+    .chord-header {
+      display: flex; align-items: center;
+      justify-content: space-between; gap: 16px;
+      flex-wrap: wrap; width: 100%;
+    }
+
+    .chord-name-block { display: flex; flex-direction: column; align-items: center; flex: 1; }
+
+    .chord-eyebrow {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9px; font-weight: 700;
+      letter-spacing: 2.5px; text-transform: uppercase; color: var(--faint);
+    }
+
+    .chord-name {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 52px; color: var(--gold);
+      line-height: 1; letter-spacing: 2px;
+      min-width: 48px; position: relative; top: 4px;
+    }
+
+    .export-btns { display: flex; gap: 8px; align-items: center; justify-content: center; width: 100%; }
+
+    .mount-shell { overflow: auto; border-radius: var(--r-xl); max-width: 100%; }
+
+    .mount {
+      display: inline-block;
+      background: var(--surface);
+      border: 1px solid var(--bdr);
+      border-radius: var(--r-xl);
+      padding: 14px;
+      box-shadow: var(--sh);
+      cursor: crosshair;
+      vertical-align: top;
+      max-width: 100%;
+    }
+
+    .mount svg {
+      display: block;
+      border-radius: 12px;
+      max-width: 100% !important;
+      height: auto !important;
+    }
+
+    /* ── Mobile ── */
+    @media (max-width: 800px) {
+      .gemba-nav { padding: 0 16px; }
+      .nav-links { display: none; }
+      .nav-text span { display: none; }
+
+      .shell, .shell.hz { flex-direction: column !important; }
+
+      .sidebar, .shell.hz .sidebar {
+        width: 100% !important; height: auto !important;
+        position: static !important;
+        border-right: none !important;
+        border-bottom: 1px solid var(--bdr) !important;
+        flex-direction: column !important;
+      }
+
+      .main { padding: 20px 16px; align-items: center; }
+
+      .diagram-unit, .shell.hz .diagram-unit {
+        width: 100%; align-items: center;
+        flex-direction: column !important;
+      }
+
+      .chord-header { flex-direction: row; width: 100%; }
+
+      .mount-shell { width: 100%; display: flex; justify-content: center; }
+
+      .mount { max-width: calc(100vw - 32px); padding: 10px; }
+
+      .mount svg { max-width: 100% !important; height: auto !important; width: 100% !important; }
+    }
+  </style>
 </head>
 <body>
-  <div class="shell">
+
+  <!-- NAVBAR -->
+  <nav class="gemba-nav">
+    <a href="/" class="nav-logo">
+      <svg class="nav-mark" viewBox="0 0 32 32" fill="none">
+        <rect width="32" height="32" rx="8" fill="#122a52"/>
+        <line x1="7" y1="9"  x2="25" y2="9"  stroke="#c9a84c" stroke-width="1.5" stroke-linecap="round" opacity="0.4"/>
+        <line x1="7" y1="16" x2="25" y2="16" stroke="#c9a84c" stroke-width="1.5" stroke-linecap="round" opacity="0.4"/>
+        <line x1="7" y1="23" x2="25" y2="23" stroke="#c9a84c" stroke-width="1.5" stroke-linecap="round" opacity="0.4"/>
+        <line x1="16" y1="5" x2="16" y2="27" stroke="#c9a84c" stroke-width="2" stroke-linecap="round"/>
+        <circle cx="16" cy="16" r="3.5" fill="#c9a84c"/>
+        <circle cx="16" cy="5"  r="2"   fill="#e8c96a"/>
+      </svg>
+      <div class="nav-text">
+        <strong>GembaGuitar</strong>
+        <span>Play · Learn · Master</span>
+      </div>
+    </a>
+    <ul class="nav-links">
+      <li><a href="/chord-generator" class="active">Chords</a></li>
+      <li><a href="/metronome">Metronome</a></li>
+      <li><a href="/tuner">Tuner</a></li>
+      <li><a href="/learn">Learn</a></li>
+    </ul>
+    <a href="/" class="nav-home">← Home</a>
+  </nav>
+
+  <!-- SHELL -->
+  <div class="shell" id="shell">
 
     <aside class="sidebar">
 
@@ -19,25 +476,46 @@
         <div class="brand-icon">🎸</div>
         <div>
           <div class="brand-name">Chord Diagram</div>
-          <div class="brand-sub">personal tool</div>
+          <div class="brand-sub">Identifier Tool</div>
         </div>
       </div>
 
-      <div class="theme-toggle-row">
-        <span class="theme-toggle-label">Dark mode</span>
-        <button id="themeToggle" class="theme-toggle" type="button" aria-pressed="false" aria-label="Toggle dark mode">
-          <span class="theme-toggle-thumb"></span>
-        </button>
+      <!-- Diagram orientation -->
+      <div class="layout-row">
+        <span class="layout-row-label">Diagram</span>
+        <div class="layout-btns">
+          <button class="lbtn on" id="lbtnV" title="Vertical (standard)" onclick="setDiagramOrientation('v')">
+            <svg viewBox="0 0 10 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+              <line x1="2" y1="3" x2="2" y2="13"/>
+              <line x1="5" y1="3" x2="5" y2="13"/>
+              <line x1="8" y1="3" x2="8" y2="13"/>
+              <line x1="1" y1="3" x2="9" y2="3"/>
+              <line x1="1" y1="7" x2="9" y2="7"/>
+              <line x1="1" y1="11" x2="9" y2="11"/>
+              <line x1="1" y1="13" x2="9" y2="13"/>
+            </svg>
+          </button>
+          <button class="lbtn" id="lbtnH" title="Horizontal" onclick="setDiagramOrientation('h')">
+            <svg viewBox="0 0 14 10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+              <line x1="1" y1="2" x2="13" y2="2"/>
+              <line x1="1" y1="5" x2="13" y2="5"/>
+              <line x1="1" y1="8" x2="13" y2="8"/>
+              <line x1="1" y1="1" x2="1"  y2="9"/>
+              <line x1="5" y1="1" x2="5"  y2="9"/>
+              <line x1="9" y1="1" x2="9"  y2="9"/>
+              <line x1="13" y1="1" x2="13" y2="9"/>
+            </svg>
+          </button>
+        </div>
       </div>
 
+      <!-- Structure -->
       <div class="group">
         <div class="group-label">Structure</div>
-
         <label class="field">
           <span class="field-label">Title</span>
           <input id="title" type="text" class="input" placeholder="e.g. Am, G7…" />
         </label>
-
         <div class="row-3">
           <label class="field">
             <span class="field-label">Start fret</span>
@@ -52,55 +530,43 @@
             <input id="strings" type="number" class="input" min="4" max="8" value="6" />
           </label>
         </div>
-
         <label class="pill-check">
           <input id="hidePosition" type="checkbox" />
           <span class="checkmark"></span>
           <span>Hide position label</span>
         </label>
-
         <label class="pill-check">
           <input id="showFretMarkers" type="checkbox" checked />
           <span class="checkmark"></span>
           <span>Show fret markers</span>
         </label>
+        <label class="pill-check">
+          <input id="showStringNames" type="checkbox" checked />
+          <span class="checkmark"></span>
+          <span>Show string names</span>
+        </label>
       </div>
 
+      <!-- Appearance — collapsible -->
       <div class="group">
-        <div class="group-label">Appearance</div>
-
-        <div class="slider-list">
-          <div class="slider-row">
-            <span>Height</span>
-            <input id="height" type="range" min="220" max="520" value="300" />
+        <button class="group-label-toggle" id="appearanceToggle" onclick="toggleAppearance()">
+          <span>Appearance</span>
+          <svg id="appearanceChevron" viewBox="0 0 12 8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="1 1 6 7 11 1"/>
+          </svg>
+        </button>
+        <div id="appearanceBody">
+          <div class="slider-list">
+            <div class="slider-row"><span>Height</span>    <input id="height"        type="range" min="220" max="520" value="300"/></div>
+            <div class="slider-row"><span>Dot size</span>  <input id="fingerSize"    type="range" min="7"   max="18"  value="11"/></div>
+            <div class="slider-row"><span>Finger font</span><input id="fingerFontSize" type="range" min="9"   max="18"  value="12"/></div>
+            <div class="slider-row"><span>Title font</span><input id="titleFontSize" type="range" min="12"  max="30"  value="18"/></div>
+            <div class="slider-row"><span>Line width</span><input id="strokeWidth"   type="range" min="1"   max="6"   value="2"/></div>
           </div>
-          <div class="slider-row">
-            <span>Dot size</span>
-            <input id="fingerSize" type="range" min="7" max="18" value="11" />
+          <div class="color-row">
+            <label class="color-field"><span>Ink</span>   <input id="fgColor" type="color" value="#111111"/></label>
+            <label class="color-field"><span>Paper</span> <input id="bgColor" type="color" value="#ffffff"/></label>
           </div>
-          <div class="slider-row">
-            <span>Finger font</span>
-            <input id="fingerFontSize" type="range" min="9" max="18" value="12" />
-          </div>
-          <div class="slider-row">
-            <span>Title font</span>
-            <input id="titleFontSize" type="range" min="12" max="30" value="18" />
-          </div>
-          <div class="slider-row">
-            <span>Line width</span>
-            <input id="strokeWidth" type="range" min="1" max="6" value="2" />
-          </div>
-        </div>
-
-        <div class="color-row">
-          <label class="color-field">
-            <span>Ink</span>
-            <input id="fgColor" type="color" value="#111111" />
-          </label>
-          <label class="color-field">
-            <span>Paper</span>
-            <input id="bgColor" type="color" value="#ffffff" />
-          </label>
         </div>
       </div>
 
@@ -108,11 +574,6 @@
         <button id="btnClear" class="btn btn-ghost">Clear</button>
         <button id="btnReset" class="btn btn-ghost">Reset</button>
       </div>
-
-      <details class="debug">
-        <summary>Show state JSON</summary>
-        <pre id="stateDump"></pre>
-      </details>
 
     </aside>
 
@@ -123,44 +584,601 @@
             <div class="chord-eyebrow">Detected chord</div>
             <div class="chord-name" id="chordName">—</div>
           </div>
-
-          <div class="export-btns">
-            <button id="btnSvg" class="btn btn-outline">↓ SVG</button>
-            <button id="btnPng" class="btn btn-primary">↓ PNG</button>
-          </div>
         </div>
-
         <div class="mount-shell">
           <div id="mount" class="mount"></div>
+        </div>
+        <div class="export-btns">
+          <button id="btnSvg" class="btn btn-outline">↓ SVG</button>
+          <button id="btnPng" class="btn btn-primary">↓ PNG</button>
+        </div>
+        <!-- Orientation toggle — always visible, especially useful on mobile -->
+        <div class="orientation-row">
+          <span class="orientation-label">Diagram orientation</span>
+          <div class="layout-btns">
+            <button class="lbtn on" id="lbtnV2" title="Vertical (standard)" onclick="setDiagramOrientation('v')">
+              <svg viewBox="0 0 10 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+                <line x1="2" y1="3" x2="2" y2="13"/>
+                <line x1="5" y1="3" x2="5" y2="13"/>
+                <line x1="8" y1="3" x2="8" y2="13"/>
+                <line x1="1" y1="3" x2="9" y2="3"/>
+                <line x1="1" y1="7" x2="9" y2="7"/>
+                <line x1="1" y1="11" x2="9" y2="11"/>
+                <line x1="1" y1="13" x2="9" y2="13"/>
+              </svg>
+              <span>Vertical</span>
+            </button>
+            <button class="lbtn" id="lbtnH2" title="Horizontal" onclick="setDiagramOrientation('h')">
+              <svg viewBox="0 0 14 10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+                <line x1="1" y1="2" x2="13" y2="2"/>
+                <line x1="1" y1="5" x2="13" y2="5"/>
+                <line x1="1" y1="8" x2="13" y2="8"/>
+                <line x1="1" y1="1" x2="1"  y2="9"/>
+                <line x1="5" y1="1" x2="5"  y2="9"/>
+                <line x1="9" y1="1" x2="9"  y2="9"/>
+                <line x1="13" y1="1" x2="13" y2="9"/>
+              </svg>
+              <span>Horizontal</span>
+            </button>
+          </div>
         </div>
       </div>
     </main>
 
   </div>
 
-  <script type="module" src="app.js"></script>
+  <script>
+  // ── Utils ──
+  const svgNS = "http://www.w3.org/2000/svg";
+  const clamp = (n,a,b) => Math.max(a, Math.min(b,n));
+
+  function el(tag, attrs={}) {
+    const n = document.createElementNS(svgNS, tag);
+    for (const [k,v] of Object.entries(attrs)) n.setAttribute(k, String(v));
+    return n;
+  }
+
+  function txt(str, x, y, size, fill, anchor="start", weight="normal") {
+    const t = el("text", { x, y, fill, "font-size": size, "font-family": "DM Sans, system-ui, sans-serif", "text-anchor": anchor, "font-weight": weight });
+    t.textContent = str;
+    return t;
+  }
+
+  function downloadBlob(blob, filename) {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = filename;
+    document.body.appendChild(a); a.click(); a.remove();
+    URL.revokeObjectURL(url);
+  }
+
+  // ── Chord Detection ──
+  const NOTES = ["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"];
+  const TUNING6 = [64, 59, 55, 50, 45, 40];
+  const pcName = pc => NOTES[(pc+12)%12];
+  const mod12  = n  => ((n%12)+12)%12;
+
+  function soundingNotes(state) {
+    const tuning = [...TUNING6];
+    while (tuning.length < state.strings) tuning.push(40);
+    const out = [];
+    for (let s=1; s<=state.strings; s++) {
+      const f = state.fingers.find(f => f.string===s);
+      if (f) { const midi=tuning[s-1]+f.fret; out.push({string:s,midi,pc:mod12(midi)}); continue; }
+      if ((state.openMuted[s-1]??"O")==="X") continue;
+      out.push({string:s, midi:tuning[s-1], pc:mod12(tuning[s-1])});
+    }
+    return out;
+  }
+
+  const PATTERNS = [
+    {name:"",       ints:[0,4,7],    score:90},{name:"m",      ints:[0,3,7],    score:90},
+    {name:"dim",    ints:[0,3,6],    score:88},{name:"aug",    ints:[0,4,8],    score:88},
+    {name:"sus2",   ints:[0,2,7],    score:86},{name:"sus4",   ints:[0,5,7],    score:86},
+    {name:"5",      ints:[0,7],      score:70},{name:"7",      ints:[0,4,7,10], score:95},
+    {name:"maj7",   ints:[0,4,7,11], score:95},{name:"m7",     ints:[0,3,7,10], score:95},
+    {name:"m(maj7)",ints:[0,3,7,11], score:93},{name:"m7b5",   ints:[0,3,6,10], score:93},
+    {name:"dim7",   ints:[0,3,6,9],  score:92},{name:"6",      ints:[0,4,7,9],  score:92},
+    {name:"m6",     ints:[0,3,7,9],  score:92},
+  ];
+
+  function detectChordName(state) {
+    const snd = soundingNotes(state);
+    if (!snd.length) return "—";
+    const pcs  = [...new Set(snd.map(n=>n.pc))];
+    const bass = snd.reduce((a,b) => b.midi<a.midi?b:a, snd[0]);
+    let best = null;
+
+    for (const rootPc of pcs) {
+      const iset = new Set(pcs.map(pc => mod12(pc-rootPc)));
+      for (const p of PATTERNS) {
+        const pat = new Set(p.ints);
+        let ok = true;
+        for (const i of pat) { if (!iset.has(i)) { ok=false; break; } }
+        if (!ok) continue;
+        const s = 100 - (iset.size - pat.size)*6;
+        const boost = bass.pc===rootPc ? 6 : 0;
+        // extension suffix
+        let ext = "";
+        if (!p.name.includes("7")) {
+          if (iset.has(2)) ext="add9";
+          else if (iset.has(9)&&p.name!=="6"&&p.name!=="m6") ext="6";
+          else if (iset.has(11)&&p.name!=="maj7") ext="maj7";
+          else if (iset.has(10)&&p.name!=="7") ext="7";
+        }
+        const name = pcName(rootPc) + p.name + ext;
+        const score = p.score + s + boost;
+        if (!best || score>best.score) best = { score, rootPc, name };
+      }
+    }
+
+    if (!best) return pcs.map(pcName).join("-");
+    if (pcName(bass.pc) !== pcName(best.rootPc)) return `${best.name}/${pcName(bass.pc)}`;
+    return best.name;
+  }
+
+  // ── Renderer ──
+  function strX(state, string, left, w) {
+    return left + (state.strings - string) * (w / (state.strings - 1));
+  }
+
+  function xToStr(state, x, left, w) {
+    return state.strings - clamp(Math.round((x-left) / (w/(state.strings-1))), 0, state.strings-1);
+  }
+
+  function yToFret(state, y, top, h) {
+    return clamp(Math.floor((y-top) / (h/state.fretsVisible)), 0, state.fretsVisible-1) + 1;
+  }
+
+  // Vertical (standard portrait) renderer
+  function renderSVGVertical(state, L) {
+    const {pad, topText, leftText, gridW} = L;
+    const st    = state.style;
+    const left  = pad + leftText;
+    const top   = pad + topText;
+    const h     = st.gridH;
+    const w     = gridW;
+    const dy    = h / state.fretsVisible;
+    const dx    = w / (state.strings - 1);
+    const titleY = pad + 22;
+    const oxY    = pad + topText - 18;
+    const bottomPad = st.showStringNames ? pad + 22 : pad;
+    const svgW  = left + w + leftText;
+    const svgH  = pad + topText + h + bottomPad;
+
+    const svg = document.createElementNS(svgNS, "svg");
+    svg.setAttribute("width", svgW);
+    svg.setAttribute("height", svgH);
+    svg.setAttribute("viewBox", `0 0 ${svgW} ${svgH}`);
+    svg.style.display = "block";
+    svg.style.borderRadius = "14px";
+    svg.appendChild(el("rect", {x:0, y:0, width:svgW, height:svgH, fill:st.bgColor}));
+
+    const fg = st.fgColor;
+    const sw = st.strokeWidth;
+
+    // Title
+    if (state.title?.trim()) {
+      svg.appendChild(txt(state.title.trim(), svgW/2, titleY, st.titleFontSize, fg, "middle", "800"));
+    }
+
+    // Fret position label
+    if (!st.hidePosition && state.startFret > 1) {
+      svg.appendChild(txt(`${state.startFret}fr`, pad, top+26, 20, fg, "start", "900"));
+    }
+
+    // String lines (vertical)
+    for (let i=0; i<state.strings; i++) {
+      const x = left + i*dx;
+      svg.appendChild(el("line", {x1:x, y1:top, x2:x, y2:top+h, stroke:fg, "stroke-width":sw, "stroke-linecap":"round"}));
+    }
+
+    // Fret lines (horizontal)
+    for (let f=0; f<=state.fretsVisible; f++) {
+      const y = top + f*dy;
+      const isNut = state.startFret===1 && f===0;
+      svg.appendChild(el("line", {x1:left, y1:y, x2:left+w, y2:y, stroke:fg, "stroke-width": isNut ? Math.max(sw*3,5) : sw, "stroke-linecap":"round"}));
+    }
+
+    // Fret markers
+    if (st.showFretMarkers) {
+      const marks = new Set([3,5,7,9,12]);
+      for (let i=1; i<=state.fretsVisible; i++) {
+        const abs = state.startFret+i-1;
+        if (!marks.has(abs)) continue;
+        const cy = top + (i-0.5)*dy;
+        const r = Math.max(sw*1.8, 4);
+        if (abs===12) {
+          svg.appendChild(el("circle", {cx:left+w/2-18, cy, r, fill:"rgba(0,0,0,0.18)"}));
+          svg.appendChild(el("circle", {cx:left+w/2+18, cy, r, fill:"rgba(0,0,0,0.18)"}));
+        } else {
+          svg.appendChild(el("circle", {cx:left+w/2, cy, r, fill:"rgba(0,0,0,0.18)"}));
+        }
+      }
+    }
+
+    const fmap = new Map();
+    for (const f of state.fingers) fmap.set(f.string, f);
+
+    // O/X row above nut
+    const oxHitR = 18;
+    for (let s=1; s<=state.strings; s++) {
+      if (fmap.has(s)) continue;
+      const x = strX(state, s, left, w);
+      const mark = state.openMuted[s-1] ?? "O";
+      svg.appendChild(el("rect", {x:x-oxHitR, y:oxY-oxHitR*1.5, width:oxHitR*2, height:oxHitR*2, fill:"transparent"}));
+      svg.appendChild(txt(mark, x, oxY, 28, fg, "middle", "900"));
+    }
+
+    // Finger dots
+    for (const f of state.fingers) {
+      const fi = f.fret - state.startFret + 1;
+      if (fi<1 || fi>state.fretsVisible) continue;
+      const cx = strX(state, f.string, left, w);
+      const cy = top + (fi-0.5)*dy;
+      svg.appendChild(el("circle", {cx, cy, r:st.dotR, fill:fg}));
+      if (f.label?.trim()) {
+        svg.appendChild(txt(f.label.trim(), cx, cy+st.fingerFontSize*0.35, st.fingerFontSize, st.bgColor, "middle", "900"));
+      }
+    }
+
+    // String names at bottom — E A D G B e (low to high, left to right)
+    if (st.showStringNames) {
+      const nameLabels = ['E','A','D','G','B','e'];
+      const nameY = top + h + 18;
+      for (let s=1; s<=state.strings; s++) {
+        // strX maps string 6→left, string 1→right, so label index = strings-s
+        const labelIdx = state.strings - s;
+        const lbl = nameLabels[labelIdx] ?? `S${s}`;
+        const x = strX(state, s, left, w);
+        svg.appendChild(txt(lbl, x, nameY, 13, fg, "middle", "700"));
+      }
+    }
+
+    return svg;
+  }
+
+  // Horizontal renderer — nut on left, strings run as horizontal rows, frets as vertical columns
+  // String 1 (high e) = top row, String 6 (low E) = bottom row
+  function renderSVGHorizontal(state, L) {
+    const st      = state.style;
+    const pad     = L.pad;
+    const strH    = 56;                          // px between each string row
+    const leftPad = 60;                          // space left of nut (for O/X symbols)
+    const topPad  = 50;                          // space above top string (title)
+    const rightPad = pad + 10;
+    const bottomPad = st.showStringNames ? 36 : pad;
+
+    const gridFretW  = st.gridH;                 // total width of fret area
+    const gridStrH   = (state.strings - 1) * strH; // total height of string area
+
+    const svgW = pad + leftPad + gridFretW + rightPad;
+    const svgH = pad + topPad  + gridStrH  + bottomPad;
+
+    const left = pad + leftPad;   // x where frets start (after nut)
+    const top  = pad + topPad;    // y where top string sits
+
+    const dy = gridFretW / state.fretsVisible; // width of one fret column
+    const dx = strH;                           // height of one string row
+
+    const svg = document.createElementNS(svgNS, "svg");
+    svg.setAttribute("width",   svgW);
+    svg.setAttribute("height",  svgH);
+    svg.setAttribute("viewBox", `0 0 ${svgW} ${svgH}`);
+    svg.style.display      = "block";
+    svg.style.borderRadius = "14px";
+    svg.appendChild(el("rect", {x:0, y:0, width:svgW, height:svgH, fill:st.bgColor}));
+
+    const fg = st.fgColor;
+    const sw = st.strokeWidth;
+
+    // Title
+    if (state.title?.trim()) {
+      svg.appendChild(txt(state.title.trim(), svgW/2, pad+18, st.titleFontSize, fg, "middle", "800"));
+    }
+
+    // Nut — vertical line on the left of fret area
+    const isNut = state.startFret === 1;
+    svg.appendChild(el("line", {
+      x1:left, y1:top, x2:left, y2:top+gridStrH,
+      stroke:fg,
+      "stroke-width": isNut ? Math.max(sw*3, 5) : sw,
+      "stroke-linecap":"round"
+    }));
+
+    if (!isNut && !st.hidePosition) {
+      svg.appendChild(txt(`${state.startFret}fr`, pad+2, top+14, 13, fg, "start", "700"));
+    }
+
+    // Fret lines (vertical)
+    for (let f=1; f<=state.fretsVisible; f++) {
+      const x = left + f*dy;
+      svg.appendChild(el("line", {x1:x, y1:top, x2:x, y2:top+gridStrH, stroke:fg, "stroke-width":sw, "stroke-linecap":"round"}));
+    }
+
+    // String lines (horizontal)
+    for (let s=1; s<=state.strings; s++) {
+      const y = top + (s-1)*dx;
+      svg.appendChild(el("line", {x1:left, y1:y, x2:left+gridFretW, y2:y, stroke:fg, "stroke-width":sw, "stroke-linecap":"round"}));
+    }
+
+    // Fret markers
+    if (st.showFretMarkers) {
+      const marks = new Set([3,5,7,9,12]);
+      for (let i=1; i<=state.fretsVisible; i++) {
+        const abs = state.startFret+i-1;
+        if (!marks.has(abs)) continue;
+        const cx  = left + (i-0.5)*dy;
+        const midY = top + gridStrH/2;
+        const r   = Math.max(sw*1.8, 4);
+        if (abs===12) {
+          svg.appendChild(el("circle", {cx, cy:midY-strH*0.7, r, fill:"rgba(0,0,0,0.18)"}));
+          svg.appendChild(el("circle", {cx, cy:midY+strH*0.7, r, fill:"rgba(0,0,0,0.18)"}));
+        } else {
+          svg.appendChild(el("circle", {cx, cy:midY, r, fill:"rgba(0,0,0,0.18)"}));
+        }
+      }
+    }
+
+    const fmap = new Map();
+    for (const f of state.fingers) fmap.set(f.string, f);
+
+    // O/X symbols — to the LEFT of the nut, one per string row
+    // oxX is the center x of the O/X symbols
+    const oxX    = pad + leftPad/2;   // centered in the leftPad area
+    const oxHitW = leftPad - pad;     // full clickable width in left area
+    const oxHitH = strH * 0.8;        // most of the row height
+    for (let s=1; s<=state.strings; s++) {
+      if (fmap.has(s)) continue;
+      const y    = top + (s-1)*dx;    // center y of this string row
+      const mark = state.openMuted[s-1] ?? "O";
+      // Large transparent hit rect covering the full left area for this string
+      svg.appendChild(el("rect", {
+        x: pad, y: y - oxHitH/2,
+        width: oxHitW, height: oxHitH,
+        fill: "transparent"
+      }));
+      svg.appendChild(txt(mark, oxX, y+8, 22, fg, "middle", "900"));
+    }
+
+    // Finger dots
+    for (const f of state.fingers) {
+      const fi = f.fret - state.startFret + 1;
+      if (fi<1 || fi>state.fretsVisible) continue;
+      const cx = left + (fi-0.5)*dy;
+      const cy = top + (f.string-1)*dx;
+      svg.appendChild(el("circle", {cx, cy, r:st.dotR, fill:fg}));
+      if (f.label?.trim()) {
+        svg.appendChild(txt(f.label.trim(), cx, cy+st.fingerFontSize*0.35, st.fingerFontSize, st.bgColor, "middle", "900"));
+      }
+    }
+
+    // String names — in horizontal mode, place on the RIGHT side of each string row
+    if (st.showStringNames) {
+      const nameLabels = ['e','B','G','D','A','E']; // s=1(top)..6(bottom)
+      for (let s=1; s<=state.strings; s++) {
+        const lbl = nameLabels[s-1] ?? `S${s}`;
+        const y   = top + (s-1)*dx;
+        svg.appendChild(txt(lbl, left + gridFretW + 12, y+5, 13, fg, "start", "700"));
+      }
+    }
+
+    return svg;
+  }
+
+  function renderSVG(state, L) {
+    return diagramOrientation === 'h'
+      ? renderSVGHorizontal(state, L)
+      : renderSVGVertical(state, L);
+  }
+
+  function hitTest(svgEl, state, L, cx, cy) {
+    const pt  = svgEl.createSVGPoint();
+    pt.x=cx; pt.y=cy;
+    const {x,y} = pt.matrixTransform(svgEl.getScreenCTM().inverse());
+
+    if (diagramOrientation === 'h') {
+      // ── Horizontal mode ──
+      const pad     = L.pad;
+      const strH    = 56;
+      const leftPad = 60;
+      const topPad  = 50;
+      const gridFretW = state.style.gridH;
+      const left = pad + leftPad;
+      const top  = pad + topPad;
+      const dy   = gridFretW / state.fretsVisible;
+      const dx   = strH;
+
+      // O/X zone: left of nut (x < left), within string rows
+      if (x >= pad && x < left && y >= top - strH*0.4 && y <= top + (state.strings-1)*dx + strH*0.4) {
+        const s = clamp(Math.round((y - top) / dx) + 1, 1, state.strings);
+        return { type:"ox", string:s };
+      }
+
+      // Grid zone: within fret area
+      if (x >= left && x <= left+gridFretW && y >= top - strH*0.4 && y <= top + (state.strings-1)*dx + strH*0.4) {
+        const fi     = clamp(Math.floor((x - left) / dy), 0, state.fretsVisible-1) + 1;
+        const fret   = state.startFret + fi - 1;
+        const string = clamp(Math.round((y - top) / dx) + 1, 1, state.strings);
+        return { type:"grid", string, fret };
+      }
+
+      return { type:"none" };
+    }
+
+    // ── Vertical mode ──
+    const left   = L.pad + L.leftText;
+    const top    = L.pad + L.topText;
+    const w      = L.gridW;
+    const h      = state.style.gridH;
+    const oxY    = L.pad + L.topText - 18;
+    const oxHitR = 18;
+    if (y >= oxY - oxHitR*1.5 && y <= top && x >= left && x <= left+w) return {type:"ox", string:xToStr(state,x,left,w)};
+    if (x >= left && x <= left+w && y >= top && y <= top+h) return {type:"grid", string:xToStr(state,x,left,w), fret:state.startFret+yToFret(state,y,top,h)-1};
+    return {type:"none"};
+  }
+
+  // ── Exporters ──
+  function doSVG(svgEl) {
+    const c = svgEl.cloneNode(true);
+    c.removeAttribute("style");
+    c.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+    downloadBlob(new Blob([new XMLSerializer().serializeToString(c)], {type:"image/svg+xml;charset=utf-8"}), "chord-diagram.svg");
+  }
+
+  async function doPNG(svgEl) {
+    const url = URL.createObjectURL(new Blob([new XMLSerializer().serializeToString(svgEl)], {type:"image/svg+xml;charset=utf-8"}));
+    const img = new Image();
+    await new Promise((res,rej) => { img.onload=res; img.onerror=rej; img.src=url; });
+    const W=900, H=Math.round(900*svgEl.height.baseVal.value/svgEl.width.baseVal.value);
+    const c = document.createElement("canvas");
+    c.width=W; c.height=H;
+    c.getContext("2d").drawImage(img, 0, 0, W, H);
+    URL.revokeObjectURL(url);
+    const blob = await new Promise(res => c.toBlob(res, "image/png"));
+    if (blob) downloadBlob(blob, "chord-diagram.png");
+  }
+
+  // ── State ──
+  const DEF = {
+    title:"", strings:6, fretsVisible:5, startFret:1,
+    gridH:300, dotR:11, fingerFontSize:12, titleFontSize:18,
+    strokeWidth:2, fgColor:"#111111", bgColor:"#ffffff",
+    showFretMarkers:true, hidePosition:false, showStringNames:true
+  };
+
+  const state = {
+    title: DEF.title, strings: DEF.strings,
+    fretsVisible: DEF.fretsVisible, startFret: DEF.startFret,
+    openMuted: Array(DEF.strings).fill("O"),
+    fingers: [],
+    style: {
+      gridH:DEF.gridH, dotR:DEF.dotR,
+      fingerFontSize:DEF.fingerFontSize, titleFontSize:DEF.titleFontSize,
+      strokeWidth:DEF.strokeWidth, fgColor:DEF.fgColor,
+      bgColor:DEF.bgColor, showFretMarkers:DEF.showFretMarkers,
+      hidePosition:DEF.hidePosition, showStringNames:DEF.showStringNames
+    }
+  };
+
+  // Layout: generous topText gives room for title AND O/X row with space between
+  const L = { pad:20, topText:80, leftText:36, gridW:340 };
+
+  // ── DOM ──
+  const $mount    = document.getElementById("mount");
+  const $chord    = document.getElementById("chordName");
+
+  function q(id) { return document.getElementById(id); }
+
+  // ── Appearance collapse ──
+  let appearanceOpen = true;
+  function toggleAppearance() {
+    appearanceOpen = !appearanceOpen;
+    const body = q("appearanceBody");
+    const btn  = q("appearanceToggle");
+    body.classList.toggle("collapsed", !appearanceOpen);
+    btn.classList.toggle("collapsed",  !appearanceOpen);
+  }
+
+  // ── Diagram Orientation ──
+  let diagramOrientation = 'v';
+
+  function setDiagramOrientation(mode) {
+    diagramOrientation = mode;
+    const isH = mode === 'h';
+    // Sidebar buttons
+    q("lbtnV")?.classList.toggle("on", !isH);
+    q("lbtnH")?.classList.toggle("on",  isH);
+    // Below-diagram buttons (always visible incl. mobile)
+    q("lbtnV2")?.classList.toggle("on", !isH);
+    q("lbtnH2")?.classList.toggle("on",  isH);
+    localStorage.setItem("chord-orientation", mode);
+    render();
+  }
+
+  // ── Render ──
+  function render() {
+    $mount.innerHTML = "";
+    const svg = renderSVG(state, L);
+    $mount.appendChild(svg);
+
+    svg.addEventListener("click", e => {
+      const hit = hitTest(svg, state, L, e.clientX, e.clientY);
+      if (hit.type==="ox") {
+        const i = hit.string-1;
+        state.openMuted[i] = state.openMuted[i]==="O"?"X":"O";
+        render();
+      }
+      if (hit.type==="grid") {
+        const idx = state.fingers.findIndex(f=>f.string===hit.string&&f.fret===hit.fret);
+        if (idx>=0) state.fingers.splice(idx,1);
+        else { state.fingers = state.fingers.filter(f=>f.string!==hit.string); state.fingers.push({string:hit.string, fret:hit.fret, label:""}); }
+        render();
+      }
+    });
+
+    if ($chord) $chord.textContent = detectChordName(state);
+
+    q("btnSvg").onclick = () => doSVG(svg);
+    q("btnPng").onclick = () => doPNG(svg);
+  }
+
+  function syncUI() {
+    q("title").value          = state.title;
+    q("fretsVisible").value   = state.fretsVisible;
+    q("startFret").value      = state.startFret;
+    q("strings").value        = state.strings;
+    q("height").value         = state.style.gridH;
+    q("fingerSize").value     = state.style.dotR;
+    q("fingerFontSize").value = state.style.fingerFontSize;
+    q("titleFontSize").value  = state.style.titleFontSize;
+    q("strokeWidth").value    = state.style.strokeWidth;
+    q("fgColor").value        = state.style.fgColor;
+    q("bgColor").value        = state.style.bgColor;
+    q("hidePosition").checked    = state.style.hidePosition;
+    q("showFretMarkers").checked = state.style.showFretMarkers;
+    q("showStringNames").checked = state.style.showStringNames;
+  }
+
+  function ensureSizes() {
+    const old = [...state.openMuted];
+    state.openMuted = Array(state.strings).fill("O");
+    for (let i=0; i<Math.min(old.length,state.strings); i++) state.openMuted[i]=old[i];
+    state.fingers = state.fingers.filter(f=>f.string>=1&&f.string<=state.strings);
+  }
+
+  // ── Events ──
+  q("title").addEventListener("input",          ()=>{ state.title=q("title").value; render(); });
+  q("fretsVisible").addEventListener("change",  ()=>{ state.fretsVisible=clamp(parseInt(q("fretsVisible").value||"5"),3,12); render(); });
+  q("startFret").addEventListener("change",     ()=>{ state.startFret=clamp(parseInt(q("startFret").value||"1"),1,20); render(); });
+  q("strings").addEventListener("change",       ()=>{ state.strings=clamp(parseInt(q("strings").value||"6"),4,8); ensureSizes(); render(); });
+  q("height").addEventListener("input",         ()=>{ state.style.gridH=parseInt(q("height").value); render(); });
+  q("fingerSize").addEventListener("input",     ()=>{ state.style.dotR=parseInt(q("fingerSize").value); render(); });
+  q("fingerFontSize").addEventListener("input", ()=>{ state.style.fingerFontSize=parseInt(q("fingerFontSize").value); render(); });
+  q("titleFontSize").addEventListener("input",  ()=>{ state.style.titleFontSize=parseInt(q("titleFontSize").value); render(); });
+  q("strokeWidth").addEventListener("input",    ()=>{ state.style.strokeWidth=parseInt(q("strokeWidth").value); render(); });
+  q("fgColor").addEventListener("input",        ()=>{ state.style.fgColor=q("fgColor").value; render(); });
+  q("bgColor").addEventListener("input",        ()=>{ state.style.bgColor=q("bgColor").value; render(); });
+  q("hidePosition").addEventListener("change",  ()=>{ state.style.hidePosition=q("hidePosition").checked; render(); });
+  q("showFretMarkers").addEventListener("change",()=>{ state.style.showFretMarkers=q("showFretMarkers").checked; render(); });
+  q("showStringNames").addEventListener("change",()=>{ state.style.showStringNames=q("showStringNames").checked; render(); });
+
+  q("btnClear").addEventListener("click", ()=>{ state.openMuted=Array(state.strings).fill("O"); state.fingers=[]; render(); });
+  q("btnReset").addEventListener("click", ()=>{
+    Object.assign(state, {
+      title:DEF.title, strings:DEF.strings, fretsVisible:DEF.fretsVisible, startFret:DEF.startFret,
+      openMuted:Array(DEF.strings).fill("O"), fingers:[],
+      style:{gridH:DEF.gridH, dotR:DEF.dotR, fingerFontSize:DEF.fingerFontSize, titleFontSize:DEF.titleFontSize, strokeWidth:DEF.strokeWidth, fgColor:DEF.fgColor, bgColor:DEF.bgColor, showFretMarkers:DEF.showFretMarkers, hidePosition:DEF.hidePosition, showStringNames:DEF.showStringNames}
+    });
+    syncUI(); render();
+  });
+
+  // ── Init ──
+  const savedOrientation = localStorage.getItem("chord-orientation");
+  if (savedOrientation === 'h') setDiagramOrientation('h');
+  syncUI();
+  render();
+  </script>
+
 </body>
-<nav class="gemba-nav">
-  <a href="/" class="gemba-nav-logo">
-    <svg class="gemba-nav-mark" viewBox="0 0 32 32" fill="none">
-      <rect width="32" height="32" rx="8" fill="#122a52"/>
-      <line x1="7" y1="9" x2="25" y2="9" stroke="#c9a84c" stroke-width="1.5" stroke-linecap="round" opacity="0.4"/>
-      <line x1="7" y1="16" x2="25" y2="16" stroke="#c9a84c" stroke-width="1.5" stroke-linecap="round" opacity="0.4"/>
-      <line x1="7" y1="23" x2="25" y2="23" stroke="#c9a84c" stroke-width="1.5" stroke-linecap="round" opacity="0.4"/>
-      <line x1="16" y1="5" x2="16" y2="27" stroke="#c9a84c" stroke-width="2" stroke-linecap="round"/>
-      <circle cx="16" cy="16" r="3.5" fill="#c9a84c"/>
-      <circle cx="16" cy="5" r="2" fill="#e8c96a"/>
-    </svg>
-    <div class="gemba-nav-text">
-      <strong>GembaGuitar</strong>
-      <span>Play. Learn. Master.</span>
-    </div>
-  </a>
-  <ul class="gemba-nav-links">
-    <li><a href="/chord-generator">Chords</a></li>
-    <li><a href="/metronome">Metronome</a></li>
-    <li><a href="/tuner">Tuner</a></li>
-  </ul>
-  <a href="/" class="gemba-nav-home">← Home</a>
-</nav>
 </html>
