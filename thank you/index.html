@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Thanks! Here's Your Free Chord Chart — GembaGuitar</title>
+  <meta name="description" content="Download your free 15 Essential Guitar Chords PDF from GembaGuitar." />
+  <meta name="robots" content="noindex, nofollow" />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy:       #0b1e3d;
+      --navy-mid:   #122a52;
+      --navy-light: #1a3a6e;
+      --gold:       #c9a84c;
+      --gold-light: #e8c96a;
+      --cream:      #f5f0e8;
+      --white:      #ffffff;
+      --muted:      #8fa3bf;
+      --font-display: 'Bebas Neue', sans-serif;
+      --font-serif:   'DM Serif Display', serif;
+      --font-body:    'DM Sans', sans-serif;
+    }
+
+    body {
+      background: var(--navy);
+      color: var(--white);
+      font-family: var(--font-body);
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.4;
+    }
+
+    nav {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      padding: 0 48px;
+      height: 72px;
+      background: rgba(11, 30, 61, 0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(201, 168, 76, 0.15);
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+    }
+
+    .logo-text {
+      display: flex;
+      flex-direction: column;
+      line-height: 1;
+    }
+
+    .logo-text span:first-child {
+      font-family: var(--font-display);
+      font-size: 22px;
+      letter-spacing: 2px;
+      color: var(--white);
+    }
+
+    .logo-text span:last-child {
+      font-family: var(--font-body);
+      font-size: 9px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-top: 2px;
+    }
+
+    .thankyou-section {
+      position: relative;
+      z-index: 1;
+      min-height: calc(100vh - 72px - 120px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 24px;
+      text-align: center;
+    }
+
+    .thankyou-inner {
+      max-width: 560px;
+      margin: 0 auto;
+    }
+
+    .thankyou-checkmark {
+      width: 72px;
+      height: 72px;
+      background: var(--gold);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 24px;
+      animation: popIn 0.4s ease-out;
+    }
+
+    @keyframes popIn {
+      0% { transform: scale(0); }
+      80% { transform: scale(1.15); }
+      100% { transform: scale(1); }
+    }
+
+    .thankyou-checkmark svg {
+      width: 36px;
+      height: 36px;
+      stroke: var(--navy);
+      stroke-width: 3;
+      fill: none;
+    }
+
+    .thankyou-inner h1 {
+      font-family: var(--font-display);
+      font-size: clamp(36px, 6vw, 52px);
+      color: var(--white);
+      margin: 0 0 8px;
+      letter-spacing: 1px;
+    }
+
+    .thankyou-inner .subtitle {
+      color: var(--muted);
+      font-size: 17px;
+      line-height: 1.7;
+      margin-bottom: 32px;
+      font-weight: 300;
+    }
+
+    .subtitle strong {
+      color: var(--white);
+      font-weight: 500;
+    }
+
+    .download-btn {
+      display: inline-block;
+      background: var(--gold);
+      color: var(--navy);
+      font-family: var(--font-display);
+      font-size: 20px;
+      letter-spacing: 1.5px;
+      padding: 16px 40px;
+      border-radius: 10px;
+      text-decoration: none;
+      transition: background 0.2s, transform 0.2s;
+      box-shadow: 0 4px 24px rgba(201, 168, 76, 0.3);
+    }
+
+    .download-btn:hover {
+      background: var(--gold-light);
+      transform: translateY(-2px);
+    }
+
+    .thankyou-next {
+      margin-top: 40px;
+      padding-top: 32px;
+      border-top: 1px solid rgba(201, 168, 76, 0.15);
+    }
+
+    .thankyou-next h3 {
+      font-family: var(--font-display);
+      font-size: 22px;
+      color: var(--gold);
+      margin-bottom: 16px;
+      letter-spacing: 1px;
+    }
+
+    .thankyou-links {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .thankyou-links a {
+      color: var(--white);
+      text-decoration: none;
+      font-size: 15px;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    .thankyou-links a:hover { color: var(--gold-light); }
+    .thankyou-links a span { color: var(--gold); margin-right: 6px; }
+
+    footer {
+      position: relative;
+      z-index: 1;
+      background: #070f1e;
+      padding: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 24px;
+      border-top: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .footer-logo span:first-child {
+      font-family: var(--font-display);
+      font-size: 20px;
+      letter-spacing: 2px;
+      color: var(--white);
+    }
+
+    .footer-logo span:last-child {
+      display: block;
+      font-size: 11px;
+      color: var(--muted);
+      letter-spacing: 2px;
+      margin-top: 4px;
+    }
+
+    .footer-links { display: flex; gap: 24px; flex-wrap: wrap; }
+    .footer-links a { color: var(--muted); text-decoration: none; font-size: 13px; transition: color 0.2s; }
+    .footer-links a:hover { color: var(--gold); }
+    .footer-copy { font-size: 12px; color: rgba(143, 163, 191, 0.5); }
+
+    @media (max-width: 768px) {
+      nav { padding: 0 20px; }
+      footer { padding: 40px 24px; flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <a href="/" class="logo">
+      <div class="logo-text">
+        <span>GembaGuitar</span>
+        <span>Play. Learn. Master.</span>
+      </div>
+    </a>
+  </nav>
+
+  <section class="thankyou-section">
+    <div class="thankyou-inner">
+      <div class="thankyou-checkmark">
+        <svg viewBox="0 0 24 24">
+          <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
+      </div>
+
+      <h1>You're In!</h1>
+      <p class="subtitle">
+        Thanks for signing up. Here's your free <strong>15 Essential Guitar Chords</strong> PDF — download it and start playing.
+      </p>
+
+      <a href="/assets/15-Essential-Guitar-Chords.pdf" download class="download-btn">
+        ↓ Download Your Free PDF
+      </a>
+
+      <div class="thankyou-next">
+        <h3>What's Next?</h3>
+        <div class="thankyou-links">
+          <a href="/chord-generator"><span>→</span> Try the Chord Diagram Tool</a>
+          <a href="/learn"><span>→</span> Start the Beginner Path</a>
+          <a href="/metronome"><span>→</span> Practice with the Metronome</a>
+          <a href="/tuner"><span>→</span> Tune Up with the Tuner</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="footer-logo">
+      <span>GembaGuitar</span>
+      <span>Play. Learn. Master.</span>
+    </div>
+    <div class="footer-links">
+      <a href="/chord-generator">Chord Diagram Tool</a>
+      <a href="/metronome">Metronome</a>
+      <a href="/tuner">Tuner</a>
+      <a href="/learn">Learn</a>
+      <a href="/about">About</a>
+    </div>
+    <span class="footer-copy">© 2025 GembaGuitar. All rights reserved.</span>
+  </footer>
+
+</body>
+</html>

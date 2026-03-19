@@ -650,6 +650,111 @@
       to   { opacity: 1; transform: translateY(0); }
     }
 
+    /* ── EMAIL CAPTURE ── */
+    .email-capture {
+      position: relative;
+      z-index: 1;
+      background: linear-gradient(135deg, var(--navy) 0%, var(--navy-mid) 50%, var(--navy-light) 100%);
+      padding: 80px 48px;
+      text-align: center;
+      border-top: 3px solid var(--gold);
+      border-bottom: 3px solid var(--gold);
+    }
+
+    .email-capture-inner {
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .email-capture-badge {
+      display: inline-block;
+      background: var(--gold);
+      color: var(--navy);
+      font-family: var(--font-display);
+      font-size: 14px;
+      letter-spacing: 2px;
+      padding: 4px 16px;
+      border-radius: 4px;
+      margin-bottom: 20px;
+    }
+
+    .email-capture-content h2 {
+      font-family: var(--font-display);
+      font-size: clamp(32px, 5vw, 48px);
+      color: var(--white);
+      margin: 8px 0;
+      letter-spacing: 1px;
+    }
+
+    .email-capture-content p {
+      font-family: var(--font-body);
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.7;
+      margin-bottom: 32px;
+    }
+
+    .email-capture-field {
+      display: flex;
+      max-width: 480px;
+      margin: 0 auto;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+    }
+
+    .email-capture-field input[type="email"] {
+      flex: 1;
+      padding: 16px 20px;
+      border: 2px solid var(--gold);
+      border-right: none;
+      border-radius: 10px 0 0 10px;
+      font-family: var(--font-body);
+      font-size: 15px;
+      background: var(--cream);
+      color: var(--navy);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .email-capture-field input[type="email"]::placeholder {
+      color: #888;
+    }
+
+    .email-capture-field input[type="email"]:focus {
+      border-color: var(--gold-light);
+    }
+
+    .email-capture-field button {
+      padding: 16px 24px;
+      background: var(--gold);
+      color: var(--navy);
+      border: 2px solid var(--gold);
+      border-radius: 0 10px 10px 0;
+      font-family: var(--font-display);
+      font-size: 16px;
+      letter-spacing: 1px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.2s, transform 0.1s;
+    }
+
+    .email-capture-field button:hover {
+      background: var(--gold-light);
+      border-color: var(--gold-light);
+    }
+
+    .email-capture-field button:active {
+      transform: scale(0.98);
+    }
+
+    .email-capture-privacy {
+      font-family: var(--font-body);
+      color: rgba(143, 163, 191, 0.5);
+      font-size: 12px;
+      margin-top: 12px;
+    }
+
     /* ── MOBILE ── */
     @media (max-width: 768px) {
       nav { padding: 0 20px; }
@@ -662,7 +767,25 @@
 
       .tools-section { padding: 64px 24px; }
       .start-here { padding: 60px 24px; }
+      .email-capture { padding: 60px 24px; }
       footer { padding: 40px 24px; flex-direction: column; align-items: flex-start; }
+    }
+
+    @media (max-width: 520px) {
+      .email-capture-field {
+        flex-direction: column;
+        border-radius: 10px;
+      }
+
+      .email-capture-field input[type="email"] {
+        border-right: 2px solid var(--gold);
+        border-radius: 10px 10px 0 0;
+        border-bottom: none;
+      }
+
+      .email-capture-field button {
+        border-radius: 0 0 10px 10px;
+      }
     }
   </style>
 </head>
@@ -878,6 +1001,37 @@
     <h2>Not Sure <em>Where to Begin?</em></h2>
     <p>Start with the 10 chords that unlock hundreds of songs. No theory required — just practical, hands-on learning.</p>
     <a href="/learn" class="btn-primary">Start the Beginner Path →</a>
+  </section>
+
+  <!-- ── EMAIL CAPTURE ── -->
+  <section class="email-capture">
+    <div class="email-capture-inner">
+      <div class="email-capture-content">
+        <span class="email-capture-badge">FREE DOWNLOAD</span>
+        <h2>15 Essential Guitar Chords</h2>
+        <p>Get the only chord chart you need to start playing songs — with finger positions, string labels, and pro tips. Delivered instantly.</p>
+      </div>
+      <form
+        name="chord-pdf-signup"
+        method="POST"
+        data-netlify="true"
+        action="/thank-you/"
+        class="email-capture-form"
+      >
+        <input type="hidden" name="form-name" value="chord-pdf-signup" />
+        <div class="email-capture-field">
+          <input
+            type="email"
+            name="email"
+            placeholder="Your email address"
+            required
+            autocomplete="email"
+          />
+          <button type="submit">Get the Free PDF →</button>
+        </div>
+        <p class="email-capture-privacy">No spam, ever. Unsubscribe anytime.</p>
+      </form>
+    </div>
   </section>
 
   <!-- ── FOOTER ── -->
