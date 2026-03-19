@@ -1017,6 +1017,7 @@
         data-netlify="true"
         action="/thank-you/"
         class="email-capture-form"
+        id="pdf-signup-form"
       >
         <input type="hidden" name="form-name" value="chord-pdf-signup" />
         <div class="email-capture-field">
@@ -1027,10 +1028,36 @@
             required
             autocomplete="email"
           />
-          <button type="submit">Get the Free PDF →</button>
+          <button type="submit" id="pdf-signup-btn">Get the Free PDF →</button>
         </div>
         <p class="email-capture-privacy">No spam, ever. Unsubscribe anytime.</p>
       </form>
+      <script>
+        document.getElementById('pdf-signup-form').addEventListener('submit', function(e) {
+          e.preventDefault();
+          var form = this;
+          var btn = document.getElementById('pdf-signup-btn');
+          btn.textContent = 'Sending...';
+          btn.disabled = true;
+          fetch('/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams(new FormData(form)).toString()
+          }).then(function(res) {
+            if (res.ok) {
+              window.location.href = '/thank-you/';
+            } else {
+              btn.textContent = 'Get the Free PDF →';
+              btn.disabled = false;
+              alert('Something went wrong. Please try again.');
+            }
+          }).catch(function() {
+            btn.textContent = 'Get the Free PDF →';
+            btn.disabled = false;
+            alert('Something went wrong. Please try again.');
+          });
+        });
+      </script>
     </div>
   </section>
 
