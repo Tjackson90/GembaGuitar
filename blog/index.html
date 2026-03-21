@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blog — Guitar Tips, Gear & Lessons | GembaGuitar</title>
+  <meta name="description" content="Honest guitar advice for self-taught players. No fluff, no gatekeeping — just what you actually need to know.">
+  <meta property="og:title" content="Blog — Guitar Tips, Gear & Lessons | GembaGuitar">
+  <meta property="og:description" content="Honest guitar advice for self-taught players. Tips, gear guides, and lessons from someone who figured it out without a teacher.">
+  <meta property="og:url" content="https://gembaguitar.com/blog/">
+  <meta property="og:type" content="website">
+
+  <!-- Shared brand stylesheet -->
+  <link rel="stylesheet" href="../css/gemba.css">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --navy:       #0b1e3d;
+      --navy-mid:   #122a52;
+      --navy-light: #1a3a6e;
+      --gold:       #c9a84c;
+      --gold-light: #e8c96a;
+      --cream:      #f5f0e8;
+      --muted:      #8fa3bf;
+      --white:      #ffffff;
+    }
+
+    body {
+      padding-top: var(--gemba-navbar-h) !important;
+      background: var(--navy);
+      color: var(--cream);
+      font-family: 'DM Sans', sans-serif;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.4;
+    }
+
+    /* ── HERO ── */
+    .blog-hero {
+      position: relative;
+      z-index: 1;
+      padding: 64px 48px 56px;
+      background: linear-gradient(180deg, var(--navy) 0%, var(--navy-mid) 100%);
+      border-bottom: 1px solid rgba(201,168,76,0.1);
+    }
+
+    .blog-hero-inner { max-width: 720px; }
+
+    .blog-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(201, 168, 76, 0.12);
+      border: 1px solid rgba(201, 168, 76, 0.25);
+      border-radius: 100px;
+      padding: 5px 16px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 20px;
+    }
+
+    .blog-eyebrow::before {
+      content: '';
+      width: 5px; height: 5px;
+      background: var(--gold);
+      border-radius: 50%;
+    }
+
+    .blog-hero h1 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(44px, 7vw, 72px);
+      letter-spacing: 2px;
+      line-height: 1;
+      color: var(--white);
+      margin-bottom: 16px;
+    }
+
+    .blog-hero h1 em {
+      font-family: 'DM Serif Display', serif;
+      font-style: italic;
+      color: var(--gold);
+      font-size: 0.85em;
+    }
+
+    .blog-hero p {
+      font-size: 17px;
+      line-height: 1.7;
+      color: var(--muted);
+      max-width: 520px;
+      font-weight: 300;
+    }
+
+    /* ── MAIN ── */
+    .blog-main {
+      position: relative;
+      z-index: 1;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 64px 48px 100px;
+    }
+
+    /* ── SECTION HEADER ── */
+    .section-label {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 28px;
+    }
+
+    /* ── ARTICLE GRID ── */
+    .articles-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 24px;
+      margin-bottom: 64px;
+    }
+
+    .article-card {
+      background: var(--navy-mid);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 16px;
+      overflow: hidden;
+      text-decoration: none;
+      color: var(--cream);
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.25s, border-color 0.25s, box-shadow 0.25s;
+      position: relative;
+    }
+
+    .article-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--gold), transparent);
+      opacity: 0;
+      transition: opacity 0.25s;
+    }
+
+    .article-card:hover {
+      transform: translateY(-5px);
+      border-color: rgba(201, 168, 76, 0.25);
+      box-shadow: 0 20px 48px rgba(0,0,0,0.3);
+    }
+
+    .article-card:hover::before { opacity: 1; }
+
+    .card-body {
+      padding: 28px 28px 24px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .card-tag {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--gold);
+      background: rgba(201,168,76,0.1);
+      border-radius: 4px;
+      padding: 3px 10px;
+      margin-bottom: 14px;
+      width: fit-content;
+    }
+
+    .card-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.5rem;
+      letter-spacing: 1px;
+      line-height: 1.2;
+      color: var(--white);
+      margin-bottom: 12px;
+    }
+
+    .card-excerpt {
+      font-size: 14px;
+      line-height: 1.7;
+      color: var(--muted);
+      flex: 1;
+      margin-bottom: 20px;
+    }
+
+    .card-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 16px;
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .card-meta {
+      font-size: 12px;
+      color: rgba(143,163,191,0.6);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .card-read-link {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--gold);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      transition: gap 0.2s;
+    }
+
+    .article-card:hover .card-read-link { gap: 9px; }
+
+    /* ── COMING SOON CARD ── */
+    .card-coming {
+      background: rgba(255,255,255,0.02);
+      border: 1px dashed rgba(201,168,76,0.2);
+      border-radius: 16px;
+      padding: 32px 28px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .card-coming-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background: rgba(201,168,76,0.08);
+      border: 1px solid rgba(201,168,76,0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .card-coming-icon svg { stroke: var(--gold); width: 22px; height: 22px; }
+
+    .card-coming-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.1rem;
+      letter-spacing: 1px;
+      color: rgba(245,240,232,0.4);
+      margin-bottom: 4px;
+    }
+
+    .card-coming-desc {
+      font-size: 13px;
+      color: rgba(143,163,191,0.5);
+    }
+
+    /* ── NEWSLETTER STRIP ── */
+    .newsletter-strip {
+      background: linear-gradient(135deg, var(--navy-mid), var(--navy-light));
+      border: 1px solid rgba(201,168,76,0.15);
+      border-radius: 16px;
+      padding: 40px 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 32px;
+      flex-wrap: wrap;
+    }
+
+    .newsletter-text strong {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.6rem;
+      letter-spacing: 1px;
+      color: var(--white);
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    .newsletter-text p {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.6;
+      max-width: 380px;
+    }
+
+    .newsletter-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--gold);
+      color: var(--navy);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      padding: 13px 28px;
+      border-radius: 10px;
+      text-decoration: none;
+      white-space: nowrap;
+      transition: background 0.2s, transform 0.2s;
+      flex-shrink: 0;
+    }
+
+    .newsletter-btn:hover { background: var(--gold-light); transform: translateY(-2px); }
+
+    /* ── FOOTER ── */
+    footer {
+      position: relative;
+      z-index: 1;
+      background: #070f1e;
+      padding: 40px 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 20px;
+      border-top: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .footer-logo strong {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 18px;
+      letter-spacing: 2px;
+      color: var(--cream);
+      font-weight: 400;
+      display: block;
+    }
+
+    .footer-logo span {
+      font-size: 10px;
+      color: var(--muted);
+      letter-spacing: 2px;
+      margin-top: 3px;
+      display: block;
+    }
+
+    .footer-links { display: flex; gap: 20px; flex-wrap: wrap; }
+    .footer-links a { color: var(--muted); text-decoration: none; font-size: 13px; transition: color 0.2s; }
+    .footer-links a:hover { color: var(--gold); }
+    .footer-copy { font-size: 12px; color: rgba(143,163,191,0.4); }
+
+    @media (max-width: 768px) {
+      .blog-hero { padding: 48px 24px 40px; }
+      .blog-main { padding: 48px 24px 72px; }
+      .newsletter-strip { padding: 32px 24px; }
+      footer { padding: 36px 24px; flex-direction: column; align-items: flex-start; }
+    }
+
+    @media (max-width: 500px) {
+      .articles-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── NAVBAR ── -->
+  <nav class="gemba-nav">
+    <a href="/" class="gemba-nav-logo">
+      <svg class="gemba-nav-mark" viewBox="0 0 32 32" fill="none">
+        <rect width="32" height="32" rx="8" fill="#122a52"/>
+        <line x1="7" y1="9"  x2="25" y2="9"  stroke="#c9a84c" stroke-width="1.5" stroke-linecap="round" opacity="0.4"/>
+        <line x1="7" y1="16" x2="25" y2="16" stroke="#c9a84c" stroke-width="1.5" stroke-linecap="round" opacity="0.4"/>
+        <line x1="7" y1="23" x2="25" y2="23" stroke="#c9a84c" stroke-width="1.5" stroke-linecap="round" opacity="0.4"/>
+        <line x1="16" y1="5" x2="16" y2="27" stroke="#c9a84c" stroke-width="2" stroke-linecap="round"/>
+        <circle cx="16" cy="16" r="3.5" fill="#c9a84c"/>
+        <circle cx="16" cy="5"  r="2"   fill="#e8c96a"/>
+      </svg>
+      <div class="gemba-nav-text">
+        <strong>GembaGuitar</strong>
+        <span>Play. Learn. Master.</span>
+      </div>
+    </a>
+    <ul class="gemba-nav-links">
+      <li><a href="/chord-lookup">Chord Library</a></li>
+      <li><a href="/chord-generator">Chord Identifier</a></li>
+      <li><a href="/metronome">Metronome</a></li>
+      <li><a href="/tuner">Tuner</a></li>
+      <li><a href="/learn">Learn</a></li>
+      <li><a href="/blog" class="active">Blog</a></li>
+    </ul>
+    <a href="/" class="gemba-nav-home">← Home</a>
+  </nav>
+
+  <!-- ── HERO ── -->
+  <div class="blog-hero">
+    <div class="blog-hero-inner">
+      <div class="blog-eyebrow">Guitar Notes</div>
+      <h1>The <em>Blog</em></h1>
+      <p>Honest advice for self-taught players. No fluff, no gatekeeping — just what you actually need to know to get better.</p>
+    </div>
+  </div>
+
+  <!-- ── ARTICLES ── -->
+  <main class="blog-main">
+
+    <p class="section-label">Latest Posts</p>
+
+    <div class="articles-grid">
+
+      <!-- Published: What Guitar Should a Beginner Buy -->
+      <a href="/blog/what-guitar-should-a-beginner-buy/" class="article-card">
+        <div class="card-body">
+          <span class="card-tag">Beginner</span>
+          <div class="card-title">What Guitar Should a Beginner Buy? My $60 Setup &amp; What I Learned</div>
+          <p class="card-excerpt">Acoustic, classical, or electric — I break down the real differences, share what I started on, and give you the one piece of advice that actually matters when buying your first guitar.</p>
+          <div class="card-footer">
+            <span class="card-meta">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              March 2026 · 6 min
+            </span>
+            <span class="card-read-link">
+              Read
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </span>
+          </div>
+        </div>
+      </a>
+
+      <!-- Coming soon placeholders -->
+      <div class="card-coming">
+        <div class="card-coming-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+        </div>
+        <div>
+          <div class="card-coming-title">How to Read a Chord Diagram</div>
+          <div class="card-coming-desc">Coming soon</div>
+        </div>
+      </div>
+
+      <div class="card-coming">
+        <div class="card-coming-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 20 22 20"/><line x1="12" y1="9" x2="16" y2="17"/></svg>
+        </div>
+        <div>
+          <div class="card-coming-title">Why You Keep Losing the Beat (And How to Fix It)</div>
+          <div class="card-coming-desc">Coming soon</div>
+        </div>
+      </div>
+
+      <div class="card-coming">
+        <div class="card-coming-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+        </div>
+        <div>
+          <div class="card-coming-title">5 Songs Every Beginner Should Learn First</div>
+          <div class="card-coming-desc">Coming soon</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Newsletter CTA -->
+    <div class="newsletter-strip">
+      <div class="newsletter-text">
+        <strong>Get New Posts First</strong>
+        <p>Drop your email and we'll send you the free 15 Essential Guitar Chords PDF, plus new articles as they come out.</p>
+      </div>
+      <a href="/#email-signup" class="newsletter-btn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        Get the Free PDF
+      </a>
+    </div>
+
+  </main>
+
+  <!-- ── FOOTER ── -->
+  <footer>
+    <div class="footer-logo">
+      <strong>GembaGuitar</strong>
+      <span>Play. Learn. Master.</span>
+    </div>
+    <div class="footer-links">
+      <a href="/chord-lookup">Chord Library</a>
+      <a href="/chord-generator">Chord Identifier</a>
+      <a href="/metronome">Metronome</a>
+      <a href="/tuner">Tuner</a>
+      <a href="/learn">Learn</a>
+      <a href="/blog">Blog</a>
+      <a href="/about">About</a>
+    </div>
+    <span class="footer-copy">© 2026 GembaGuitar. All rights reserved.</span>
+  </footer>
+
+</body>
+</html>
