@@ -148,17 +148,17 @@
     /* DROPDOWN */
     .dropdown {
       position: absolute;
-      top: calc(100% + 8px);
+      top: 100%;
       left: 50%;
-      transform: translateX(-50%);
+      transform: translateX(-50%) translateY(-8px);
       background: var(--navy-mid);
       border: 1px solid rgba(201, 168, 76, 0.2);
       border-radius: 12px;
-      padding: 8px;
-      min-width: 200px;
+      padding: 16px 8px 8px; /* top padding bridges the gap so hover doesn't break */
+      margin-top: 0;
+      min-width: 220px;
       opacity: 0;
       pointer-events: none;
-      transform: translateX(-50%) translateY(-8px);
       transition: opacity 0.2s, transform 0.2s;
       box-shadow: 0 20px 40px rgba(0,0,0,0.4);
     }
@@ -784,6 +784,47 @@
     }
 
     /* ── MOBILE ── */
+    .nav-links.open {
+      display: flex !important;
+      flex-direction: column;
+      position: fixed;
+      top: 72px;
+      left: 0;
+      right: 0;
+      background: rgba(11, 30, 61, 0.98);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(201, 168, 76, 0.15);
+      padding: 12px 20px 20px;
+      gap: 2px;
+      z-index: 99;
+      box-shadow: 0 16px 40px rgba(0,0,0,0.4);
+    }
+
+    /* flatten the Tools dropdown inside mobile menu */
+    .nav-links.open .dropdown {
+      position: static;
+      opacity: 1;
+      pointer-events: all;
+      transform: none;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 10px;
+      padding: 6px;
+      margin: 4px 0 6px;
+      box-shadow: none;
+      min-width: unset;
+    }
+
+    .nav-links.open > li > button {
+      width: 100%;
+      justify-content: space-between;
+    }
+
+    /* hamburger → X animation */
+    .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .hamburger.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+    .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
     @media (max-width: 768px) {
       nav { padding: 0 20px; }
 
@@ -1134,5 +1175,37 @@
     <span class="footer-copy">© 2026 GembaGuitar. All rights reserved.</span>
   </footer>
 
+  <script>
+    (function () {
+      const hamburger = document.querySelector('.hamburger');
+      const navLinks  = document.querySelector('.nav-links');
+
+      // Toggle mobile menu open/closed
+      hamburger.addEventListener('click', function (e) {
+        e.stopPropagation();
+        const isOpen = navLinks.classList.toggle('open');
+        hamburger.classList.toggle('open', isOpen);
+        hamburger.setAttribute('aria-expanded', isOpen);
+      });
+
+      // Close menu when clicking outside
+      document.addEventListener('click', function (e) {
+        if (!navLinks.contains(e.target) && !hamburger.contains(e.target)) {
+          navLinks.classList.remove('open');
+          hamburger.classList.remove('open');
+          hamburger.setAttribute('aria-expanded', false);
+        }
+      });
+
+      // Close menu when a link is clicked
+      navLinks.querySelectorAll('a').forEach(function (link) {
+        link.addEventListener('click', function () {
+          navLinks.classList.remove('open');
+          hamburger.classList.remove('open');
+          hamburger.setAttribute('aria-expanded', false);
+        });
+      });
+    })();
+  </script>
 </body>
 </html>
