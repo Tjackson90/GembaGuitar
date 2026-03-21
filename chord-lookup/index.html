@@ -1,0 +1,979 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="description" content="Free guitar chord library — browse all 12 keys with multiple voicings for every chord type. Open and barre chord diagrams, instantly."/>
+  <meta name="keywords" content="guitar chord library, guitar chord diagrams, chord voicings, all guitar chords, free chord chart"/>
+  <meta property="og:title" content="Guitar Chord Library — GembaGuitar"/>
+  <meta property="og:description" content="Browse every guitar chord across all 12 keys. Multiple voicings per chord, instant diagrams, free download."/>
+  <meta property="og:url" content="https://gembaguitar.com/chord-lookup/"/>
+  <meta property="og:type" content="website"/>
+  <title>Chord Library — GembaGuitar</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/gemba.css" />
+  <style>
+    /* ── Local tokens ── */
+    :root {
+      --navy:      #0b1e3d;
+      --navy-mid:  #122a52;
+      --navy-dk:   #0d1b35;
+      --gold:      #c9a84c;
+      --gold-lt:   #e8c96a;
+      --gold-glow: rgba(201,168,76,0.2);
+      --cream:     #f5f0e8;
+      --muted:     #8fa3bf;
+      --bdr:       rgba(201,168,76,0.15);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'DM Sans', system-ui, sans-serif;
+      background: var(--navy);
+      color: var(--cream);
+      min-height: 100dvh;
+    }
+
+    /* ── Page layout ── */
+    .page-wrap {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 0 24px 80px;
+    }
+
+    /* ── Hero ── */
+    .hero {
+      text-align: center;
+      padding: 48px 0 36px;
+    }
+
+    .hero-pill {
+      display: inline-block;
+      background: rgba(201,168,76,0.12);
+      color: var(--gold);
+      border: 1px solid rgba(201,168,76,0.3);
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      padding: 4px 14px;
+      margin-bottom: 18px;
+    }
+
+    .hero h1 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(40px, 7vw, 72px);
+      letter-spacing: 3px;
+      color: var(--cream);
+      line-height: 1;
+      margin-bottom: 16px;
+    }
+
+    .hero h1 span { color: var(--gold); }
+
+    .hero-sub {
+      font-size: 16px;
+      color: var(--muted);
+      max-width: 520px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+
+    /* ── Selector blocks ── */
+    .selector-block {
+      margin-bottom: 16px;
+    }
+
+    .selector-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    /* ── Keys row ── */
+    .keys-row {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      padding-bottom: 4px;
+    }
+
+    .keys-row::-webkit-scrollbar { display: none; }
+
+    .key-btn {
+      flex: 0 0 auto;
+      min-width: 64px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+      border: 1px solid var(--bdr);
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      padding: 8px 6px;
+      line-height: 1;
+      font-family: 'DM Sans', system-ui, sans-serif;
+    }
+
+    .key-btn.natural {
+      background: var(--navy-mid);
+      padding-top: 12px;
+      padding-bottom: 12px;
+    }
+
+    .key-btn.accidental {
+      background: var(--navy-dk);
+    }
+
+    .key-btn .key-main {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--cream);
+      line-height: 1;
+      transition: color 0.15s ease;
+    }
+
+    .key-btn .key-flat {
+      font-size: 10px;
+      font-weight: 500;
+      color: var(--gold);
+      line-height: 1;
+      transition: color 0.15s ease;
+    }
+
+    .key-btn:hover:not(.selected) {
+      background: rgba(201,168,76,0.08);
+      border-color: rgba(201,168,76,0.35);
+      transform: translateY(-1px);
+    }
+
+    .key-btn.selected {
+      background: var(--gold);
+      border-color: var(--gold);
+    }
+
+    .key-btn.selected .key-main {
+      color: var(--navy);
+    }
+
+    .key-btn.selected .key-flat {
+      color: var(--navy-dk);
+    }
+
+    /* ── Quality row ── */
+    .quality-row {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      padding-bottom: 4px;
+    }
+
+    .quality-row::-webkit-scrollbar { display: none; }
+
+    .qual-btn {
+      flex: 0 0 auto;
+      background: var(--navy-mid);
+      color: var(--muted);
+      border: 1px solid var(--bdr);
+      border-radius: 20px;
+      font-family: 'DM Sans', system-ui, sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 7px 18px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+    }
+
+    .qual-btn:hover:not(.selected) {
+      background: rgba(201,168,76,0.08);
+      color: var(--gold);
+      border-color: rgba(201,168,76,0.35);
+    }
+
+    .qual-btn.selected {
+      background: var(--gold);
+      color: var(--navy);
+      border-color: var(--gold);
+      font-weight: 700;
+    }
+
+    /* ── Chord info banner ── */
+    .chord-banner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      background: #0f2344;
+      border: 1px solid var(--bdr);
+      border-top: 3px solid var(--gold);
+      border-radius: 14px;
+      padding: 20px 28px;
+      margin: 20px 0 28px;
+      flex-wrap: wrap;
+    }
+
+    .banner-name {
+      font-family: 'Bebas Neue', sans-serif;
+      letter-spacing: 2px;
+    }
+
+    .banner-chord-root {
+      font-size: clamp(28px, 5vw, 42px);
+      color: var(--cream);
+      line-height: 1;
+      display: block;
+    }
+
+    .banner-chord-quality {
+      font-size: clamp(18px, 3vw, 26px);
+      color: var(--gold);
+      line-height: 1.1;
+      display: block;
+    }
+
+    .banner-tones {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .tone-pill {
+      background: rgba(201,168,76,0.1);
+      color: var(--gold-lt);
+      border: 1px solid rgba(201,168,76,0.3);
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 700;
+      padding: 5px 12px;
+      font-family: 'DM Sans', system-ui, sans-serif;
+      letter-spacing: 0.5px;
+    }
+
+    /* ── Cards grid ── */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    .chord-card {
+      background: var(--navy-mid);
+      border: 1px solid rgba(201,168,76,0.2);
+      border-top: 2px solid var(--gold);
+      border-radius: 16px;
+      padding: 18px 18px 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .chord-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+    }
+
+    .card-header {
+      width: 100%;
+      text-align: center;
+    }
+
+    .card-voicing-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--gold);
+    }
+
+    .svg-wrapper {
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 6px;
+      box-shadow: inset 0 2px 8px rgba(0,0,0,0.12);
+      line-height: 0;
+    }
+
+    .card-download {
+      width: 100%;
+      background: transparent;
+      color: var(--muted);
+      border: 1px solid var(--bdr);
+      border-radius: 8px;
+      font-family: 'DM Sans', system-ui, sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      padding: 8px 0;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .card-download:hover {
+      background: var(--gold);
+      color: var(--navy);
+      border-color: var(--gold);
+    }
+
+    /* ── Card animation ── */
+    .card-enter {
+      opacity: 0;
+      transform: translateY(8px);
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+
+    .card-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ── No voicings state ── */
+    .no-voicings {
+      grid-column: 1 / -1;
+      text-align: center;
+      color: var(--muted);
+      padding: 40px 0;
+      font-size: 15px;
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 639px) {
+      .page-wrap { padding: 0 16px 60px; }
+      .hero { padding: 32px 0 24px; }
+      .cards-grid { grid-template-columns: 1fr; }
+      .chord-banner { padding: 16px 20px; }
+      .key-btn { min-width: 54px; }
+    }
+
+    @media (min-width: 640px) and (max-width: 900px) {
+      .cards-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="gemba-nav">
+    <a href="/" class="gemba-nav-logo">
+      <svg class="gemba-nav-mark" viewBox="0 0 32 32" fill="none">
+        <rect width="32" height="32" rx="8" fill="#122a52"/>
+        <line x1="7" y1="9"  x2="25" y2="9"  stroke="#c9a84c" stroke-width="1.5" stroke-linecap="round" opacity="0.4"/>
+        <line x1="7" y1="16" x2="25" y2="16" stroke="#c9a84c" stroke-width="1.5" stroke-linecap="round" opacity="0.4"/>
+        <line x1="7" y1="23" x2="25" y2="23" stroke="#c9a84c" stroke-width="1.5" stroke-linecap="round" opacity="0.4"/>
+        <line x1="16" y1="5" x2="16" y2="27" stroke="#c9a84c" stroke-width="2" stroke-linecap="round"/>
+        <circle cx="16" cy="16" r="3.5" fill="#c9a84c"/>
+        <circle cx="16" cy="5"  r="2"   fill="#e8c96a"/>
+      </svg>
+      <div class="gemba-nav-text">
+        <strong>GembaGuitar</strong>
+        <span>Play. Learn. Master.</span>
+      </div>
+    </a>
+    <ul class="gemba-nav-links">
+      <li><a href="/chord-generator">Chords</a></li>
+      <li><a href="/metronome">Metronome</a></li>
+      <li><a href="/tuner">Tuner</a></li>
+      <li><a href="/learn">Learn</a></li>
+      <li><a href="/about">About</a></li>
+    </ul>
+    <a href="/" class="gemba-nav-home">&#8592; Home</a>
+  </nav>
+
+  <div class="page-wrap">
+
+    <!-- Hero -->
+    <section class="hero">
+      <div class="hero-pill">Chord Library</div>
+      <h1>Guitar Chord <span>Library</span></h1>
+      <p class="hero-sub">Select a key and chord type to see finger positions across the neck.</p>
+    </section>
+
+    <!-- Key Selector -->
+    <div class="selector-block">
+      <div class="selector-label">KEY</div>
+      <div class="keys-row" id="keysRow"></div>
+    </div>
+
+    <!-- Quality Selector -->
+    <div class="selector-block">
+      <div class="selector-label">TYPE</div>
+      <div class="quality-row" id="qualityRow"></div>
+    </div>
+
+    <!-- Chord Info Banner -->
+    <div class="chord-banner" id="chordBanner">
+      <div class="banner-name" id="bannerName"></div>
+      <div class="banner-tones" id="bannerTones"></div>
+    </div>
+
+    <!-- Cards -->
+    <div class="cards-grid" id="cardsGrid"></div>
+
+  </div><!-- /page-wrap -->
+
+  <script>
+  // ── SVG helpers ──────────────────────────────────────────────────────────────
+  const svgNS = "http://www.w3.org/2000/svg";
+  const clamp = (n, a, b) => Math.max(a, Math.min(b, n));
+
+  function el(tag, attrs = {}) {
+    const n = document.createElementNS(svgNS, tag);
+    for (const [k, v] of Object.entries(attrs)) n.setAttribute(k, String(v));
+    return n;
+  }
+
+  function txt(str, x, y, size, fill, anchor = "start", weight = "normal") {
+    const t = el("text", {
+      x, y, fill,
+      "font-size": size,
+      "font-family": "DM Sans, system-ui, sans-serif",
+      "text-anchor": anchor,
+      "font-weight": weight
+    });
+    t.textContent = str;
+    return t;
+  }
+
+  function strX(state, string, left, w) {
+    return left + (state.strings - string) * (w / (state.strings - 1));
+  }
+
+  // ── Vertical SVG renderer ────────────────────────────────────────────────────
+  function renderSVGVertical(state, L) {
+    const { pad, topText, leftText, gridW } = L;
+    const st   = state.style;
+    const left = pad + leftText;
+    const top  = pad + topText;
+    const h    = st.gridH;
+    const w    = gridW;
+    const dy   = h / state.fretsVisible;
+    const dx   = w / (state.strings - 1);
+    const titleY     = pad + 22;
+    const oxY        = pad + topText - 18;
+    const bottomPad  = st.showStringNames ? pad + 22 : pad;
+    const svgW = left + w + leftText;
+    const svgH = pad + topText + h + bottomPad;
+
+    const svg = document.createElementNS(svgNS, "svg");
+    svg.setAttribute("width",   svgW);
+    svg.setAttribute("height",  svgH);
+    svg.setAttribute("viewBox", `0 0 ${svgW} ${svgH}`);
+    svg.style.display      = "block";
+    svg.style.borderRadius = "14px";
+    svg.appendChild(el("rect", { x: 0, y: 0, width: svgW, height: svgH, fill: st.bgColor }));
+
+    const fg = st.fgColor;
+    const sw = st.strokeWidth;
+
+    // Title
+    if (state.title?.trim()) {
+      svg.appendChild(txt(state.title.trim(), svgW / 2, titleY, st.titleFontSize, fg, "middle", "800"));
+    }
+
+    // Fret position label
+    if (!st.hidePosition && state.startFret > 1) {
+      svg.appendChild(txt(`${state.startFret}fr`, pad, top + 26, 20, fg, "start", "900"));
+    }
+
+    // String lines (vertical)
+    for (let i = 0; i < state.strings; i++) {
+      const x = left + i * dx;
+      svg.appendChild(el("line", { x1: x, y1: top, x2: x, y2: top + h, stroke: fg, "stroke-width": sw, "stroke-linecap": "round" }));
+    }
+
+    // Fret lines (horizontal)
+    for (let f = 0; f <= state.fretsVisible; f++) {
+      const y    = top + f * dy;
+      const isNut = state.startFret === 1 && f === 0;
+      svg.appendChild(el("line", { x1: left, y1: y, x2: left + w, y2: y, stroke: fg, "stroke-width": isNut ? Math.max(sw * 3, 5) : sw, "stroke-linecap": "round" }));
+    }
+
+    // Fret markers
+    if (st.showFretMarkers) {
+      const marks = new Set([3, 5, 7, 9, 12]);
+      for (let i = 1; i <= state.fretsVisible; i++) {
+        const abs = state.startFret + i - 1;
+        if (!marks.has(abs)) continue;
+        const cy = top + (i - 0.5) * dy;
+        const r  = Math.max(sw * 1.8, 4);
+        if (abs === 12) {
+          svg.appendChild(el("circle", { cx: left + w / 2 - 18, cy, r, fill: "rgba(0,0,0,0.18)" }));
+          svg.appendChild(el("circle", { cx: left + w / 2 + 18, cy, r, fill: "rgba(0,0,0,0.18)" }));
+        } else {
+          svg.appendChild(el("circle", { cx: left + w / 2, cy, r, fill: "rgba(0,0,0,0.18)" }));
+        }
+      }
+    }
+
+    const fmap = new Map();
+    for (const f of state.fingers) fmap.set(f.string, f);
+
+    // O/X row above nut
+    const oxHitR = 18;
+    for (let s = 1; s <= state.strings; s++) {
+      if (fmap.has(s)) continue;
+      const x    = strX(state, s, left, w);
+      const mark = state.openMuted[s - 1] ?? "O";
+      svg.appendChild(el("rect", { x: x - oxHitR, y: oxY - oxHitR * 1.5, width: oxHitR * 2, height: oxHitR * 2, fill: "transparent" }));
+      svg.appendChild(txt(mark, x, oxY, 28, fg, "middle", "900"));
+    }
+
+    // Finger dots
+    for (const f of state.fingers) {
+      const fi = f.fret - state.startFret + 1;
+      if (fi < 1 || fi > state.fretsVisible) continue;
+      const cx = strX(state, f.string, left, w);
+      const cy = top + (fi - 0.5) * dy;
+      svg.appendChild(el("circle", { cx, cy, r: st.dotR, fill: fg }));
+      if (f.label?.trim()) {
+        svg.appendChild(txt(f.label.trim(), cx, cy + st.fingerFontSize * 0.35, st.fingerFontSize, st.bgColor, "middle", "900"));
+      }
+    }
+
+    // String names at bottom — E A D G B e (low to high, left to right)
+    if (st.showStringNames) {
+      const nameLabels = ['E', 'A', 'D', 'G', 'B', 'e'];
+      const nameY = top + h + 18;
+      for (let s = 1; s <= state.strings; s++) {
+        const labelIdx = state.strings - s;
+        const lbl = nameLabels[labelIdx] ?? `S${s}`;
+        const x   = strX(state, s, left, w);
+        svg.appendChild(txt(lbl, x, nameY, 13, fg, "middle", "700"));
+      }
+    }
+
+    return svg;
+  }
+
+  // ── Constants ────────────────────────────────────────────────────────────────
+  const L = { pad: 16, topText: 58, leftText: 26, gridW: 210 };
+
+  const NOTE_NAMES = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
+
+  const KEYS = [
+    { root: 'A',  display: 'A',  flat: null },
+    { root: 'A#', display: 'A#', flat: 'Bb' },
+    { root: 'B',  display: 'B',  flat: null },
+    { root: 'C',  display: 'C',  flat: null },
+    { root: 'C#', display: 'C#', flat: 'Db' },
+    { root: 'D',  display: 'D',  flat: null },
+    { root: 'D#', display: 'D#', flat: 'Eb' },
+    { root: 'E',  display: 'E',  flat: null },
+    { root: 'F',  display: 'F',  flat: null },
+    { root: 'F#', display: 'F#', flat: 'Gb' },
+    { root: 'G',  display: 'G',  flat: null },
+    { root: 'G#', display: 'G#', flat: 'Ab' },
+  ];
+
+  const QUALITIES = [
+    { qual: '',     label: 'Major',   shortLabel: 'Maj' },
+    { qual: 'm',    label: 'Minor',   shortLabel: 'Min' },
+    { qual: '7',    label: '7th',     shortLabel: '7' },
+    { qual: 'maj7', label: 'Major 7', shortLabel: 'M7' },
+    { qual: 'm7',   label: 'Minor 7', shortLabel: 'm7' },
+    { qual: 'sus2', label: 'Sus 2',   shortLabel: 'sus2' },
+    { qual: 'sus4', label: 'Sus 4',   shortLabel: 'sus4' },
+    { qual: 'dim',  label: 'Dim',     shortLabel: 'dim' },
+    { qual: 'aug',  label: 'Aug',     shortLabel: 'aug' },
+    { qual: 'add9', label: 'Add 9',   shortLabel: 'add9' },
+  ];
+
+  const QUAL_LABELS = {
+    '':     'Major',
+    'm':    'Minor',
+    '7':    'Dominant 7th',
+    'maj7': 'Major 7th',
+    'm7':   'Minor 7th',
+    'sus2': 'Sus 2',
+    'sus4': 'Sus 4',
+    'dim':  'Diminished',
+    'aug':  'Augmented',
+    'add9': 'Add 9',
+  };
+
+  const INTERVALS = {
+    '':     [0, 4, 7],
+    'm':    [0, 3, 7],
+    '7':    [0, 4, 7, 10],
+    'maj7': [0, 4, 7, 11],
+    'm7':   [0, 3, 7, 10],
+    'sus2': [0, 2, 7],
+    'sus4': [0, 5, 7],
+    'dim':  [0, 3, 6],
+    'aug':  [0, 4, 8],
+    'add9': [0, 2, 4, 7],
+  };
+
+  // ── Barre templates ──────────────────────────────────────────────────────────
+  const E_TEMPLATE = {
+    "":     [0, 2, 2, 1, 0, 0],
+    "m":    [0, 2, 2, 0, 0, 0],
+    "7":    [0, 2, 0, 1, 0, 0],
+    "maj7": [0, 2, 1, 1, 0, 0],
+    "m7":   [0, 2, 0, 0, 0, 0],
+    "sus4": [0, 2, 2, 2, 0, 0],
+    "sus2": [0, 2, 4, 4, 0, 0],
+    "aug":  [0, 3, 2, 1, 1, 0],
+    "add9": [0, 2, 2, 1, 0, 2],
+  };
+
+  const A_TEMPLATE = {
+    "":     [-1, 0, 2, 2, 2, 0],
+    "m":    [-1, 0, 2, 2, 1, 0],
+    "7":    [-1, 0, 2, 0, 2, 0],
+    "maj7": [-1, 0, 2, 1, 2, 0],
+    "m7":   [-1, 0, 2, 0, 1, 0],
+    "sus2": [-1, 0, 2, 2, 0, 0],
+    "sus4": [-1, 0, 2, 2, 3, 0],
+    "aug":  [-1, 0, 3, 2, 2, 1],
+    "add9": [-1, 0, 2, 4, 2, 2],
+    "dim":  [-1, 0, 1, 2, 1, -1],
+  };
+
+  const D_TEMPLATE = {
+    "":     [-1, -1, 0, 2, 3, 2],
+    "m":    [-1, -1, 0, 2, 3, 1],
+    "7":    [-1, -1, 0, 2, 1, 2],
+    "maj7": [-1, -1, 0, 2, 2, 2],
+    "m7":   [-1, -1, 0, 2, 1, 1],
+    "sus2": [-1, -1, 0, 2, 3, 0],
+    "sus4": [-1, -1, 0, 2, 3, 3],
+  };
+
+  // ── Open voicings ────────────────────────────────────────────────────────────
+  const OPEN_VOICINGS = {
+    "C":     [{ frets: [-1, 3, 2, 0, 1, 0],  label: "Open Position" }],
+    "C7":    [{ frets: [-1, 3, 2, 3, 1, 0],  label: "Open Position" }],
+    "Cmaj7": [{ frets: [-1, 3, 2, 0, 0, 0],  label: "Open Position" }],
+    "Csus2": [{ frets: [-1, 3, 0, 0, 1, 3],  label: "Open Position" }],
+    "Csus4": [{ frets: [-1, 3, 3, 0, 1, 1],  label: "Open Position" }],
+    "Cadd9": [{ frets: [-1, 3, 2, 0, 3, 0],  label: "Open Position" }],
+
+    "D":     [{ frets: [-1, -1, 0, 2, 3, 2], label: "Open Position" }],
+    "Dm":    [{ frets: [-1, -1, 0, 2, 3, 1], label: "Open Position" }],
+    "D7":    [{ frets: [-1, -1, 0, 2, 1, 2], label: "Open Position" }],
+    "Dmaj7": [{ frets: [-1, -1, 0, 2, 2, 2], label: "Open Position" }],
+    "Dm7":   [{ frets: [-1, -1, 0, 2, 1, 1], label: "Open Position" }],
+    "Dsus2": [{ frets: [-1, -1, 0, 2, 3, 0], label: "Open Position" }],
+    "Dsus4": [{ frets: [-1, -1, 0, 2, 3, 3], label: "Open Position" }],
+    "Dadd9": [{ frets: [-1, -1, 4, 2, 3, 0], label: "Open Position" }],
+
+    "E":     [{ frets: [0, 2, 2, 1, 0, 0],   label: "Open Position" }],
+    "Em":    [{ frets: [0, 2, 2, 0, 0, 0],   label: "Open Position" }],
+    "E7":    [{ frets: [0, 2, 0, 1, 0, 0],   label: "Open Position" }],
+    "Emaj7": [{ frets: [0, 2, 1, 1, 0, 0],   label: "Open Position" }],
+    "Em7":   [{ frets: [0, 2, 0, 0, 0, 0],   label: "Open Position" }],
+    "Esus4": [{ frets: [0, 2, 2, 2, 0, 0],   label: "Open Position" }],
+    "Eaug":  [{ frets: [0, 3, 2, 1, 1, 0],   label: "Open Position" }],
+
+    "F":     [{ frets: [1, 3, 3, 2, 1, 1],   label: "E-shape · Barre 1" }],
+    "Fm":    [{ frets: [1, 3, 3, 1, 1, 1],   label: "E-shape · Barre 1" }],
+    "F7":    [{ frets: [1, 3, 1, 2, 1, 1],   label: "E-shape · Barre 1" }],
+    "Fmaj7": [{ frets: [-1, -1, 3, 2, 1, 0], label: "Open Position" }],
+
+    "G":     [{ frets: [3, 2, 0, 0, 0, 3],   label: "Open Position" }],
+    "G7":    [{ frets: [3, 2, 0, 0, 0, 1],   label: "Open Position" }],
+    "Gmaj7": [{ frets: [3, 2, 0, 0, 0, 2],   label: "Open Position" }],
+    "Gsus2": [{ frets: [3, 0, 0, 0, 3, 3],   label: "Open Position" }],
+    "Gadd9": [{ frets: [3, 2, 0, 2, 0, 3],   label: "Open Position" }],
+
+    "A":     [{ frets: [-1, 0, 2, 2, 2, 0],  label: "Open Position" }],
+    "Am":    [{ frets: [-1, 0, 2, 2, 1, 0],  label: "Open Position" }],
+    "A7":    [{ frets: [-1, 0, 2, 0, 2, 0],  label: "Open Position" }],
+    "Amaj7": [{ frets: [-1, 0, 2, 1, 2, 0],  label: "Open Position" }],
+    "Am7":   [{ frets: [-1, 0, 2, 0, 1, 0],  label: "Open Position" }],
+    "Asus2": [{ frets: [-1, 0, 2, 2, 0, 0],  label: "Open Position" }],
+    "Asus4": [{ frets: [-1, 0, 2, 2, 3, 0],  label: "Open Position" }],
+    "Aaug":  [{ frets: [-1, 0, 3, 2, 2, 1],  label: "Open Position" }],
+    "Adim":  [{ frets: [-1, 0, 1, 2, 1, -1], label: "Open Position" }],
+    "Aadd9": [{ frets: [-1, 0, 2, 4, 2, 0],  label: "Open Position" }],
+
+    "Bm":    [{ frets: [-1, 2, 4, 4, 3, 2],  label: "A-shape · Barre 2" }],
+    "B7":    [{ frets: [-1, 2, 1, 2, 0, 2],  label: "Open Position" }],
+  };
+
+  // ── Barre calculation ────────────────────────────────────────────────────────
+  function barreFor(root, shape) {
+    const openIdx = { E: 4, A: 9, D: 2 }[shape];
+    let b = (NOTE_NAMES.indexOf(root) - openIdx + 12) % 12;
+    if (b === 0) b = 12;
+    return b;
+  }
+
+  function generateBarre(root, qual, shape) {
+    const templates = { E: E_TEMPLATE, A: A_TEMPLATE, D: D_TEMPLATE };
+    const tmpl = templates[shape][qual];
+    if (!tmpl) return null;
+    const barre = barreFor(root, shape);
+    const frets = tmpl.map(f => f === -1 ? -1 : f + barre);
+    const shapeName = `${shape}-shape`;
+    return { frets, label: `${shapeName} \u00b7 Barre ${barre}`, shape, barre };
+  }
+
+  // ── Voicing logic ────────────────────────────────────────────────────────────
+  function getVoicings(root, qual) {
+    const key = root + qual;
+    const results = [];
+
+    // 1. Open voicing first (if exists)
+    const open = OPEN_VOICINGS[key];
+    if (open && open.length) results.push(open[0]);
+
+    // 2. Generate all barre shapes
+    const candidates = [];
+    for (const shape of ['E', 'A', 'D']) {
+      const v = generateBarre(root, qual, shape);
+      if (v) candidates.push({ v, pos: barreFor(root, shape) });
+    }
+
+    // Sort: prefer positions <= 9 first, then higher positions
+    candidates.sort((a, b) => {
+      const aScore = a.pos > 9 ? a.pos + 100 : a.pos;
+      const bScore = b.pos > 9 ? b.pos + 100 : b.pos;
+      return aScore - bScore;
+    });
+
+    // Add non-duplicate barres
+    for (const { v } of candidates) {
+      if (results.length >= 3) break;
+      if (!results.some(r => r.frets.every((f, i) => f === v.frets[i]))) {
+        results.push(v);
+      }
+    }
+
+    return results;
+  }
+
+  // ── fretsToState ─────────────────────────────────────────────────────────────
+  function fretsToState(fretArr) {
+    const fingers = [];
+    const openMuted = Array(6).fill("O");
+
+    for (let i = 0; i < 6; i++) {
+      const s = 6 - i;       // i=0 → string 6 (low E); i=5 → string 1 (high e)
+      const f = fretArr[i];
+      const omIdx = s - 1;   // openMuted[0]=string1, openMuted[5]=string6
+      if (f === -1) openMuted[omIdx] = "X";
+      else if (f > 0) fingers.push({ string: s, fret: f, label: "" });
+    }
+
+    const activeFrets = fretArr.filter(f => f > 0);
+    const hasOpen     = fretArr.some(f => f === 0);
+    const minF        = activeFrets.length ? Math.min(...activeFrets) : 1;
+    const maxF        = activeFrets.length ? Math.max(...activeFrets) : 5;
+    const startFret   = (hasOpen || minF <= 2) ? 1 : minF;
+    const fretsVisible = Math.min(Math.max(maxF - startFret + 2, 4), 6);
+
+    return {
+      strings: 6, fretsVisible, startFret, fingers, openMuted,
+      style: {
+        gridH: 210, dotR: 10, fingerFontSize: 11, titleFontSize: 0,
+        strokeWidth: 2, fgColor: "#0d1b35", bgColor: "#ffffff",
+        showFretMarkers: true, showStringNames: true, hidePosition: false
+      }
+    };
+  }
+
+  // ── SVG → PNG download ───────────────────────────────────────────────────────
+  function downloadSVGAsPNG(svgEl, filename) {
+    const serializer = new XMLSerializer();
+    const svgStr = serializer.serializeToString(svgEl);
+    const svgBlob = new Blob([svgStr], { type: 'image/svg+xml;charset=utf-8' });
+    const url = URL.createObjectURL(svgBlob);
+    const img = new Image();
+    img.onload = function() {
+      const scale = 2;
+      const canvas = document.createElement('canvas');
+      canvas.width  = img.width  * scale;
+      canvas.height = img.height * scale;
+      const ctx = canvas.getContext('2d');
+      ctx.scale(scale, scale);
+      ctx.drawImage(img, 0, 0);
+      URL.revokeObjectURL(url);
+      const a = document.createElement('a');
+      a.download = filename;
+      a.href = canvas.toDataURL('image/png');
+      a.click();
+    };
+    img.src = url;
+  }
+
+  // ── State ────────────────────────────────────────────────────────────────────
+  let state = { root: 'A', qual: '' };
+
+  function setState(root, qual) {
+    state = { root, qual };
+    renderAll();
+  }
+
+  // ── Render: key buttons ──────────────────────────────────────────────────────
+  function buildKeyButtons() {
+    const row = document.getElementById('keysRow');
+    row.innerHTML = '';
+    for (const k of KEYS) {
+      const btn = document.createElement('button');
+      btn.className = 'key-btn ' + (k.flat ? 'accidental' : 'natural');
+      btn.dataset.root = k.root;
+
+      const mainSpan = document.createElement('span');
+      mainSpan.className = 'key-main';
+      mainSpan.textContent = k.display;
+      btn.appendChild(mainSpan);
+
+      if (k.flat) {
+        const flatSpan = document.createElement('span');
+        flatSpan.className = 'key-flat';
+        flatSpan.textContent = k.flat;
+        btn.appendChild(flatSpan);
+      }
+
+      btn.addEventListener('click', () => setState(k.root, state.qual));
+      row.appendChild(btn);
+    }
+  }
+
+  function buildQualityButtons() {
+    const row = document.getElementById('qualityRow');
+    row.innerHTML = '';
+    for (const q of QUALITIES) {
+      const btn = document.createElement('button');
+      btn.className = 'qual-btn';
+      btn.dataset.qual = q.qual;
+      btn.textContent = q.label;
+      btn.addEventListener('click', () => setState(state.root, q.qual));
+      row.appendChild(btn);
+    }
+  }
+
+  function updateKeyButtons() {
+    document.querySelectorAll('.key-btn').forEach(btn => {
+      btn.classList.toggle('selected', btn.dataset.root === state.root);
+    });
+  }
+
+  function updateQualityButtons() {
+    document.querySelectorAll('.qual-btn').forEach(btn => {
+      btn.classList.toggle('selected', btn.dataset.qual === state.qual);
+    });
+  }
+
+  // ── Render: chord banner ─────────────────────────────────────────────────────
+  function updateChordBanner() {
+    const rootIdx  = NOTE_NAMES.indexOf(state.root);
+    const intervals = INTERVALS[state.qual] || [0];
+    const toneNames = intervals.map(iv => NOTE_NAMES[(rootIdx + iv) % 12]);
+
+    // Root display name (with enharmonic)
+    const keyInfo = KEYS.find(k => k.root === state.root);
+    const rootDisplay = keyInfo && keyInfo.flat
+      ? `${keyInfo.display} / ${keyInfo.flat}`
+      : state.root;
+
+    const qualLabel = QUAL_LABELS[state.qual] || state.qual;
+
+    // Banner name
+    const nameEl = document.getElementById('bannerName');
+    nameEl.innerHTML = `
+      <span class="banner-chord-root">${rootDisplay}</span>
+      <span class="banner-chord-quality">${qualLabel}</span>
+    `;
+
+    // Tone pills
+    const tonesEl = document.getElementById('bannerTones');
+    tonesEl.innerHTML = toneNames
+      .map(n => `<span class="tone-pill">${n}</span>`)
+      .join('');
+  }
+
+  // ── Render: cards ────────────────────────────────────────────────────────────
+  function renderCards() {
+    const grid = document.getElementById('cardsGrid');
+    grid.innerHTML = '';
+
+    const voicings = getVoicings(state.root, state.qual);
+
+    if (!voicings.length) {
+      const msg = document.createElement('div');
+      msg.className = 'no-voicings';
+      msg.textContent = 'No voicings available for this chord.';
+      grid.appendChild(msg);
+      return;
+    }
+
+    voicings.forEach((voicing, idx) => {
+      const card = document.createElement('div');
+      card.className = 'chord-card card-enter';
+
+      // Header
+      const header = document.createElement('div');
+      header.className = 'card-header';
+      const lbl = document.createElement('div');
+      lbl.className = 'card-voicing-label';
+      lbl.textContent = voicing.label;
+      header.appendChild(lbl);
+      card.appendChild(header);
+
+      // SVG
+      const svgState = fretsToState(voicing.frets);
+      const svgEl = renderSVGVertical(svgState, L);
+      const wrapper = document.createElement('div');
+      wrapper.className = 'svg-wrapper';
+      wrapper.appendChild(svgEl);
+      card.appendChild(wrapper);
+
+      // Download button
+      const dl = document.createElement('button');
+      dl.className = 'card-download';
+      dl.textContent = 'Download PNG';
+      const chordName = state.root + state.qual;
+      const dlLabel   = voicing.label.replace(/[\s·]+/g, '-').toLowerCase();
+      dl.addEventListener('click', () => {
+        downloadSVGAsPNG(svgEl, `${chordName}-${dlLabel}.png`);
+      });
+      card.appendChild(dl);
+
+      grid.appendChild(card);
+
+      // Animate in with stagger
+      requestAnimationFrame(() => {
+        setTimeout(() => {
+          card.classList.add('card-visible');
+        }, idx * 60);
+      });
+    });
+  }
+
+  // ── renderAll ────────────────────────────────────────────────────────────────
+  function renderAll() {
+    updateKeyButtons();
+    updateQualityButtons();
+    updateChordBanner();
+    renderCards();
+  }
+
+  // ── Init ─────────────────────────────────────────────────────────────────────
+  buildKeyButtons();
+  buildQualityButtons();
+  renderAll();
+  </script>
+
+</body>
+</html>

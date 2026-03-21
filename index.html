@@ -471,10 +471,14 @@
 
     .tools-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      grid-template-columns: repeat(2, 1fr);
       gap: 24px;
-      max-width: 1100px;
+      max-width: 900px;
       margin: 0 auto;
+    }
+
+    @media (max-width: 640px) {
+      .tools-grid { grid-template-columns: 1fr; }
     }
 
     .tool-card {
@@ -559,6 +563,30 @@
 
     .tool-card:hover .tool-link svg {
       transform: translateX(4px);
+    }
+
+    .tool-card-new {
+      border-color: rgba(201,168,76,0.3);
+      background: linear-gradient(145deg, #122a52 0%, #0f2244 100%);
+    }
+
+    .tool-card-new::before {
+      opacity: 0.6;
+    }
+
+    .new-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: var(--gold);
+      color: var(--navy);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      padding: 3px 10px;
+      border-radius: 4px;
+      margin-bottom: 16px;
     }
 
     /* ── START HERE BANNER ── */
@@ -823,6 +851,17 @@
           </svg>
         </button>
         <div class="dropdown">
+          <a href="/chord-lookup">
+            <div class="dropdown-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 6h16M4 10h16M4 14h8M4 18h6"/><circle cx="19" cy="17" r="3"/>
+              </svg>
+            </div>
+            <div class="dropdown-label">
+              <strong>Chord Library ✦ New</strong>
+              <span>All 12 keys, 3 voicings each</span>
+            </div>
+          </a>
           <a href="/chord-generator">
             <div class="dropdown-icon">
               <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -831,8 +870,8 @@
               </svg>
             </div>
             <div class="dropdown-label">
-              <strong>Chord Diagram Tool</strong>
-              <span>Visualize any chord</span>
+              <strong>Chord Identifier</strong>
+              <span>Click frets, name the chord</span>
             </div>
           </a>
           <a href="/metronome">
@@ -924,7 +963,7 @@
           <span class="stat-label">Chord Diagrams</span>
         </div>
         <div class="stat">
-          <span class="stat-number">3</span>
+          <span class="stat-number">4</span>
           <span class="stat-label">Free Tools</span>
         </div>
         <div class="stat">
@@ -940,9 +979,26 @@
     <div class="section-header">
       <p class="section-tag">The Toolkit</p>
       <h2 class="section-title">Everything You Need to Practice</h2>
-      <p class="section-desc">Three essential tools, built specifically for self-taught guitarists. No sign-up. No cost. Just play.</p>
+      <p class="section-desc">Four essential tools, built specifically for self-taught guitarists. No sign-up. No cost. Just play.</p>
     </div>
     <div class="tools-grid">
+
+      <a href="/chord-lookup" class="tool-card tool-card-new">
+        <div class="new-badge">✦ New</div>
+        <div class="tool-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 6h16M4 10h16M4 14h8M4 18h6"/><circle cx="19" cy="17" r="3"/>
+          </svg>
+        </div>
+        <h3>Chord Library</h3>
+        <p>Every chord across all 12 keys — open positions and barre shapes, with instant diagrams for every voicing. Your complete reference.</p>
+        <span class="tool-link">
+          Open Tool
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+          </svg>
+        </span>
+      </a>
 
       <a href="/chord-generator" class="tool-card">
         <div class="tool-icon">
@@ -1068,13 +1124,14 @@
       <span>Play. Learn. Master.</span>
     </div>
     <div class="footer-links">
-      <a href="/chord-generator">Chord Diagram Tool</a>
+      <a href="/chord-lookup">Chord Library</a>
+      <a href="/chord-generator">Chord Identifier</a>
       <a href="/metronome">Metronome</a>
       <a href="/tuner">Tuner</a>
       <a href="/learn">Learn</a>
       <a href="/about">About</a>
     </div>
-    <span class="footer-copy">© 2025 GembaGuitar. All rights reserved.</span>
+    <span class="footer-copy">© 2026 GembaGuitar. All rights reserved.</span>
   </footer>
 
 </body>
