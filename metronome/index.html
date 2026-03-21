@@ -9,147 +9,1472 @@
   <meta property="og:description" content="Free online metronome with tap tempo, time signatures, and swing. Built for guitar practice."/>
   <meta property="og:url" content="https://gembaguitar.com/metronome/"/>
   <meta property="og:type" content="website"/>
-  <title>METRO</title>
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css" />
-  <link rel="stylesheet" href="../css/gemba.css">
+  <title>Metronome — GembaGuitar</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy:       #0b1e3d;
+      --navy-mid:   #122a52;
+      --navy-light: #1a3a6e;
+      --gold:       #c9a84c;
+      --gold-light: #e8c96a;
+      --cream:      #f5f0e8;
+      --white:      #ffffff;
+      --muted:      #8fa3bf;
+      --danger:     #e05555;
+      --font-display: 'Bebas Neue', sans-serif;
+      --font-serif:   'DM Serif Display', serif;
+      --font-body:    'DM Sans', sans-serif;
+      --navbar-h:   64px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--navy);
+      color: var(--white);
+      font-family: var(--font-body);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.4;
+    }
+
+    /* ── NAVBAR ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 48px;
+      height: var(--navbar-h);
+      background: rgba(11, 30, 61, 0.95);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(201, 168, 76, 0.15);
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+    }
+
+    .nav-logo-mark { width: 34px; height: 34px; flex-shrink: 0; }
+
+    .nav-logo-text { display: flex; flex-direction: column; line-height: 1; }
+
+    .nav-logo-text strong {
+      font-family: var(--font-display);
+      font-size: 20px;
+      letter-spacing: 2px;
+      color: var(--white);
+      font-weight: 400;
+    }
+
+    .nav-logo-text span {
+      font-size: 8px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-top: 2px;
+    }
+
+    .nav-links { display: flex; align-items: center; gap: 4px; list-style: none; }
+
+    .nav-links a {
+      color: rgba(255,255,255,0.7);
+      font-size: 13px;
+      font-weight: 500;
+      text-decoration: none;
+      padding: 7px 14px;
+      border-radius: 6px;
+      transition: color 0.2s, background 0.2s;
+    }
+
+    .nav-links a:hover { color: var(--white); background: rgba(255,255,255,0.06); }
+    .nav-links a.active { color: var(--gold); }
+
+    .nav-back {
+      color: var(--muted) !important;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* ── PAGE ── */
+    .page {
+      position: relative;
+      z-index: 1;
+      padding-top: calc(var(--navbar-h) + 40px);
+      padding-bottom: 80px;
+      min-height: 100vh;
+    }
+
+    .wide-container {
+      width: 100%;
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 0 32px;
+    }
+
+    /* ── PAGE HEADER ── */
+    .page-header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .page-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(201, 168, 76, 0.12);
+      border: 1px solid rgba(201, 168, 76, 0.25);
+      border-radius: 100px;
+      padding: 5px 14px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 16px;
+    }
+
+    .page-eyebrow::before {
+      content: '';
+      width: 5px;
+      height: 5px;
+      background: var(--gold);
+      border-radius: 50%;
+    }
+
+    .page-title {
+      font-family: var(--font-display);
+      font-size: clamp(48px, 8vw, 72px);
+      letter-spacing: 2px;
+      color: var(--white);
+      line-height: 1;
+      margin-bottom: 10px;
+    }
+
+    .page-subtitle {
+      font-size: 15px;
+      color: var(--muted);
+      font-weight: 300;
+    }
+
+    /* ── MAIN TWO-COLUMN LAYOUT ── */
+    .metronome-layout {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    /* ── CARDS ── */
+    .card {
+      background: var(--navy-mid);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 20px;
+      padding: 28px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(201,168,76,0.35), transparent);
+    }
+
+    /* ── LEFT: STAGE AREA ── */
+    .stage-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      min-height: 400px;
+      background: var(--navy-mid);
+      background-image:
+        radial-gradient(ellipse 70% 50% at 50% 45%, rgba(201,168,76,0.04) 0%, transparent 100%);
+    }
+
+    .bpm-label {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+
+    #bpmDisplay {
+      font-family: var(--font-display);
+      font-size: 140px;
+      line-height: 1;
+      letter-spacing: -3px;
+      color: var(--white);
+      transition: color 0.1s, text-shadow 0.1s;
+      display: block;
+    }
+
+    #bpmDisplay.pulse {
+      color: var(--gold);
+      text-shadow: 0 0 40px rgba(201,168,76,0.25);
+    }
+
+    .bpm-tempo-label {
+      font-size: 13px;
+      color: var(--gold);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      font-weight: 500;
+      margin-top: 2px;
+      margin-bottom: 24px;
+      min-height: 20px;
+    }
+
+    .beat-dots {
+      display: flex;
+      justify-content: center;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-bottom: 24px;
+    }
+
+    .beat-dot {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+      transition: background 0.06s, transform 0.06s, box-shadow 0.06s;
+    }
+
+    .beat-dot.accent {
+      background: rgba(201,168,76,0.2);
+      border-color: rgba(201,168,76,0.4);
+    }
+
+    .beat-dot.active {
+      background: var(--white);
+      transform: scale(1.6);
+      box-shadow: 0 0 14px rgba(255,255,255,0.5);
+      border-color: transparent;
+    }
+
+    .beat-dot.accent.active {
+      background: var(--gold);
+      box-shadow: 0 0 22px rgba(201,168,76,0.7);
+    }
+
+    #beatCounter {
+      font-family: var(--font-display);
+      font-size: 64px;
+      line-height: 1;
+      letter-spacing: 2px;
+      color: rgba(255,255,255,0.15);
+      transition: transform 0.07s ease, color 0.07s ease;
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    #beatCounter.pulse {
+      transform: scale(1.1);
+      color: rgba(255,255,255,0.3);
+    }
+
+    #beatCounter.accent-pulse {
+      transform: scale(1.15);
+      color: var(--gold);
+    }
+
+    #status {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--muted);
+      min-height: 16px;
+    }
+
+    #status.running { color: var(--gold); }
+
+    /* ── RIGHT: CONTROLS PANEL ── */
+    .controls-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .controls-card {
+      background: var(--navy-mid);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 20px;
+      padding: 24px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .controls-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(201,168,76,0.35), transparent);
+    }
+
+    .controls-section-label {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 16px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+
+    /* BPM Adjust */
+    .bpm-adjust-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .nudge-btn {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.05);
+      color: var(--white);
+      font-size: 20px;
+      font-weight: 300;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.15s, border-color 0.15s, transform 0.1s;
+      flex-shrink: 0;
+    }
+
+    .nudge-btn:hover {
+      background: rgba(201,168,76,0.12);
+      border-color: rgba(201,168,76,0.4);
+      color: var(--gold);
+    }
+
+    .nudge-btn:active { transform: scale(0.92); }
+
+    #bpm {
+      flex: 1;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 10px;
+      color: var(--white);
+      font-family: var(--font-display);
+      font-size: 22px;
+      letter-spacing: 1px;
+      padding: 10px 12px;
+      text-align: center;
+      outline: none;
+    }
+
+    #bpm:focus { border-color: rgba(201,168,76,0.5); }
+
+    .slider-row { margin-bottom: 14px; }
+
+    input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 4px;
+      border-radius: 2px;
+      background: rgba(255,255,255,0.1);
+      outline: none;
+      cursor: pointer;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--gold);
+      border: 2px solid var(--navy);
+      box-shadow: 0 0 10px rgba(201,168,76,0.4);
+      cursor: pointer;
+      transition: transform 0.1s, box-shadow 0.1s;
+    }
+
+    input[type="range"]::-webkit-slider-thumb:hover {
+      transform: scale(1.2);
+      box-shadow: 0 0 16px rgba(201,168,76,0.6);
+    }
+
+    #bpmSlider {
+      background: linear-gradient(
+        to right,
+        var(--gold) 0%,
+        var(--gold) var(--fill, 33%),
+        rgba(255,255,255,0.1) var(--fill, 33%),
+        rgba(255,255,255,0.1) 100%
+      );
+    }
+
+    .quick-row {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 6px;
+    }
+
+    .quickBpmBtn {
+      padding: 8px 4px;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 8px;
+      background: rgba(255,255,255,0.03);
+      color: var(--muted);
+      font-family: var(--font-body);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .quickBpmBtn:hover {
+      border-color: rgba(201,168,76,0.35);
+      color: var(--gold);
+      background: rgba(201,168,76,0.06);
+    }
+
+    .quickBpmBtn.active {
+      border-color: var(--gold);
+      color: var(--gold);
+      background: rgba(201,168,76,0.1);
+    }
+
+    .setting-row { margin-bottom: 14px; }
+    .setting-row:last-child { margin-bottom: 0; }
+
+    .setting-label {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .range-val {
+      font-size: 12px;
+      color: var(--gold);
+      font-weight: 600;
+      letter-spacing: 0;
+    }
+
+    .settings-2col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    select {
+      width: 100%;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px;
+      color: var(--white);
+      font-family: var(--font-body);
+      font-size: 13px;
+      font-weight: 500;
+      padding: 9px 28px 9px 12px;
+      cursor: pointer;
+      outline: none;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238fa3bf' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+    }
+
+    select:focus { border-color: rgba(201,168,76,0.4); }
+
+    select option {
+      background: var(--navy-mid);
+      color: var(--white);
+      padding: 8px;
+    }
+
+    /* ── TRANSPORT ── */
+    .transport-bar {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .btn {
+      flex: 1;
+      padding: 18px 10px;
+      border: none;
+      border-radius: 14px;
+      font-family: var(--font-display);
+      font-size: 22px;
+      letter-spacing: 1px;
+      cursor: pointer;
+      transition: transform 0.1s, box-shadow 0.2s, background 0.2s;
+    }
+
+    .btn:active { transform: scale(0.97); }
+
+    .btn-start {
+      background: var(--gold);
+      color: var(--navy);
+      box-shadow: 0 4px 24px rgba(201,168,76,0.25);
+    }
+
+    .btn-start:hover {
+      background: var(--gold-light);
+      box-shadow: 0 4px 32px rgba(201,168,76,0.4);
+    }
+
+    .btn-stop {
+      background: rgba(255,255,255,0.06);
+      color: var(--muted);
+      border: 1px solid rgba(255,255,255,0.1);
+      flex: 0 0 72px;
+    }
+
+    .btn-stop:hover {
+      background: rgba(224,85,85,0.15);
+      border-color: rgba(224,85,85,0.4);
+      color: #f08080;
+    }
+
+    .btn-tap {
+      flex: 1;
+      padding: 15px 10px;
+      border-radius: 14px;
+      border: 1px solid rgba(201,168,76,0.3);
+      background: rgba(201,168,76,0.06);
+      color: var(--gold);
+      font-family: var(--font-display);
+      font-size: 18px;
+      letter-spacing: 1px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .btn-tap:hover {
+      background: rgba(201,168,76,0.12);
+      border-color: rgba(201,168,76,0.5);
+    }
+
+    .btn-tap:active { transform: scale(0.94); }
+
+    .btn-reset {
+      padding: 15px 24px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: transparent;
+      color: var(--muted);
+      font-family: var(--font-body);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .btn-reset:hover {
+      border-color: rgba(255,255,255,0.2);
+      color: var(--white);
+    }
+
+    .btn-reset:active { transform: scale(0.96); }
+
+    .secondary-transport { display: flex; gap: 10px; }
+
+    /* ── KEYBOARD HINT ── */
+    .keyboard-hint {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      margin-top: 20px;
+      padding-top: 16px;
+      border-top: 1px solid rgba(255,255,255,0.04);
+    }
+
+    .kb-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+      color: rgba(143,163,191,0.5);
+    }
+
+    .kb-item kbd {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 28px;
+      padding: 4px 7px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-bottom: 2px solid rgba(255,255,255,0.13);
+      border-radius: 5px;
+      font-family: var(--font-body);
+      font-size: 11px;
+      font-weight: 600;
+      color: rgba(255,255,255,0.4);
+    }
+
+    /* ── GUIDE SECTION ── */
+    .guide-section {
+      margin-top: 64px;
+      padding-top: 56px;
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .guide-header {
+      text-align: center;
+      margin-bottom: 36px;
+    }
+
+    .guide-eyebrow {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 10px;
+    }
+
+    .guide-title {
+      font-family: var(--font-display);
+      font-size: clamp(28px, 5vw, 40px);
+      letter-spacing: 1px;
+      color: var(--white);
+      line-height: 1.1;
+    }
+
+    .guide-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .guide-card {
+      background: var(--navy-mid);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 20px;
+      padding: 32px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .guide-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(201,168,76,0.3), transparent);
+    }
+
+    .guide-card-title {
+      font-family: var(--font-display);
+      font-size: 18px;
+      letter-spacing: 1px;
+      color: var(--gold);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .guide-card-title svg { stroke: var(--gold); flex-shrink: 0; }
+
+    .guide-steps {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .guide-steps li { display: flex; gap: 14px; align-items: flex-start; }
+
+    .step-num {
+      flex-shrink: 0;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: rgba(201,168,76,0.15);
+      border: 1px solid rgba(201,168,76,0.3);
+      color: var(--gold);
+      font-size: 12px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 1px;
+    }
+
+    .guide-steps strong { display: block; font-size: 14px; font-weight: 600; color: var(--white); margin-bottom: 4px; }
+    .guide-steps p { font-size: 13px; color: var(--muted); line-height: 1.6; }
+
+    .guide-tips {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .guide-tips li { display: flex; gap: 14px; align-items: flex-start; }
+
+    .tip-icon {
+      flex-shrink: 0;
+      width: 26px;
+      height: 26px;
+      border-radius: 8px;
+      background: rgba(201,168,76,0.12);
+      color: var(--gold);
+      font-size: 13px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 1px;
+    }
+
+    .guide-tips strong { display: block; font-size: 14px; font-weight: 600; color: var(--white); margin-bottom: 4px; }
+    .guide-tips p { font-size: 13px; color: var(--muted); line-height: 1.6; }
+
+    .shortcuts-card {
+      background: var(--navy-mid);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 20px;
+      padding: 28px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .shortcuts-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(201,168,76,0.3), transparent);
+    }
+
+    .shortcuts-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+
+    .shortcut { display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center; }
+
+    .shortcut kbd {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 44px;
+      padding: 8px 10px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-bottom: 2px solid rgba(255,255,255,0.2);
+      border-radius: 8px;
+      font-family: var(--font-body);
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--white);
+    }
+
+    .shortcut span { font-size: 11px; color: var(--muted); }
+
+    /* ── FOOTER ── */
+    footer {
+      position: relative;
+      z-index: 1;
+      background: #070f1e;
+      padding: 40px 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 20px;
+      border-top: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .footer-logo strong {
+      font-family: var(--font-display);
+      font-size: 18px;
+      letter-spacing: 2px;
+      color: var(--white);
+      font-weight: 400;
+      display: block;
+    }
+
+    .footer-logo span { font-size: 10px; color: var(--muted); letter-spacing: 2px; margin-top: 3px; display: block; }
+    .footer-links { display: flex; gap: 20px; flex-wrap: wrap; }
+    .footer-links a { color: var(--muted); text-decoration: none; font-size: 13px; transition: color 0.2s; }
+    .footer-links a:hover { color: var(--gold); }
+    .footer-copy { font-size: 12px; color: rgba(143,163,191,0.4); }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+      nav { padding: 0 20px; }
+      .nav-links { display: none; }
+      .wide-container { padding: 0 20px; }
+      .metronome-layout { grid-template-columns: 1fr; }
+      .stage-card { min-height: 300px; }
+      #bpmDisplay { font-size: 96px; }
+      #beatCounter { font-size: 48px; }
+      .guide-grid { grid-template-columns: 1fr; }
+      .shortcuts-grid { grid-template-columns: repeat(2, 1fr); }
+      .keyboard-hint { display: none; }
+      footer { padding: 36px 24px; flex-direction: column; align-items: flex-start; }
+    }
+
+    @media (max-width: 480px) {
+      #bpmDisplay { font-size: 72px; }
+      .settings-2col { grid-template-columns: 1fr; }
+    }
+  </style>
 </head>
 <body>
-  <div class="app">
-    <div class="header">
-      <h1>METRO</h1>
-      <div class="header-line"></div>
 
-      <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme" title="Toggle light/dark mode">
-        <span id="themeToggleIcon">☾</span>
-      </button>
+  <!-- ── NAVBAR ── -->
+  <nav>
+    <a href="/" class="nav-logo">
+      <svg class="nav-logo-mark" viewBox="0 0 34 34" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect width="34" height="34" rx="9" fill="#122a52"/>
+        <line x1="7" y1="9"  x2="27" y2="9"  stroke="#c9a84c" stroke-width="1.5" stroke-linecap="round" opacity="0.4"/>
+        <line x1="7" y1="17" x2="27" y2="17" stroke="#c9a84c" stroke-width="1.5" stroke-linecap="round" opacity="0.4"/>
+        <line x1="7" y1="25" x2="27" y2="25" stroke="#c9a84c" stroke-width="1.5" stroke-linecap="round" opacity="0.4"/>
+        <line x1="17" y1="5" x2="17" y2="29" stroke="#c9a84c" stroke-width="2" stroke-linecap="round"/>
+        <circle cx="17" cy="17" r="3.5" fill="#c9a84c"/>
+        <circle cx="17" cy="5"  r="2"   fill="#e8c96a"/>
+      </svg>
+      <div class="nav-logo-text">
+        <strong>GembaGuitar</strong>
+        <span>Play. Learn. Master.</span>
+      </div>
+    </a>
+    <ul class="nav-links">
+      <li><a href="/chord-lookup">Chord Library</a></li>
+      <li><a href="/chord-generator">Chord Identifier</a></li>
+      <li><a href="/metronome" class="active">Metronome</a></li>
+      <li><a href="/tuner">Tuner</a></li>
+      <li><a href="/learn">Learn</a></li>
+    </ul>
+    <a href="/" class="nav-back">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      Home
+    </a>
+  </nav>
 
-      <span class="header-tag">v3</span>
-    </div>
+  <!-- ── PAGE ── -->
+  <main class="page">
+    <div class="wide-container">
 
-    <div class="bpm-display">
-      <div class="bpm-label">Beats per minute</div>
+      <div class="page-header">
+        <div class="page-eyebrow">Practice Tool</div>
+        <h1 class="page-title">Metronome</h1>
+        <p class="page-subtitle">Keep perfect time. Every session.</p>
+      </div>
 
-      <div class="bpm-row">
-        <div>
-          <div id="bpmDisplay">120</div>
+      <!-- ── TWO-COLUMN LAYOUT ── -->
+      <div class="metronome-layout">
+
+        <!-- LEFT: Stage -->
+        <div class="card stage-card">
+          <div class="bpm-label">Beats per minute</div>
+          <span id="bpmDisplay">120</span>
           <div class="bpm-tempo-label" id="tempoLabel">Moderato</div>
+          <div id="beatDots" class="beat-dots"></div>
+          <span id="beatCounter">1</span>
+          <div id="status">Stopped</div>
         </div>
 
-        <div class="bpm-controls">
-          <div class="bpm-nudge">
-            <button class="nudge-btn" id="bpmDown" type="button">−</button>
-            <button class="nudge-btn" id="bpmUp" type="button">+</button>
+        <!-- RIGHT: Controls -->
+        <div class="controls-panel">
+          <div class="controls-card">
+            <div class="controls-section-label">Tempo</div>
+            <div class="bpm-adjust-row">
+              <button class="nudge-btn" id="bpmDown" type="button">−</button>
+              <input id="bpm" type="number" min="30" max="300" value="120" />
+              <button class="nudge-btn" id="bpmUp" type="button">+</button>
+            </div>
+            <div class="slider-row">
+              <input id="bpmSlider" type="range" min="30" max="300" value="120" />
+            </div>
+            <div class="quick-row">
+              <button class="quickBpmBtn" data-bpm="60">60</button>
+              <button class="quickBpmBtn" data-bpm="80">80</button>
+              <button class="quickBpmBtn" data-bpm="100">100</button>
+              <button class="quickBpmBtn" data-bpm="120">120</button>
+              <button class="quickBpmBtn" data-bpm="160">160</button>
+            </div>
           </div>
-          <input id="bpm" type="number" min="30" max="300" value="120" />
+
+          <div class="controls-card">
+            <div class="controls-section-label">Settings</div>
+            <div class="settings-2col">
+              <div class="setting-row">
+                <div class="setting-label">Time Sig</div>
+                <select id="timeSignature">
+                  <option value="4/4">4 / 4</option>
+                  <option value="3/4">3 / 4</option>
+                  <option value="2/4">2 / 4</option>
+                  <option value="5/4">5 / 4</option>
+                  <option value="6/8">6 / 8</option>
+                  <option value="7/4">7 / 4</option>
+                </select>
+              </div>
+              <div class="setting-row">
+                <div class="setting-label">Subdivision</div>
+                <select id="subdivision">
+                  <option value="quarter">Quarter ♩</option>
+                  <option value="eighth">8th ♪</option>
+                  <option value="sixteenth">16th ♬</option>
+                </select>
+              </div>
+            </div>
+            <div class="settings-2col">
+              <div class="setting-row">
+                <div class="setting-label">Sound</div>
+                <select id="soundSelect">
+                  <option value="wood">Wood Block</option>
+                  <option value="click">Sharp Click</option>
+                  <option value="beep">Soft Beep</option>
+                  <option value="cowbell">Cowbell</option>
+                </select>
+              </div>
+              <div class="setting-row">
+                <div class="setting-label">Volume <span class="range-val" id="volumeValue">70%</span></div>
+                <input id="volume" type="range" min="0" max="100" value="70" />
+              </div>
+            </div>
+            <div class="setting-row">
+              <div class="setting-label">Swing <span class="range-val" id="swingValue">50%</span></div>
+              <input id="swing" type="range" min="50" max="75" value="50" />
+            </div>
+          </div>
         </div>
       </div>
 
-      <div class="slider-row">
-        <input id="bpmSlider" type="range" min="30" max="300" value="120" />
+      <!-- ── TRANSPORT ── -->
+      <div class="transport-bar">
+        <button class="btn btn-start" id="startBtn" type="button">▶ Start</button>
+        <button class="btn btn-stop"  id="stopBtn"  type="button">■</button>
       </div>
-    </div>
-
-    <div class="quick-buttons">
-      <button class="quickBpmBtn" type="button" data-bpm="60">60</button>
-      <button class="quickBpmBtn" type="button" data-bpm="80">80</button>
-      <button class="quickBpmBtn" type="button" data-bpm="100">100</button>
-      <button class="quickBpmBtn" type="button" data-bpm="120">120</button>
-      <button class="quickBpmBtn" type="button" data-bpm="160">160</button>
-    </div>
-
-    <div class="settings-grid">
-      <div class="setting-block">
-        <div class="setting-label">Time Sig</div>
-        <select id="timeSignature">
-          <option value="4">4 / 4</option>
-          <option value="3">3 / 4</option>
-          <option value="2">2 / 4</option>
-          <option value="5">5 / 4</option>
-          <option value="6">6 / 8</option>
-          <option value="7">7 / 4</option>
-        </select>
+      <div class="secondary-transport">
+        <button class="btn-tap"   id="tapBtn"      type="button">Tap Tempo</button>
+        <button class="btn-reset" id="resetTapBtn" type="button">Reset Tap</button>
       </div>
 
-      <div class="setting-block">
-        <div class="setting-label">Subdivision</div>
-        <select id="subdivision">
-          <option value="1">Quarter ♩</option>
-          <option value="2">8th ♪</option>
-          <option value="4">16th ♬</option>
-        </select>
+      <div class="keyboard-hint">
+        <div class="kb-item"><kbd>Space</kbd> Start / Stop</div>
+        <div class="kb-item"><kbd>T</kbd> Tap Tempo</div>
+        <div class="kb-item"><kbd>↑</kbd><kbd>↓</kbd> BPM ± 1</div>
       </div>
 
-      <div class="setting-block">
-        <div class="setting-label">Sound</div>
-        <select id="soundSelect">
-          <option value="wood">Wood Block</option>
-          <option value="click">Sharp Click</option>
-          <option value="beep">Soft Beep</option>
-          <option value="cowbell">Cowbell</option>
-        </select>
-      </div>
-
-      <div class="setting-block">
-        <div class="setting-label">Volume <span class="range-val" id="volumeValue">70%</span></div>
-        <input id="volume" type="range" min="0" max="100" value="70" />
-      </div>
-
-      <div class="setting-block full">
-        <div class="setting-label setting-label-row">
-          <span>Swing (8ths)</span>
-          <span class="range-val" id="swingValue">50%</span>
+      <!-- ── GUIDE ── -->
+      <div class="guide-section">
+        <div class="guide-header">
+          <div class="guide-eyebrow">Getting the Most Out of It</div>
+          <h2 class="guide-title">How to Use the Metronome</h2>
         </div>
-        <input id="swing" type="range" min="50" max="75" value="50" />
+
+        <div class="guide-grid">
+          <div class="guide-card">
+            <h3 class="guide-card-title">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              Step by Step
+            </h3>
+            <ol class="guide-steps">
+              <li><span class="step-num">1</span><div><strong>Set your BPM</strong><p>Drag the slider, type a number, or use the +/− buttons. Quick presets (60, 80, 100…) let you jump to common tempos instantly.</p></div></li>
+              <li><span class="step-num">2</span><div><strong>Choose your time signature</strong><p>4/4 covers most songs. Use 3/4 for waltzes, 6/8 for compound feel. The beat counter and dots will reflect your choice.</p></div></li>
+              <li><span class="step-num">3</span><div><strong>Pick a subdivision</strong><p>Quarter notes for basic pulse. 8th notes to internalize the "and" between beats. 16ths for rapid runs and lead work.</p></div></li>
+              <li><span class="step-num">4</span><div><strong>Hit Start — or press Space</strong><p>Watch beat 1 glow gold. The large counter shows your position in the bar so you always know where you are.</p></div></li>
+              <li><span class="step-num">5</span><div><strong>Match a song with Tap Tempo</strong><p>Play a track and tap the button in time. After 3–4 taps the BPM locks in. Press <kbd>T</kbd> to tap with your keyboard.</p></div></li>
+            </ol>
+          </div>
+
+          <div class="guide-card">
+            <h3 class="guide-card-title">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              Best Practices
+            </h3>
+            <ul class="guide-tips">
+              <li><span class="tip-icon">♩</span><div><strong>Always start slow</strong><p>Set the metronome to 60–70% of your target tempo. Playing something perfectly at a lower BPM builds muscle memory faster than struggling at full speed.</p></div></li>
+              <li><span class="tip-icon">↑</span><div><strong>Increase in small steps</strong><p>Once you play cleanly three times in a row, nudge up by 5 BPM. Rushing the ramp-up is the most common practice mistake.</p></div></li>
+              <li><span class="tip-icon">1</span><div><strong>Lock onto beat 1</strong><p>The gold flash on beat 1 is your anchor. Feel it in your foot, your strum, or your breath — not just your ears.</p></div></li>
+              <li><span class="tip-icon">↻</span><div><strong>Subdivide to fix uneven playing</strong><p>If your notes rush or drag, switch to 8th or 16th subdivisions. Hearing the grid between beats reveals exactly where timing breaks down.</p></div></li>
+              <li><span class="tip-icon">~</span><div><strong>Use swing for feel</strong><p>Push the Swing slider past 50% to add the lopsided 8th-note groove that makes blues and jazz feel alive. Start around 62–65%.</p></div></li>
+              <li><span class="tip-icon">✓</span><div><strong>End every session in time</strong><p>Whatever you practice — scales, chords, solos — do the final rep with the metronome. Ending clean locks in the tempo before you put the guitar down.</p></div></li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="shortcuts-card">
+          <h3 class="guide-card-title" style="margin-bottom:16px;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="13" rx="2"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M8 14h8"/></svg>
+            Keyboard Shortcuts
+          </h3>
+          <div class="shortcuts-grid">
+            <div class="shortcut"><kbd>Space</kbd><span>Start / Stop</span></div>
+            <div class="shortcut"><kbd>T</kbd><span>Tap Tempo</span></div>
+            <div class="shortcut"><kbd>↑</kbd><span>BPM + 1</span></div>
+            <div class="shortcut"><kbd>↓</kbd><span>BPM − 1</span></div>
+          </div>
+        </div>
       </div>
+
     </div>
+  </main>
 
-    <div class="beat-section">
-      <div class="beat-counter-wrap">
-        <div id="beatCounter">1</div>
-      </div>
-
-      <div id="beatDots" class="beat-dots"></div>
-      <div id="status">Stopped</div>
-    </div>
-
-    <div class="transport">
-      <button class="btn btn-start" id="startBtn" type="button">▶ Start</button>
-      <button class="btn btn-stop" id="stopBtn" type="button">■ Stop</button>
-    </div>
-
-    <div class="secondary-transport">
-      <button class="btn-tap" id="tapBtn" type="button">Tap Tempo</button>
-      <button class="btn-reset" id="resetTapBtn" type="button">Reset Tap</button>
-    </div>
-  </div>
-
-  <script src="audio.js"></script>
-  <script src="ui.js"></script>
-  <script src="metronome.js"></script>
-  <script src="app.js"></script>
-</body>
-<nav class="gemba-nav">
-  <a href="/" class="gemba-nav-logo">
-    <svg class="gemba-nav-mark" viewBox="0 0 32 32" fill="none">
-      <rect width="32" height="32" rx="8" fill="#122a52"/>
-      <line x1="7" y1="9" x2="25" y2="9" stroke="#c9a84c" stroke-width="1.5" stroke-linecap="round" opacity="0.4"/>
-      <line x1="7" y1="16" x2="25" y2="16" stroke="#c9a84c" stroke-width="1.5" stroke-linecap="round" opacity="0.4"/>
-      <line x1="7" y1="23" x2="25" y2="23" stroke="#c9a84c" stroke-width="1.5" stroke-linecap="round" opacity="0.4"/>
-      <line x1="16" y1="5" x2="16" y2="27" stroke="#c9a84c" stroke-width="2" stroke-linecap="round"/>
-      <circle cx="16" cy="16" r="3.5" fill="#c9a84c"/>
-      <circle cx="16" cy="5" r="2" fill="#e8c96a"/>
-    </svg>
-    <div class="gemba-nav-text">
+  <!-- ── FOOTER ── -->
+  <footer>
+    <div class="footer-logo">
       <strong>GembaGuitar</strong>
       <span>Play. Learn. Master.</span>
     </div>
-  </a>
-  <ul class="gemba-nav-links">
-    <li><a href="/chord-generator">Chords</a></li>
-    <li><a href="/metronome">Metronome</a></li>
-    <li><a href="/tuner">Tuner</a></li>
-  </ul>
-  <a href="/" class="gemba-nav-home">← Home</a>
-</nav>
+    <div class="footer-links">
+      <a href="/chord-lookup">Chord Library</a>
+      <a href="/chord-generator">Chord Identifier</a>
+      <a href="/metronome">Metronome</a>
+      <a href="/tuner">Tuner</a>
+      <a href="/learn">Learn</a>
+      <a href="/about">About</a>
+    </div>
+    <span class="footer-copy">© 2026 GembaGuitar. All rights reserved.</span>
+  </footer>
+
+  <script>
+  window.AudioEngine = (function () {
+    let audioCtx = null;
+    let hasTriedLoading = false;
+    const sampleBuffers = { normal: null, accent: null };
+
+    function getCtx() {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      return audioCtx;
+    }
+
+    async function unlock() {
+      const ctx = getCtx();
+      if (ctx.state === "suspended") await ctx.resume();
+      if (!hasTriedLoading) { hasTriedLoading = true; loadSamples(); }
+    }
+
+    async function loadSample(url) {
+      try {
+        const ctx = getCtx();
+        const res = await fetch(url);
+        if (!res.ok) throw new Error(`Failed to load ${url}`);
+        const arr = await res.arrayBuffer();
+        return await ctx.decodeAudioData(arr);
+      } catch { return null; }
+    }
+
+    async function loadSamples() {
+      sampleBuffers.normal = await loadSample("beat.wav");
+      sampleBuffers.accent = await loadSample("accent.wav");
+    }
+
+    function tone(freq, type, dur, vol, when) {
+      const ctx = getCtx();
+      const osc  = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = type;
+      osc.frequency.setValueAtTime(freq, when);
+      gain.gain.setValueAtTime(Math.max(0.0001, vol), when);
+      gain.gain.exponentialRampToValueAtTime(0.0001, when + dur);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(when);
+      osc.stop(when + dur + 0.01);
+    }
+
+    function playBuffer(buffer, volume, when) {
+      if (!buffer) return false;
+      const ctx    = getCtx();
+      const source = ctx.createBufferSource();
+      const gain   = ctx.createGain();
+      source.buffer = buffer;
+      gain.gain.setValueAtTime(Math.max(0, Math.min(1, volume)), when);
+      source.connect(gain);
+      gain.connect(ctx.destination);
+      source.start(when);
+      return true;
+    }
+
+    function synthFallback(soundName, isAccent, masterVol, when) {
+      const v = Math.max(0, Math.min(1, masterVol));
+      switch (soundName) {
+        case "wood":
+          if (isAccent) { tone(1450,"triangle",0.018,0.24*v,when); tone(980,"triangle",0.020,0.10*v,when); }
+          else            tone(900,"triangle",0.018,0.13*v,when);
+          break;
+        case "click":
+          if (isAccent) { tone(2400,"square",0.008,0.16*v,when); tone(1800,"square",0.010,0.08*v,when); }
+          else            tone(1750,"square",0.007,0.08*v,when);
+          break;
+        case "beep":
+          tone(isAccent?1350:950,"sine",isAccent?0.03:0.025,isAccent?0.13*v:0.08*v,when);
+          break;
+        case "cowbell":
+          if (isAccent) { tone(1750,"square",0.014,0.15*v,when); tone(1180,"triangle",0.018,0.09*v,when); }
+          else            tone(1250,"square",0.012,0.08*v,when);
+          break;
+        default:
+          tone(isAccent?1400:1000,"triangle",0.02,isAccent?0.12*v:0.08*v,when);
+      }
+    }
+
+    function playAt(soundName, isAccent, masterVol, when) {
+      const v = Math.max(0, Math.min(1, masterVol));
+      const usedSample = isAccent
+        ? playBuffer(sampleBuffers.accent, v, when)
+        : playBuffer(sampleBuffers.normal, v, when);
+      if (!usedSample) synthFallback(soundName, isAccent, masterVol, when);
+    }
+
+    function currentTime() { return getCtx().currentTime; }
+
+    return { unlock, playAt, currentTime };
+  })();
+
+  window.UI = (function () {
+    function setStatus(text, running = false) {
+      const el = document.getElementById("status");
+      if (!el) return;
+      el.textContent = text;
+      el.className = running ? "running" : "";
+    }
+
+    function setBeat(beat) {
+      const counter = document.getElementById("beatCounter");
+      if (!counter) return;
+      counter.textContent = beat;
+      counter.classList.remove("pulse", "accent-pulse");
+      void counter.offsetWidth;
+      counter.classList.add(beat === 1 ? "accent-pulse" : "pulse");
+      setTimeout(() => counter.classList.remove("pulse", "accent-pulse"), 120);
+    }
+
+    function renderDots(beatsPerMeasure, currentBeat) {
+      const container = document.getElementById("beatDots");
+      if (!container) return;
+      container.innerHTML = "";
+      for (let i = 1; i <= beatsPerMeasure; i++) {
+        const dot = document.createElement("div");
+        dot.className = "beat-dot" +
+          (i === 1 ? " accent" : "") +
+          (i === currentBeat ? " active" : "");
+        container.appendChild(dot);
+      }
+    }
+
+    return { setStatus, setBeat, renderDots };
+  })();
+
+  window.Metronome = (function () {
+    let isRunning  = false;
+    let schedulerID = null;
+    let nextNoteTime = 0;
+    let currentBeat  = 1;
+    let currentPulse = 0;
+    let snapshot     = null;
+
+    const LOOKAHEAD   = 0.15;
+    const INTERVAL_MS = 25;
+
+    function getSubdivisionInfo(mode) {
+      switch (mode) {
+        case "quarter":   return { pulsesPerBeat: 1, label: "Quarter" };
+        case "eighth":    return { pulsesPerBeat: 2, label: "8th" };
+        case "triplet8":  return { pulsesPerBeat: 3, label: "8th Triplets" };
+        case "sixteenth": return { pulsesPerBeat: 4, label: "16th" };
+        case "triplet16": return { pulsesPerBeat: 6, label: "16th Triplets" };
+        default:          return { pulsesPerBeat: 1, label: "Quarter" };
+      }
+    }
+
+    function noteInterval(settings, pulseIndexInBeat) {
+      const beatDur = 60 / settings.bpm;
+      const info    = getSubdivisionInfo(settings.subdivision);
+      // Swing applies to eighth notes and sixteenth notes (swing pairs)
+      if (settings.swing > 50) {
+        const swing = settings.swing / 100;
+        if (settings.subdivision === "eighth") {
+          // 2 pulses per beat: swing the off-beat
+          return pulseIndexInBeat % 2 === 0 ? beatDur * swing : beatDur * (1 - swing);
+        }
+        if (settings.subdivision === "sixteenth") {
+          // 4 pulses per beat: swing in pairs (0-1 swung, 2-3 swung)
+          return pulseIndexInBeat % 2 === 0 ? (beatDur / 2) * swing : (beatDur / 2) * (1 - swing);
+        }
+      }
+      return beatDur / info.pulsesPerBeat;
+    }
+
+    function scheduleAhead() {
+      if (!isRunning || !snapshot) return;
+      const now  = window.AudioEngine.currentTime();
+      const info = getSubdivisionInfo(snapshot.subdivision);
+
+      while (nextNoteTime < now + LOOKAHEAD) {
+        const isMainBeat = currentPulse === 0;
+        const isAccent   = isMainBeat && currentBeat === 1;
+
+        window.AudioEngine.playAt(snapshot.sound, isAccent, snapshot.volume, nextNoteTime);
+
+        if (isMainBeat) {
+          const beat = currentBeat;
+          const bpm  = snapshot.beatsPerMeasure;
+          const delay = Math.max(0, (nextNoteTime - now) * 1000);
+          setTimeout(() => { window.UI.setBeat(beat); window.UI.renderDots(bpm, beat); }, delay);
+        }
+
+        nextNoteTime += noteInterval(snapshot, currentPulse);
+        currentPulse++;
+
+        if (currentPulse >= info.pulsesPerBeat) {
+          currentPulse = 0;
+          currentBeat++;
+          if (currentBeat > snapshot.beatsPerMeasure) currentBeat = 1;
+        }
+      }
+    }
+
+    function start(settings) {
+      stop();
+      snapshot     = { ...settings };
+      isRunning    = true;
+      currentBeat  = 1;
+      currentPulse = 0;
+      nextNoteTime = window.AudioEngine.currentTime() + 0.05;
+
+      const info = getSubdivisionInfo(settings.subdivision);
+      window.UI.renderDots(settings.beatsPerMeasure, 1);
+      window.UI.setStatus(`${settings.bpm} BPM · ${settings.timeSignatureLabel} · ${info.label}`, true);
+
+      schedulerID = setInterval(scheduleAhead, INTERVAL_MS);
+      scheduleAhead();
+    }
+
+    function stop() {
+      isRunning = false;
+      if (schedulerID) { clearInterval(schedulerID); schedulerID = null; }
+      currentBeat  = 1;
+      currentPulse = 0;
+      const bpm = snapshot ? snapshot.beatsPerMeasure : 4;
+      window.UI.setBeat(1);
+      window.UI.renderDots(bpm, 1);
+      window.UI.setStatus("Stopped", false);
+    }
+
+    function restartIfRunning(settings) { if (isRunning) start(settings); }
+    function updateLiveVolume(v) { if (snapshot) snapshot.volume = v; }
+    function updateLive(props) {
+      if (!snapshot || !isRunning) return;
+      Object.assign(snapshot, props);
+      const info = getSubdivisionInfo(snapshot.subdivision);
+      window.UI.setStatus(`${snapshot.bpm} BPM · ${snapshot.timeSignatureLabel} · ${info.label}`, true);
+    }
+    function getIsRunning() { return isRunning; }
+
+    return { start, stop, restartIfRunning, updateLiveVolume, updateLive, getIsRunning };
+  })();
+
+  (function () {
+    const bpmInput    = document.getElementById("bpm");
+    const bpmSlider   = document.getElementById("bpmSlider");
+    const bpmDisplay  = document.getElementById("bpmDisplay");
+    const tempoLabel  = document.getElementById("tempoLabel");
+    const timeSig     = document.getElementById("timeSignature");
+    const subdivision = document.getElementById("subdivision");
+    const swingEl     = document.getElementById("swing");
+    const swingVal    = document.getElementById("swingValue");
+    const soundSelect = document.getElementById("soundSelect");
+    const volumeEl    = document.getElementById("volume");
+    const volumeVal   = document.getElementById("volumeValue");
+    const startBtn    = document.getElementById("startBtn");
+    const stopBtn     = document.getElementById("stopBtn");
+    const tapBtn      = document.getElementById("tapBtn");
+    const resetTapBtn = document.getElementById("resetTapBtn");
+    const bpmUp       = document.getElementById("bpmUp");
+    const bpmDown     = document.getElementById("bpmDown");
+
+    let tapTimes = [];
+
+    const TEMPO_NAMES = [
+      [0,   40,  "Larghissimo"],
+      [40,  60,  "Largo"],
+      [60,  66,  "Larghetto"],
+      [66,  76,  "Adagio"],
+      [76,  108, "Andante"],
+      [108, 120, "Moderato"],
+      [120, 156, "Allegro"],
+      [156, 176, "Vivace"],
+      [176, 200, "Presto"],
+      [200, 999, "Prestissimo"]
+    ];
+
+    function getTempoName(bpm) {
+      for (const [lo, hi, name] of TEMPO_NAMES) {
+        if (bpm >= lo && bpm < hi) return name;
+      }
+      return "";
+    }
+
+    function clamp(value) {
+      const n = parseInt(value, 10);
+      return Number.isNaN(n) ? 120 : Math.min(300, Math.max(30, n));
+    }
+
+    function getTimeSignatureInfo(value) {
+      const [top, bottom] = value.split("/").map(Number);
+      return { beatsPerMeasure: top, beatUnit: bottom, label: `${top}/${bottom}` };
+    }
+
+    function syncBpm(value) {
+      const bpm = clamp(value);
+      bpmInput.value     = bpm;
+      bpmSlider.value    = bpm;
+      bpmDisplay.textContent = bpm;
+      tempoLabel.textContent = getTempoName(bpm);
+      const pct = (((bpm - 30) / (300 - 30)) * 100).toFixed(1) + "%";
+      bpmSlider.style.setProperty("--fill", pct);
+      document.querySelectorAll(".quickBpmBtn").forEach(btn => {
+        btn.classList.toggle("active", parseInt(btn.dataset.bpm, 10) === bpm);
+      });
+    }
+
+    function getSettings() {
+      const tsInfo = getTimeSignatureInfo(timeSig.value);
+      return {
+        bpm:                clamp(bpmInput.value),
+        beatsPerMeasure:    tsInfo.beatsPerMeasure,
+        beatUnit:           tsInfo.beatUnit,
+        timeSignatureLabel: tsInfo.label,
+        subdivision:        subdivision.value,
+        swing:              parseInt(swingEl.value, 10),
+        sound:              soundSelect.value,
+        volume:             parseInt(volumeEl.value, 10) / 100
+      };
+    }
+
+    function restart() { window.Metronome.restartIfRunning(getSettings()); }
+
+    // Live-update BPM/swing/sound without restarting the beat cycle
+    function liveUpdate() {
+      window.Metronome.updateLive({
+        bpm:    clamp(bpmInput.value),
+        swing:  parseInt(swingEl.value, 10),
+        sound:  soundSelect.value
+      });
+    }
+
+    function handleTap() {
+      const now = Date.now();
+      tapTimes.push(now);
+      if (tapTimes.length > 8) tapTimes.shift();
+      if (tapTimes.length >= 2) {
+        const intervals = tapTimes.slice(1).map((t, i) => t - tapTimes[i]);
+        const avg = intervals.reduce((a, b) => a + b, 0) / intervals.length;
+        syncBpm(Math.round(60000 / avg));
+        liveUpdate();
+      }
+      tapBtn.style.transform = "scale(0.93)";
+      setTimeout(() => { tapBtn.style.transform = ""; }, 100);
+    }
+
+    // BPM changes — live update, no restart
+    bpmSlider.addEventListener("input", () => { syncBpm(bpmSlider.value); liveUpdate(); });
+    bpmInput.addEventListener("input",  () => { syncBpm(bpmInput.value);  liveUpdate(); });
+    bpmUp.addEventListener("click",     () => { syncBpm(clamp(bpmInput.value) + 1); liveUpdate(); });
+    bpmDown.addEventListener("click",   () => { syncBpm(clamp(bpmInput.value) - 1); liveUpdate(); });
+
+    // Time sig & subdivision change beat structure — need full restart
+    timeSig.addEventListener("change", restart);
+    subdivision.addEventListener("change", restart);
+
+    // Swing & sound — live update, no restart
+    swingEl.addEventListener("input",  () => { swingVal.textContent  = swingEl.value  + "%"; liveUpdate(); });
+    volumeEl.addEventListener("input", () => {
+      volumeVal.textContent = volumeEl.value + "%";
+      window.Metronome.updateLiveVolume(parseInt(volumeEl.value, 10) / 100);
+    });
+    soundSelect.addEventListener("change", liveUpdate);
+
+    startBtn.addEventListener("click", async () => {
+      await window.AudioEngine.unlock();
+      window.Metronome.start(getSettings());
+    });
+
+    stopBtn.addEventListener("click", () => window.Metronome.stop());
+
+    tapBtn.addEventListener("click", async () => {
+      await window.AudioEngine.unlock();
+      handleTap();
+    });
+
+    resetTapBtn.addEventListener("click", () => {
+      tapTimes = [];
+      window.UI.setStatus("Tap reset", false);
+    });
+
+    document.querySelectorAll(".quickBpmBtn").forEach(btn => {
+      btn.addEventListener("click", () => { syncBpm(btn.dataset.bpm); liveUpdate(); });
+    });
+
+    document.addEventListener("keydown", async (e) => {
+      const tag = e.target.tagName;
+      if (tag === "INPUT" || tag === "SELECT") return;
+
+      if (e.key === " ") {
+        e.preventDefault();
+        if (window.Metronome.getIsRunning()) {
+          window.Metronome.stop();
+        } else {
+          await window.AudioEngine.unlock();
+          window.Metronome.start(getSettings());
+        }
+      }
+      if (e.key === "t" || e.key === "T") { await window.AudioEngine.unlock(); handleTap(); }
+      if (e.key === "ArrowUp")   { syncBpm(clamp(bpmInput.value) + 1); liveUpdate(); }
+      if (e.key === "ArrowDown") { syncBpm(clamp(bpmInput.value) - 1); liveUpdate(); }
+    });
+
+    syncBpm(120);
+    swingVal.textContent  = swingEl.value  + "%";
+    volumeVal.textContent = volumeEl.value + "%";
+    window.UI.renderDots(getTimeSignatureInfo(timeSig.value).beatsPerMeasure, 1);
+  })();
+  </script>
+</body>
 </html>
