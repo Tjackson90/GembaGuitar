@@ -1,0 +1,1571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tab Creator — GembaGuitar</title>
+  <meta name="description" content="Free online guitar tab creator with hammer-ons, pull-offs, slides, bends, vibrato and more. Print or download as PNG.">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/gemba.css">
+  <style>
+    /* ─── RESET ─── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    /* ─── TOKENS ─── */
+    :root {
+      --navy:       #0b1e3d;
+      --navy-mid:   #122a52;
+      --navy-light: #1a3a6e;
+      --gold:       #c9a84c;
+      --gold-light: #e8c96a;
+      --gold-glow:  rgba(201,168,76,0.18);
+      --cream:      #f5f0e8;
+      --muted:      #8fa3bf;
+      --tab-paper:  #fdfaf5;
+      --tab-line:   #bfae8a;
+      --tab-bar:    #8a7050;
+      --tab-text:   #1a0f00;
+      --cell-w:     38px;
+      --cell-h:     32px;
+      --label-w:    28px;
+      --cols:       8;
+      /* Technique badge colors */
+      --tc-connect: #1e6e1e;
+      --tc-fret:    #7a4a00;
+      --tc-artic:   #5a2a7a;
+      --tc-mute:    #4a4a00;
+    }
+
+    body {
+      background: var(--navy);
+      color: var(--cream);
+      font-family: 'DM Sans', sans-serif;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* ─── MAIN EDITOR LAYOUT ─── */
+    .editor-shell {
+      flex: 1;
+      display: flex;
+      overflow: hidden;
+    }
+
+    /* ─────────────────────────────────────────
+       SIDEBAR
+    ───────────────────────────────────────── */
+    .sidebar {
+      width: 178px;
+      flex-shrink: 0;
+      background: var(--navy-mid);
+      border-right: 1px solid rgba(201,168,76,0.1);
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      padding: 10px 0 20px;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(201,168,76,0.2) transparent;
+    }
+
+    .sidebar-section {
+      padding: 0 10px 12px;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      margin-bottom: 2px;
+    }
+
+    .sidebar-heading {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: var(--muted);
+      padding: 10px 2px 8px;
+    }
+
+    /* Duration grid */
+    .duration-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 4px;
+    }
+
+    .dur-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 5px 2px 4px;
+      border-radius: 5px;
+      border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.03);
+      cursor: pointer;
+      transition: all 0.15s;
+      gap: 2px;
+    }
+
+    .dur-btn:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.2); }
+    .dur-btn.active { background: rgba(201,168,76,0.15); border-color: var(--gold); }
+
+    .dur-symbol {
+      font-size: 16px;
+      line-height: 1;
+      color: var(--cream);
+    }
+
+    .dur-label {
+      font-size: 8px;
+      color: var(--muted);
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+
+    .dur-btn.active .dur-label { color: var(--gold); }
+
+    /* Technique buttons */
+    .tech-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 5px;
+    }
+
+    .tech-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 7px 4px 6px;
+      border-radius: 6px;
+      border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.03);
+      cursor: pointer;
+      transition: all 0.15s;
+      gap: 2px;
+      user-select: none;
+    }
+
+    .tech-btn:hover { background: rgba(255,255,255,0.09); border-color: rgba(255,255,255,0.22); }
+
+    .tech-btn.active {
+      border-color: var(--gold);
+      background: rgba(201,168,76,0.15);
+    }
+
+    .tech-sym {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 15px;
+      font-weight: 700;
+      line-height: 1;
+    }
+
+    .tech-lbl {
+      font-size: 8px;
+      font-weight: 600;
+      letter-spacing: 0.3px;
+      color: var(--muted);
+    }
+
+    .tech-btn.active .tech-lbl { color: var(--gold); }
+
+    /* Technique color groups */
+    .tech-btn[data-group="connect"] .tech-sym  { color: #6abf6a; }
+    .tech-btn[data-group="fret"]    .tech-sym  { color: #e8a040; }
+    .tech-btn[data-group="artic"]   .tech-sym  { color: #a070d0; }
+    .tech-btn[data-group="mute"]    .tech-sym  { color: #c0b040; }
+
+    .tech-btn.active[data-group="connect"] { border-color: #6abf6a; background: rgba(106,191,106,0.1); }
+    .tech-btn.active[data-group="fret"]    { border-color: #e8a040; background: rgba(232,160,64,0.1);  }
+    .tech-btn.active[data-group="artic"]   { border-color: #a070d0; background: rgba(160,112,208,0.1); }
+    .tech-btn.active[data-group="mute"]    { border-color: #c0b040; background: rgba(192,176,64,0.1);  }
+
+    /* Sidebar action buttons */
+    .sidebar-actions { padding: 0 10px; display: flex; flex-direction: column; gap: 6px; }
+
+    .sb-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 7px 10px;
+      border-radius: 6px;
+      border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.04);
+      color: var(--cream);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .sb-btn:hover { background: rgba(255,255,255,0.1); }
+    .sb-btn.danger { color: #e08090; }
+    .sb-btn.danger:hover { background: rgba(224,128,144,0.1); border-color: rgba(224,128,144,0.35); }
+
+    /* ─────────────────────────────────────────
+       MAIN AREA
+    ───────────────────────────────────────── */
+    .main-area {
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    /* ─── TOOLBAR ─── */
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: flex-end;
+      background: var(--navy-mid);
+      border-bottom: 1px solid rgba(201,168,76,0.1);
+      padding: 10px 16px;
+      flex-shrink: 0;
+    }
+
+    .meta-fields {
+      display: flex;
+      gap: 8px;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .meta-input {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 6px;
+      padding: 6px 10px;
+      color: var(--cream);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px;
+      outline: none;
+      transition: border-color 0.2s;
+      min-width: 0;
+    }
+    .meta-input:focus { border-color: var(--gold); }
+    .meta-input::placeholder { color: var(--muted); }
+    #titleInput  { flex: 1.5; font-weight: 600; font-size: 14px; }
+    #artistInput { flex: 1; }
+
+    .toolbar-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+
+    .tb-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 6px 12px;
+      border-radius: 6px;
+      border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.04);
+      color: var(--cream);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+    .tb-btn:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.22); }
+    .tb-btn.gold { background: var(--gold); border-color: var(--gold); color: var(--navy); font-weight: 700; }
+    .tb-btn.gold:hover { background: var(--gold-light); }
+
+    /* ─── STATUS BAR ─── */
+    .status-bar {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 5px 16px;
+      background: rgba(11,30,61,0.6);
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      font-size: 11px;
+      color: var(--muted);
+      flex-shrink: 0;
+      flex-wrap: wrap;
+    }
+
+    .status-item { display: flex; align-items: center; gap: 5px; }
+    .status-item strong { color: var(--gold); font-weight: 600; }
+
+    .active-tech-display {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-left: auto;
+    }
+
+    .active-tech-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* ─── TAB EDITOR AREA ─── */
+    .tab-area {
+      flex: 1;
+      padding: 20px 16px;
+      overflow: visible;
+    }
+
+    /* ─── TAB SYSTEM ─── */
+    .tab-system {
+      display: flex;
+      align-items: stretch;
+      margin-bottom: 28px;
+    }
+    .tab-system:last-child { margin-bottom: 0; }
+
+    /* String labels */
+    .string-labels {
+      width: var(--label-w);
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      background: var(--tab-paper);
+      border-radius: 3px 0 0 3px;
+    }
+
+    .string-label {
+      height: var(--cell-h);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 700;
+      color: #9a7820;
+      flex-shrink: 0;
+    }
+
+    /* Measures row */
+    .measures-row {
+      display: flex;
+      align-items: stretch;
+      background: var(--tab-paper);
+      flex-shrink: 0;
+    }
+
+    /* String lines via background-image on both label + measures rows */
+    .string-labels,
+    .measures-row {
+      background-color: var(--tab-paper);
+      background-image: repeating-linear-gradient(
+        to bottom,
+        transparent 0px,
+        transparent calc(var(--cell-h) - 1.5px),
+        var(--tab-line) calc(var(--cell-h) - 1.5px),
+        var(--tab-line) var(--cell-h)
+      );
+      background-size: 100% var(--cell-h);
+    }
+
+    /* Outer border for the whole tab system */
+    .tab-system-paper {
+      display: flex;
+      align-items: stretch;
+      border: 1.5px solid var(--tab-line);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    /* Measure */
+    .measure {
+      display: grid;
+      grid-template-columns: repeat(var(--cols), var(--cell-w));
+      grid-template-rows: repeat(6, var(--cell-h));
+      border-left: 2px solid var(--tab-bar);
+      position: relative;
+      flex-shrink: 0;
+    }
+
+    /* Measure number */
+    .measure-num {
+      position: absolute;
+      top: -16px;
+      left: 3px;
+      font-size: 9px;
+      color: rgba(138,112,80,0.7);
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 600;
+      pointer-events: none;
+      line-height: 1;
+    }
+
+    /* End bar */
+    .end-bar {
+      display: flex;
+      gap: 3px;
+      align-self: stretch;
+      align-items: stretch;
+      padding: 0 4px 0 2px;
+      flex-shrink: 0;
+    }
+    .end-bar-thin  { width: 2px; background: var(--tab-bar); }
+    .end-bar-thick { width: 4px; background: var(--tab-bar); }
+
+    /* ─── CELL WRAP ─── */
+    .cell-wrap {
+      position: relative;
+      width: var(--cell-w);
+      height: var(--cell-h);
+    }
+
+    /* Fret input */
+    .cell-fret {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      background: transparent;
+      border: none;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--tab-text);
+      text-align: center;
+      padding: 0 0 2px;
+      outline: none;
+      -webkit-appearance: none;
+      appearance: none;
+      caret-color: var(--gold);
+      cursor: pointer;
+      z-index: 1;
+    }
+
+    .cell-fret:focus,
+    .cell-wrap.focused .cell-fret {
+      background: rgba(201,168,76,0.18);
+    }
+
+    .cell-fret::-webkit-outer-spin-button,
+    .cell-fret::-webkit-inner-spin-button { -webkit-appearance: none; }
+
+    /* Technique badges */
+    .cell-badge {
+      position: absolute;
+      pointer-events: none;
+      z-index: 2;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+      line-height: 1;
+    }
+
+    /* Top badge: PM, LR */
+    .badge-top {
+      top: 1px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 7px;
+      white-space: nowrap;
+    }
+
+    /* Right badge: /, \ slide text — sits right edge */
+    .badge-right {
+      bottom: 3px;
+      right: -2px;
+      font-size: 10px;
+      z-index: 3;
+    }
+
+    /* SVG arc for hammer-on / pull-off */
+    .cell-arc-svg {
+      position: absolute;
+      top: 1px;
+      left: 50%;
+      overflow: visible;
+      pointer-events: none;
+      z-index: 4;
+    }
+
+    /* Vibrato badge */
+    .badge-vibrato {
+      top: 2px;
+      right: 1px;
+      font-size: 10px;
+      color: var(--tc-artic);
+    }
+
+    /* Natural harmonic: circle around fret number */
+    .cell-wrap.nh .cell-fret {
+      border: 1.5px solid var(--tc-artic);
+      border-radius: 50%;
+      width: 22px;
+      height: 22px;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      padding: 0;
+      font-size: 11px;
+    }
+
+    /* Tap: 'T' shown in accent color */
+    .cell-wrap.tap .cell-fret { color: #c05030; }
+
+    /* Bend indicator dot */
+    .badge-bend {
+      top: 1px;
+      right: 2px;
+      font-size: 8px;
+      font-weight: 700;
+    }
+
+    /* ─── KEYBOARD HINT ─── */
+    .editor-hint {
+      padding: 8px 16px;
+      font-size: 11px;
+      color: rgba(143,163,191,0.6);
+      border-top: 1px solid rgba(255,255,255,0.04);
+      flex-shrink: 0;
+      line-height: 1.8;
+    }
+
+    .editor-hint kbd {
+      display: inline-block;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 3px;
+      padding: 0px 5px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      color: var(--cream);
+    }
+
+    /* ─── PRINT HEADER ─── */
+    .print-only { display: none; }
+
+    /* ─── PRINT ─── */
+    @media print {
+      * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+      body { background: white !important; overflow: auto !important; height: auto !important; }
+      .gemba-nav, .toolbar, .status-bar, .sidebar, .editor-hint { display: none !important; }
+      .editor-shell { display: block !important; }
+      .main-area { overflow: visible !important; }
+      .tab-area { padding: 16px !important; }
+      .print-only {
+        display: block !important;
+        text-align: center;
+        margin-bottom: 20px;
+      }
+      .print-title {
+        display: block;
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 28px;
+        letter-spacing: 2px;
+        color: #111;
+      }
+      .print-artist {
+        display: block;
+        font-size: 13px;
+        color: #555;
+        margin-top: 3px;
+      }
+      .tab-system { break-inside: avoid; margin-bottom: 24px !important; }
+      .tab-system-paper { border-color: #999 !important; }
+      .string-labels, .measures-row {
+        background-color: white !important;
+        background-image: repeating-linear-gradient(
+          to bottom, transparent 0, transparent calc(var(--cell-h) - 1.5px),
+          #bbb calc(var(--cell-h) - 1.5px), #bbb var(--cell-h)
+        ) !important;
+      }
+      .string-label { color: #7a5a00 !important; }
+      .measure { border-left-color: #555 !important; }
+      .end-bar-thin, .end-bar-thick { background: #333 !important; }
+      .cell-fret { color: #111 !important; }
+      .cell-fret:focus, .cell-wrap.focused .cell-fret { background: transparent !important; }
+      .measure-num { display: none; }
+    }
+
+    /* ─── SCROLLBAR ─── */
+    .main-area::-webkit-scrollbar { width: 6px; }
+    .main-area::-webkit-scrollbar-track { background: transparent; }
+    .main-area::-webkit-scrollbar-thumb { background: rgba(201,168,76,0.2); border-radius: 3px; }
+  </style>
+</head>
+<body>
+
+<!-- ── NAV ── -->
+<nav class="gemba-nav">
+  <a href="/" class="gemba-nav-logo">
+    <svg class="gemba-nav-mark" viewBox="0 0 32 32" fill="none">
+      <rect width="32" height="32" rx="8" fill="#122a52"/>
+      <line x1="7" y1="9"  x2="25" y2="9"  stroke="#c9a84c" stroke-width="1.5" stroke-linecap="round" opacity="0.4"/>
+      <line x1="7" y1="16" x2="25" y2="16" stroke="#c9a84c" stroke-width="1.5" stroke-linecap="round" opacity="0.4"/>
+      <line x1="7" y1="23" x2="25" y2="23" stroke="#c9a84c" stroke-width="1.5" stroke-linecap="round" opacity="0.4"/>
+      <line x1="16" y1="5"  x2="16" y2="27" stroke="#c9a84c" stroke-width="2"   stroke-linecap="round"/>
+      <circle cx="16" cy="16" r="3.5" fill="#c9a84c"/>
+      <circle cx="16" cy="5"  r="2"   fill="#e8c96a"/>
+    </svg>
+    <div class="gemba-nav-text">
+      <strong>GembaGuitar</strong>
+      <span>Play. Learn. Master.</span>
+    </div>
+  </a>
+  <ul class="gemba-nav-links">
+    <li><a href="/chord-lookup">Chord Library</a></li>
+    <li><a href="/chord-generator">Chord Identifier</a></li>
+    <li><a href="/metronome">Metronome</a></li>
+    <li><a href="/tuner">Tuner</a></li>
+    <li><a href="/learn">Learn</a></li>
+    <li><a href="/blog">Blog</a></li>
+  </ul>
+  <a href="/" class="gemba-nav-home">← Home</a>
+</nav>
+
+<!-- ── SHELL ── -->
+<div class="editor-shell">
+
+  <!-- ════════ SIDEBAR ════════ -->
+  <div class="sidebar">
+
+    <!-- Duration -->
+    <div class="sidebar-section">
+      <div class="sidebar-heading">Duration</div>
+      <div class="duration-grid" id="durGrid">
+        <button class="dur-btn active" data-dur="w" title="Whole note">
+          <span class="dur-symbol">𝅝</span>
+          <span class="dur-label">Whole</span>
+        </button>
+        <button class="dur-btn" data-dur="h" title="Half note">
+          <span class="dur-symbol">𝅗𝅥</span>
+          <span class="dur-label">Half</span>
+        </button>
+        <button class="dur-btn" data-dur="q" title="Quarter note">
+          <span class="dur-symbol">♩</span>
+          <span class="dur-label">Quarter</span>
+        </button>
+        <button class="dur-btn" data-dur="e" title="Eighth note">
+          <span class="dur-symbol">♪</span>
+          <span class="dur-label">Eighth</span>
+        </button>
+        <button class="dur-btn" data-dur="s" title="Sixteenth note">
+          <span class="dur-symbol">♬</span>
+          <span class="dur-label">16th</span>
+        </button>
+        <button class="dur-btn" data-dur="t" title="Triplet">
+          <span class="dur-symbol" style="font-size:12px;font-family:'DM Sans'">3</span>
+          <span class="dur-label">Triplet</span>
+        </button>
+        <button class="dur-btn" data-dur="d" title="Dotted">
+          <span class="dur-symbol" style="font-size:16px">·</span>
+          <span class="dur-label">Dotted</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Techniques — Connections -->
+    <div class="sidebar-section">
+      <div class="sidebar-heading">Connect</div>
+      <div class="tech-grid">
+        <button class="tech-btn" data-tech="h" data-group="connect" title="Hammer-on">
+          <span class="tech-sym">h</span>
+          <span class="tech-lbl">Hammer-on</span>
+        </button>
+        <button class="tech-btn" data-tech="p" data-group="connect" title="Pull-off">
+          <span class="tech-sym">p</span>
+          <span class="tech-lbl">Pull-off</span>
+        </button>
+        <button class="tech-btn" data-tech="/" data-group="connect" title="Slide up">
+          <span class="tech-sym">/</span>
+          <span class="tech-lbl">Slide ↑</span>
+        </button>
+        <button class="tech-btn" data-tech="\" data-group="connect" title="Slide down">
+          <span class="tech-sym">\</span>
+          <span class="tech-lbl">Slide ↓</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Techniques — Fret -->
+    <div class="sidebar-section">
+      <div class="sidebar-heading">Fret</div>
+      <div class="tech-grid">
+        <button class="tech-btn" data-tech="b" data-group="fret" title="Bend">
+          <span class="tech-sym">b</span>
+          <span class="tech-lbl">Bend</span>
+        </button>
+        <button class="tech-btn" data-tech="br" data-group="fret" title="Bend &amp; Release">
+          <span class="tech-sym" style="font-size:11px">br</span>
+          <span class="tech-lbl">Bend+Rel</span>
+        </button>
+        <button class="tech-btn" data-tech="t" data-group="fret" title="Tap">
+          <span class="tech-sym">T</span>
+          <span class="tech-lbl">Tap</span>
+        </button>
+        <button class="tech-btn" data-tech="nh" data-group="fret" title="Natural Harmonic">
+          <span class="tech-sym" style="font-size:11px">NH</span>
+          <span class="tech-lbl">Harmonic</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Techniques — Articulation -->
+    <div class="sidebar-section">
+      <div class="sidebar-heading">Articulation</div>
+      <div class="tech-grid">
+        <button class="tech-btn" data-tech="~" data-group="artic" title="Vibrato">
+          <span class="tech-sym">~</span>
+          <span class="tech-lbl">Vibrato</span>
+        </button>
+        <button class="tech-btn" data-tech="wv" data-group="artic" title="Wide Vibrato">
+          <span class="tech-sym" style="font-size:10px">≈</span>
+          <span class="tech-lbl">Wide Vib</span>
+        </button>
+        <button class="tech-btn" data-tech="pm" data-group="mute" title="Palm Mute">
+          <span class="tech-sym" style="font-size:10px">PM</span>
+          <span class="tech-lbl">Palm Mute</span>
+        </button>
+        <button class="tech-btn" data-tech="lr" data-group="mute" title="Let Ring">
+          <span class="tech-sym" style="font-size:10px">LR</span>
+          <span class="tech-lbl">Let Ring</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Measure controls -->
+    <div class="sidebar-section">
+      <div class="sidebar-heading">Measures</div>
+      <div style="display:flex;flex-direction:column;gap:5px;padding:0 2px">
+        <button class="sb-btn" id="addMeasureBtn">+ Add Measure</button>
+        <button class="sb-btn danger" id="removeMeasureBtn">− Remove Last</button>
+        <button class="sb-btn danger" id="clearBtn">✕ Clear All</button>
+      </div>
+    </div>
+
+    <!-- Cols per measure -->
+    <div class="sidebar-section">
+      <div class="sidebar-heading">Columns / Measure</div>
+      <div style="padding:0 2px">
+        <select id="colsSel" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:6px;padding:6px 8px;color:var(--cream);font-family:'DM Sans',sans-serif;font-size:12px;outline:none">
+          <option value="4">4 — Quarter notes</option>
+          <option value="6">6 — Triplet</option>
+          <option value="8" selected>8 — Eighth notes</option>
+          <option value="12">12 — Triplet 8ths</option>
+          <option value="16">16 — Sixteenth notes</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Export -->
+    <div class="sidebar-section" style="border-bottom:none">
+      <div class="sidebar-heading">Export</div>
+      <div style="display:flex;flex-direction:column;gap:5px;padding:0 2px">
+        <button class="sb-btn" id="printBtn">⎙ Print</button>
+        <button class="sb-btn" style="background:rgba(201,168,76,0.15);border-color:var(--gold);color:var(--gold);font-weight:600" id="pngBtn">↓ Download PNG</button>
+      </div>
+    </div>
+
+  </div><!-- /sidebar -->
+
+  <!-- ════════ MAIN AREA ════════ -->
+  <div class="main-area">
+
+    <!-- Toolbar -->
+    <div class="toolbar">
+      <div class="meta-fields">
+        <input type="text" id="titleInput"  class="meta-input" placeholder="Song Title"        maxlength="80">
+        <input type="text" id="artistInput" class="meta-input" placeholder="Artist (optional)" maxlength="80">
+      </div>
+      <div class="toolbar-actions">
+        <button class="tb-btn" id="undoBtn">↩ Undo</button>
+        <button class="tb-btn gold" id="pngBtn2">↓ PNG</button>
+      </div>
+    </div>
+
+    <!-- Status bar -->
+    <div class="status-bar">
+      <div class="status-item">Measure <strong id="statusMeasure">—</strong></div>
+      <div class="status-item">Beat <strong id="statusBeat">—</strong></div>
+      <div class="status-item">String <strong id="statusString">—</strong></div>
+      <div class="active-tech-display" id="activeTechDisplay"></div>
+    </div>
+
+    <!-- Print header (screen hidden) -->
+    <div class="print-only" id="printHeader">
+      <span class="print-title"  id="printTitle"></span>
+      <span class="print-artist" id="printArtist"></span>
+    </div>
+
+    <!-- Tab editor -->
+    <div class="tab-area" id="tabArea">
+      <div id="tabEditor"></div>
+    </div>
+
+    <!-- Hints -->
+    <div class="editor-hint">
+      <kbd>← →</kbd> Beat &nbsp;·&nbsp; <kbd>↑ ↓</kbd> String &nbsp;·&nbsp;
+      <kbd>0–9</kbd> Fret &nbsp;·&nbsp; <kbd>Backspace</kbd> Clear &nbsp;·&nbsp;
+      <kbd>Tab</kbd>/<kbd>Enter</kbd> Advance &nbsp;·&nbsp;
+      Click a <b style="color:var(--gold)">technique button</b> to toggle it on the selected note
+    </div>
+
+  </div><!-- /main-area -->
+</div><!-- /editor-shell -->
+
+<script>
+// ─────────────────────────────────────────────────────────────────────────────
+// CONSTANTS & CONFIG
+// ─────────────────────────────────────────────────────────────────────────────
+const STRINGS = ['e', 'B', 'G', 'D', 'A', 'E'];
+const CELL_W  = 38;
+const BAR_W   = 2;
+
+// Technique definitions
+const TECHS = {
+  'h':  { sym: 'h',   label: 'Hammer-on',   group: 'connect', color: '#4abf4a', badge: 'right' },
+  'p':  { sym: 'p',   label: 'Pull-off',    group: 'connect', color: '#4abf4a', badge: 'right' },
+  '/':  { sym: '/',   label: 'Slide ↑',     group: 'connect', color: '#4a8abe', badge: 'right' },
+  '\\': { sym: '\\',  label: 'Slide ↓',     group: 'connect', color: '#4a8abe', badge: 'right' },
+  'b':  { sym: 'b',   label: 'Bend',        group: 'fret',    color: '#e8a040', badge: 'bend'  },
+  'br': { sym: 'br',  label: 'Bend+Rel',    group: 'fret',    color: '#e8a040', badge: 'bend'  },
+  't':  { sym: 'T',   label: 'Tap',         group: 'fret',    color: '#e05030', badge: 'tap'   },
+  'nh': { sym: 'NH',  label: 'Harmonic',    group: 'fret',    color: '#a060d0', badge: 'top'   },
+  '~':  { sym: '~',   label: 'Vibrato',     group: 'artic',   color: '#9860d0', badge: 'vib'   },
+  'wv': { sym: '≈',   label: 'Wide Vib',    group: 'artic',   color: '#9860d0', badge: 'vib'   },
+  'pm': { sym: 'PM',  label: 'Palm Mute',   group: 'mute',    color: '#b0a030', badge: 'top'   },
+  'lr': { sym: 'LR',  label: 'Let Ring',    group: 'mute',    color: '#30b0a0', badge: 'top'   },
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// STATE
+// ─────────────────────────────────────────────────────────────────────────────
+const state = {
+  notes:          {},   // "m:b:s" → fret string
+  fx:             {},   // "m:b:s" → Set of tech keys
+  measureCount:   4,
+  colsPerMeasure: 8,
+  title:          '',
+  artist:         '',
+  history:        [],   // undo stack (snapshots of notes + fx)
+};
+
+// Current focused cell
+let activeCell = null;  // { m, b, s } or null
+let measuresPerRow = 3;
+let advanceTimer = null;
+
+// ─────────────────────────────────────────────────────────────────────────────
+// NOTE + FX HELPERS
+// ─────────────────────────────────────────────────────────────────────────────
+const nkey    = (m, b, s)  => `${m}:${b}:${s}`;
+const getNote = (m, b, s)  => state.notes[nkey(m, b, s)] ?? '';
+const getFx   = (m, b, s)  => state.fx[nkey(m, b, s)] ?? new Set();
+
+function setNote(m, b, s, val) {
+  const n = parseInt(val, 10);
+  if (isNaN(n) || val === '') { delete state.notes[nkey(m, b, s)]; return; }
+  state.notes[nkey(m, b, s)] = String(Math.min(24, Math.max(0, n)));
+}
+
+function clearNote(m, b, s) {
+  delete state.notes[nkey(m, b, s)];
+}
+
+function toggleFx(m, b, s, tech) {
+  const k = nkey(m, b, s);
+  if (!state.fx[k]) state.fx[k] = new Set();
+  if (state.fx[k].has(tech)) state.fx[k].delete(tech);
+  else                        state.fx[k].add(tech);
+  if (state.fx[k].size === 0) delete state.fx[k];
+  updateCellBadges(m, b, s);
+  updateTechButtons();
+}
+
+function hasFx(m, b, s, tech) {
+  const k = nkey(m, b, s);
+  return state.fx[k] ? state.fx[k].has(tech) : false;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// UNDO
+// ─────────────────────────────────────────────────────────────────────────────
+function saveHistory() {
+  if (state.history.length > 50) state.history.shift();
+  state.history.push({
+    notes: { ...state.notes },
+    fx:    Object.fromEntries(Object.entries(state.fx).map(([k, v]) => [k, new Set(v)])),
+    measureCount: state.measureCount,
+  });
+}
+
+function undo() {
+  if (state.history.length === 0) return;
+  const snap = state.history.pop();
+  state.notes        = snap.notes;
+  state.fx           = snap.fx;
+  state.measureCount = snap.measureCount;
+  render();
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// LAYOUT CALCULATION
+// ─────────────────────────────────────────────────────────────────────────────
+function calcMeasuresPerRow() {
+  const area = document.getElementById('tabArea');
+  if (!area) return 3;
+  const avail = area.clientWidth - 32;   // subtract horizontal padding
+  const mw    = state.colsPerMeasure * CELL_W + BAR_W;
+  return Math.max(1, Math.floor(avail / mw));
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// RENDER
+// ─────────────────────────────────────────────────────────────────────────────
+function render(focusCoords) {
+  document.documentElement.style.setProperty('--cols', state.colsPerMeasure);
+  measuresPerRow = calcMeasuresPerRow();
+
+  const editor = document.getElementById('tabEditor');
+  editor.innerHTML = '';
+
+  const sysCount = Math.ceil(state.measureCount / measuresPerRow);
+
+  for (let sys = 0; sys < sysCount; sys++) {
+    const startM = sys * measuresPerRow;
+    const endM   = Math.min(startM + measuresPerRow, state.measureCount);
+    editor.appendChild(buildSystem(startM, endM));
+  }
+
+  if (focusCoords) {
+    const cell = getCellInput(focusCoords.m, focusCoords.b, focusCoords.s);
+    if (cell) { cell.focus(); cell.select(); }
+  } else if (activeCell) {
+    const cell = getCellInput(activeCell.m, activeCell.b, activeCell.s);
+    if (cell) cell.focus();
+  }
+
+  updateStatusBar();
+}
+
+function buildSystem(startM, endM) {
+  const sysEl  = document.createElement('div');
+  sysEl.className = 'tab-system';
+
+  const paper  = document.createElement('div');
+  paper.className = 'tab-system-paper';
+
+  // String labels
+  const labels = document.createElement('div');
+  labels.className = 'string-labels';
+  STRINGS.forEach(str => {
+    const lbl = document.createElement('span');
+    lbl.className  = 'string-label';
+    lbl.textContent = str;
+    labels.appendChild(lbl);
+  });
+
+  // Measures
+  const row = document.createElement('div');
+  row.className = 'measures-row';
+  for (let m = startM; m < endM; m++) row.appendChild(buildMeasure(m));
+
+  // End bar
+  const endBar   = document.createElement('div');
+  endBar.className = 'end-bar';
+  const thin  = document.createElement('div'); thin.className  = 'end-bar-thin';
+  const thick = document.createElement('div'); thick.className = 'end-bar-thick';
+  endBar.appendChild(thin);
+  endBar.appendChild(thick);
+  row.appendChild(endBar);
+
+  paper.appendChild(labels);
+  paper.appendChild(row);
+  sysEl.appendChild(paper);
+  return sysEl;
+}
+
+function buildMeasure(m) {
+  const mEl = document.createElement('div');
+  mEl.className = 'measure';
+  mEl.dataset.m  = m;
+
+  const num = document.createElement('span');
+  num.className  = 'measure-num';
+  num.textContent = m + 1;
+  mEl.appendChild(num);
+
+  // Grid: iterate strings (rows) then beats (cols)
+  for (let s = 0; s < STRINGS.length; s++) {
+    for (let b = 0; b < state.colsPerMeasure; b++) {
+      mEl.appendChild(buildCellWrap(m, b, s));
+    }
+  }
+  return mEl;
+}
+
+function buildCellWrap(m, b, s) {
+  const wrap = document.createElement('div');
+  wrap.className = 'cell-wrap';
+  wrap.dataset.m = m;
+  wrap.dataset.b = b;
+  wrap.dataset.s = s;
+
+  const inp = document.createElement('input');
+  inp.type      = 'text';
+  inp.className = 'cell-fret';
+  inp.maxLength = 2;
+  inp.setAttribute('inputmode', 'numeric');
+  inp.setAttribute('autocomplete', 'off');
+  inp.value = getNote(m, b, s);
+
+  inp.addEventListener('keydown', e => onCellKeydown(e, m, b, s));
+  inp.addEventListener('input',   e => onCellInput(e, m, b, s));
+  inp.addEventListener('focus',   ()  => onCellFocus(m, b, s, wrap));
+  inp.addEventListener('click',   ()  => inp.select());
+
+  wrap.appendChild(inp);
+  applyBadges(wrap, m, b, s);
+  return wrap;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// BADGES
+// ─────────────────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────────
+// SVG ARC (hammer-on / pull-off)
+// ─────────────────────────────────────────────────────────────────────────────
+function createArc(sym, color) {
+  const ns  = 'http://www.w3.org/2000/svg';
+  const W   = CELL_W;   // arc spans from center of this cell to center of next
+  const H   = 13;       // arc height in px
+
+  const svg = document.createElementNS(ns, 'svg');
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  svg.setAttribute('class', 'cell-arc-svg');
+  svg.style.width  = W + 'px';
+  svg.style.height = H + 'px';
+
+  // Quadratic bezier: from bottom-left to bottom-right, peaking near top-center
+  const path = document.createElementNS(ns, 'path');
+  path.setAttribute('d', `M 1,${H - 1} Q ${W / 2},1 ${W - 1},${H - 1}`);
+  path.setAttribute('fill', 'none');
+  path.setAttribute('stroke', color);
+  path.setAttribute('stroke-width', '1.5');
+  path.setAttribute('stroke-linecap', 'round');
+  svg.appendChild(path);
+
+  // Symbol (h or p) at the midpoint, just inside the arc
+  const txt = document.createElementNS(ns, 'text');
+  txt.setAttribute('x', W / 2);
+  txt.setAttribute('y', H - 2);
+  txt.setAttribute('text-anchor', 'middle');
+  txt.setAttribute('font-size', '8');
+  txt.setAttribute('font-weight', '700');
+  txt.setAttribute('font-family', 'DM Sans, sans-serif');
+  txt.setAttribute('fill', color);
+  txt.textContent = sym;
+  svg.appendChild(txt);
+
+  return svg;
+}
+
+function applyBadges(wrap, m, b, s) {
+  // Remove existing badges
+  wrap.querySelectorAll('.cell-badge').forEach(el => el.remove());
+  wrap.classList.remove('nh', 'tap');
+
+  const fx = getFx(m, b, s);
+  if (fx.size === 0) return;
+
+  // Top badges (PM, LR, NH)
+  const topFx = ['pm', 'lr', 'nh'].filter(k => fx.has(k));
+  if (topFx.length > 0) {
+    const badge = document.createElement('span');
+    badge.className = 'cell-badge badge-top';
+    badge.textContent = topFx.map(k => TECHS[k].sym).join(' ');
+    // Color by first tech
+    badge.style.color = TECHS[topFx[0]].color;
+    wrap.appendChild(badge);
+  }
+
+  // Vibrato / wide vibrato
+  const vibFx = ['~', 'wv'].filter(k => fx.has(k));
+  if (vibFx.length > 0) {
+    const badge = document.createElement('span');
+    badge.className = 'cell-badge badge-vibrato';
+    badge.textContent = vibFx.map(k => TECHS[k].sym).join('');
+    badge.style.color = TECHS['~'].color;
+    wrap.appendChild(badge);
+  }
+
+  // Bend
+  if (fx.has('b') || fx.has('br')) {
+    const badge = document.createElement('span');
+    badge.className = 'cell-badge badge-bend';
+    badge.textContent = fx.has('br') ? 'br' : 'b';
+    badge.style.color = TECHS['b'].color;
+    wrap.appendChild(badge);
+  }
+
+  // Hammer-on / Pull-off — SVG arc connecting to next cell
+  ['h', 'p'].filter(k => fx.has(k)).forEach(tech => {
+    wrap.appendChild(createArc(TECHS[tech].sym, TECHS[tech].color));
+  });
+
+  // Slides — text badge on right edge
+  const slideFx = ['/', '\\'].filter(k => fx.has(k));
+  if (slideFx.length > 0) {
+    const badge = document.createElement('span');
+    badge.className = 'cell-badge badge-right';
+    badge.textContent = slideFx.map(k => TECHS[k].sym).join('');
+    badge.style.color = TECHS[slideFx[0]].color;
+    wrap.appendChild(badge);
+  }
+
+  // Special class modifiers
+  if (fx.has('nh')) wrap.classList.add('nh');
+  if (fx.has('t'))  wrap.classList.add('tap');
+
+  // Tap badge (shown in different font color — already handled via .tap class)
+}
+
+function updateCellBadges(m, b, s) {
+  const wrap = getCellWrap(m, b, s);
+  if (wrap) applyBadges(wrap, m, b, s);
+}
+
+function getCellWrap(m, b, s) {
+  return document.querySelector(`.cell-wrap[data-m="${m}"][data-b="${b}"][data-s="${s}"]`);
+}
+
+function getCellInput(m, b, s) {
+  const wrap = getCellWrap(m, b, s);
+  return wrap ? wrap.querySelector('.cell-fret') : null;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// CELL EVENTS
+// ─────────────────────────────────────────────────────────────────────────────
+function onCellFocus(m, b, s, wrap) {
+  // Unfocus previous wrap
+  document.querySelectorAll('.cell-wrap.focused').forEach(el => el.classList.remove('focused'));
+  wrap.classList.add('focused');
+  activeCell = { m, b, s };
+  updateStatusBar();
+  updateTechButtons();
+}
+
+function onCellInput(e, m, b, s) {
+  let val = e.target.value.replace(/[^0-9]/g, '');
+  if (val.length > 2) val = val.slice(-2);
+  if (val !== '' && parseInt(val, 10) > 24) val = '24';
+  e.target.value = val;
+
+  clearTimeout(advanceTimer);
+  saveHistory();
+  setNote(m, b, s, val);
+
+  if (val.length === 2) {
+    advanceCursor(m, b, s);
+  } else if (val === '0') {
+    advanceTimer = setTimeout(() => advanceCursor(m, b, s), 300);
+  } else if (val.length === 1) {
+    advanceTimer = setTimeout(() => advanceCursor(m, b, s), 600);
+  }
+}
+
+function onCellKeydown(e, m, b, s) {
+  clearTimeout(advanceTimer);
+  switch (e.key) {
+    case 'ArrowRight': e.preventDefault(); moveTo(m, b + 1, s);  break;
+    case 'ArrowLeft':  e.preventDefault(); moveTo(m, b - 1, s);  break;
+    case 'ArrowDown':  e.preventDefault(); moveTo(m, b, s + 1);  break;
+    case 'ArrowUp':    e.preventDefault(); moveTo(m, b, s - 1);  break;
+    case 'Enter':      e.preventDefault(); moveTo(m, b + 1, s);  break;
+    case 'Tab':
+      e.preventDefault();
+      if (e.shiftKey) moveTo(m, b - 1, s);
+      else            moveTo(m, b + 1, s);
+      break;
+    case 'Backspace':
+      if (e.target.value === '') { e.preventDefault(); moveTo(m, b - 1, s); }
+      break;
+    case 'Delete':
+      saveHistory();
+      clearNote(m, b, s);
+      e.target.value = '';
+      break;
+  }
+}
+
+function advanceCursor(m, b, s) { moveTo(m, b + 1, s); }
+
+function moveTo(m, b, s) {
+  while (b >= state.colsPerMeasure) { b -= state.colsPerMeasure; m++; }
+  while (b < 0)                      { b += state.colsPerMeasure; m--; }
+  m = Math.max(0, Math.min(state.measureCount - 1, m));
+  b = Math.max(0, Math.min(state.colsPerMeasure - 1, b));
+  s = Math.max(0, Math.min(STRINGS.length - 1, s));
+
+  const inp = getCellInput(m, b, s);
+  if (inp) { inp.focus(); inp.select(); }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// TECHNIQUE BUTTON INTERACTION
+// ─────────────────────────────────────────────────────────────────────────────
+function updateTechButtons() {
+  document.querySelectorAll('.tech-btn').forEach(btn => {
+    const tech = btn.dataset.tech;
+    const on   = activeCell ? hasFx(activeCell.m, activeCell.b, activeCell.s, tech) : false;
+    btn.classList.toggle('active', on);
+  });
+  updateActiveTechDisplay();
+}
+
+function updateActiveTechDisplay() {
+  const el = document.getElementById('activeTechDisplay');
+  el.innerHTML = '';
+  if (!activeCell) return;
+
+  const fx = getFx(activeCell.m, activeCell.b, activeCell.s);
+  if (fx.size === 0) return;
+
+  const label = document.createElement('span');
+  label.style.cssText = 'font-size:10px;color:var(--muted);margin-right:4px';
+  label.textContent   = 'Active:';
+  el.appendChild(label);
+
+  fx.forEach(tech => {
+    if (!TECHS[tech]) return;
+    const chip = document.createElement('span');
+    chip.className = 'active-tech-chip';
+    chip.style.cssText = `background:${TECHS[tech].color}22;border:1px solid ${TECHS[tech].color}55;color:${TECHS[tech].color}`;
+    chip.textContent   = TECHS[tech].sym;
+    el.appendChild(chip);
+  });
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// STATUS BAR
+// ─────────────────────────────────────────────────────────────────────────────
+function updateStatusBar() {
+  if (!activeCell) return;
+  document.getElementById('statusMeasure').textContent = activeCell.m + 1;
+  document.getElementById('statusBeat').textContent    = activeCell.b + 1;
+  document.getElementById('statusString').textContent  = STRINGS[activeCell.s];
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// TOOLBAR ACTIONS
+// ─────────────────────────────────────────────────────────────────────────────
+function addMeasure() {
+  saveHistory();
+  state.measureCount++;
+  render({ m: state.measureCount - 1, b: 0, s: 0 });
+}
+
+function removeMeasure() {
+  if (state.measureCount <= 1) return;
+  saveHistory();
+  const m = state.measureCount - 1;
+  for (let b = 0; b < state.colsPerMeasure; b++)
+    for (let s = 0; s < STRINGS.length; s++) {
+      delete state.notes[nkey(m, b, s)];
+      delete state.fx[nkey(m, b, s)];
+    }
+  state.measureCount--;
+  if (activeCell && activeCell.m >= state.measureCount) activeCell = { m: state.measureCount - 1, b: 0, s: 0 };
+  render();
+}
+
+function clearAll() {
+  if (!confirm('Clear all notes and techniques? This cannot be undone.')) return;
+  saveHistory();
+  state.notes = {};
+  state.fx    = {};
+  render();
+}
+
+function changeColsPerMeasure(n) {
+  saveHistory();
+  if (n < state.colsPerMeasure) {
+    for (const k of Object.keys(state.notes)) {
+      if (parseInt(k.split(':')[1], 10) >= n) { delete state.notes[k]; delete state.fx[k]; }
+    }
+  }
+  state.colsPerMeasure = n;
+  render();
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// PRINT
+// ─────────────────────────────────────────────────────────────────────────────
+function doPrint() {
+  document.getElementById('printTitle').textContent  = state.title  || 'Untitled Tab';
+  document.getElementById('printArtist').textContent = state.artist || '';
+  window.print();
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// CANVAS PNG DOWNLOAD
+// ─────────────────────────────────────────────────────────────────────────────
+function doPNG() {
+  const canvas = buildCanvas();
+  canvas.toBlob(blob => {
+    const url = URL.createObjectURL(blob);
+    const a   = document.createElement('a');
+    a.href     = url;
+    a.download = (state.title || 'tab').replace(/[^a-z0-9]/gi, '_').toLowerCase() + '.png';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 2000);
+  }, 'image/png');
+}
+
+function buildCanvas() {
+  const SC      = 2;
+  const PAD     = 50;
+  const C_CW    = 40;
+  const C_CH    = 30;
+  const C_LABEL = 32;
+  const C_BAR   = 2;
+  const C_MPR   = 4;
+  const TITLE_H = 58;
+  const SYS_GAP = 38;
+
+  const mW     = state.colsPerMeasure * C_CW + C_BAR;
+  const sysW   = C_LABEL + C_MPR * mW + 10;
+  const totalW = PAD * 2 + sysW;
+  const sysH   = STRINGS.length * C_CH;
+  const sysCnt = Math.ceil(state.measureCount / C_MPR);
+  const totalH = PAD * 2 + TITLE_H + sysCnt * sysH + Math.max(0, sysCnt - 1) * SYS_GAP;
+
+  const canvas  = document.createElement('canvas');
+  canvas.width  = totalW * SC;
+  canvas.height = totalH * SC;
+  const ctx     = canvas.getContext('2d');
+  ctx.scale(SC, SC);
+
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, totalW, totalH);
+
+  // Title
+  ctx.textAlign = 'center';
+  ctx.fillStyle = '#0b1e3d';
+  ctx.font      = 'bold 24px Arial, sans-serif';
+  ctx.fillText(state.title || 'Untitled Tab', totalW / 2, PAD + 22);
+  if (state.artist) {
+    ctx.font      = '13px Arial, sans-serif';
+    ctx.fillStyle = '#666';
+    ctx.fillText(state.artist, totalW / 2, PAD + 42);
+  }
+
+  for (let sys = 0; sys < sysCnt; sys++) {
+    const startM = sys * C_MPR;
+    const endM   = Math.min(startM + C_MPR, state.measureCount);
+    const mCnt   = endM - startM;
+    const isLast = endM === state.measureCount;
+    const sysY   = PAD + TITLE_H + sys * (sysH + SYS_GAP);
+    const tabX   = PAD + C_LABEL;
+
+    // String labels + lines
+    for (let si = 0; si < STRINGS.length; si++) {
+      const cy = sysY + si * C_CH + C_CH / 2;
+
+      ctx.fillStyle = '#9a7820';
+      ctx.font      = 'bold 11px "Courier New", monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText(STRINGS[si], PAD + C_LABEL / 2, cy + 4);
+
+      ctx.strokeStyle = '#bfae8a';
+      ctx.lineWidth   = 1;
+      ctx.beginPath();
+      ctx.moveTo(tabX, cy);
+      ctx.lineTo(tabX + mCnt * mW + (isLast ? 8 : C_BAR), cy);
+      ctx.stroke();
+    }
+
+    // Measures + notes
+    for (let mi = 0; mi < mCnt; mi++) {
+      const m  = startM + mi;
+      const mX = tabX + mi * mW;
+
+      // Bar line
+      ctx.strokeStyle = '#8a7050';
+      ctx.lineWidth   = mi === 0 ? 2 : 1.5;
+      ctx.beginPath();
+      ctx.moveTo(mX, sysY);
+      ctx.lineTo(mX, sysY + sysH);
+      ctx.stroke();
+
+      // Notes + technique annotations
+      for (let si = 0; si < STRINGS.length; si++) {
+        for (let b = 0; b < state.colsPerMeasure; b++) {
+          const val = getNote(m, b, si);
+          const cx  = mX + C_BAR + b * C_CW + C_CW / 2;
+          const cy  = sysY + si * C_CH + C_CH / 2;
+          const fx  = getFx(m, b, si);
+
+          if (val) {
+            const nw = val.length > 1 ? 20 : 14;
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(cx - nw / 2, cy - 9, nw, 16);
+
+            ctx.fillStyle  = fx.has('t') ? '#c05030' : '#0b1e3d';
+            ctx.font       = 'bold 12px "Courier New", monospace';
+            ctx.textAlign  = 'center';
+            ctx.fillText(val, cx, cy + 5);
+
+            // Draw natural harmonic circle
+            if (fx.has('nh')) {
+              ctx.strokeStyle = '#a060d0';
+              ctx.lineWidth   = 1.5;
+              ctx.beginPath();
+              ctx.arc(cx, cy, 10, 0, Math.PI * 2);
+              ctx.stroke();
+            }
+          }
+
+          // Technique annotations in canvas
+          if (fx.size > 0) {
+            ctx.font      = 'bold 9px "Courier New", monospace';
+
+            // Top: PM, LR, NH
+            const topFx = ['pm', 'lr', 'nh'].filter(k => fx.has(k));
+            if (topFx.length > 0) {
+              ctx.fillStyle = TECHS[topFx[0]].color;
+              ctx.textAlign = 'center';
+              ctx.fillText(topFx.map(k => TECHS[k].sym).join(' '), cx, cy - 11);
+            }
+
+            // Right: h, p, /, \
+            // Hammer-on / Pull-off: bezier arc to next beat
+            ['h', 'p'].filter(k => fx.has(k)).forEach(tech => {
+              const arcColor = TECHS[tech].color;
+              const arcW     = C_CW;   // spans to center of next cell
+              const arcH     = 11;
+              const ax       = cx;     // start x = center of this cell
+              const ay       = cy - C_CH / 2 + arcH; // top of cell + arc height
+
+              ctx.strokeStyle = arcColor;
+              ctx.lineWidth   = 1.5;
+              ctx.beginPath();
+              ctx.moveTo(ax, ay);
+              ctx.quadraticCurveTo(ax + arcW / 2, ay - arcH + 1, ax + arcW, ay);
+              ctx.stroke();
+
+              // Label inside the arc
+              ctx.fillStyle  = arcColor;
+              ctx.font       = 'bold 8px Arial, sans-serif';
+              ctx.textAlign  = 'center';
+              ctx.fillText(TECHS[tech].sym, ax + arcW / 2, ay - 1);
+            });
+
+            // Slides — text
+            const slideFx = ['/', '\\'].filter(k => fx.has(k));
+            if (slideFx.length > 0) {
+              ctx.fillStyle  = TECHS[slideFx[0]].color;
+              ctx.textAlign  = 'left';
+              ctx.font       = 'bold 10px "Courier New", monospace';
+              ctx.fillText(slideFx.map(k => TECHS[k].sym).join(''), cx + 8, cy + 5);
+            }
+
+            // Bend
+            if (fx.has('b') || fx.has('br')) {
+              ctx.fillStyle  = TECHS['b'].color;
+              ctx.textAlign  = 'right';
+              ctx.font       = 'bold 8px "Courier New", monospace';
+              ctx.fillText(fx.has('br') ? 'br' : 'b', cx + 14, cy - 3);
+            }
+
+            // Vibrato
+            if (fx.has('~') || fx.has('wv')) {
+              ctx.fillStyle  = TECHS['~'].color;
+              ctx.textAlign  = 'right';
+              ctx.font       = '10px "Courier New", monospace';
+              ctx.fillText(fx.has('wv') ? '≈' : '~', cx + 16, cy - 11);
+            }
+          }
+        }
+      }
+    }
+
+    // Closing bar
+    const closeX = tabX + mCnt * mW;
+    if (isLast) {
+      ctx.strokeStyle = '#333';
+      ctx.lineWidth   = 1.5;
+      ctx.beginPath(); ctx.moveTo(closeX, sysY); ctx.lineTo(closeX, sysY + sysH); ctx.stroke();
+      ctx.lineWidth   = 4;
+      ctx.beginPath(); ctx.moveTo(closeX + 5, sysY); ctx.lineTo(closeX + 5, sysY + sysH); ctx.stroke();
+    } else {
+      ctx.strokeStyle = '#8a7050';
+      ctx.lineWidth   = 1.5;
+      ctx.beginPath(); ctx.moveTo(closeX, sysY); ctx.lineTo(closeX, sysY + sysH); ctx.stroke();
+    }
+  }
+
+  return canvas;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// EVENT WIRING
+// ─────────────────────────────────────────────────────────────────────────────
+// Technique buttons
+document.querySelectorAll('.tech-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    if (!activeCell) return;
+    saveHistory();
+    toggleFx(activeCell.m, activeCell.b, activeCell.s, btn.dataset.tech);
+    // Re-focus the cell so keyboard nav continues
+    const inp = getCellInput(activeCell.m, activeCell.b, activeCell.s);
+    if (inp) inp.focus();
+  });
+});
+
+// Duration buttons (decorative selection only for now)
+document.querySelectorAll('.dur-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.dur-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  });
+});
+
+document.getElementById('addMeasureBtn').addEventListener('click', addMeasure);
+document.getElementById('removeMeasureBtn').addEventListener('click', removeMeasure);
+document.getElementById('clearBtn').addEventListener('click', clearAll);
+document.getElementById('printBtn').addEventListener('click', doPrint);
+document.getElementById('pngBtn').addEventListener('click', doPNG);
+document.getElementById('pngBtn2').addEventListener('click', doPNG);
+document.getElementById('undoBtn').addEventListener('click', undo);
+
+document.getElementById('colsSel').addEventListener('change', e => {
+  changeColsPerMeasure(parseInt(e.target.value, 10));
+});
+
+document.getElementById('titleInput').addEventListener('input', e => {
+  state.title = e.target.value;
+});
+document.getElementById('artistInput').addEventListener('input', e => {
+  state.artist = e.target.value;
+});
+
+// Keyboard shortcuts
+document.addEventListener('keydown', e => {
+  if ((e.ctrlKey || e.metaKey) && e.key === 'z') { e.preventDefault(); undo(); }
+  if ((e.ctrlKey || e.metaKey) && e.key === 'p') { e.preventDefault(); doPrint(); }
+});
+
+// Resize (debounced)
+let resizeTimer;
+window.addEventListener('resize', () => {
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(() => render(), 200);
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// INIT
+// ─────────────────────────────────────────────────────────────────────────────
+document.documentElement.style.setProperty('--cols', state.colsPerMeasure);
+render();
+</script>
+</body>
+</html>
