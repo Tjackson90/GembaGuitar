@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="Every free guitar tool on GembaGuitar in one place — chord library, chord identifier, metronome, tuner, and tab creator. No sign-up, no cost."/>
+  <meta name="keywords" content="free guitar tools, guitar metronome, guitar tuner, chord diagram generator, guitar tab creator, chord library"/>
+  <meta property="og:title" content="All Tools — GembaGuitar"/>
+  <meta property="og:description" content="Every free guitar tool on GembaGuitar in one place. Chord library, chord identifier, metronome, tuner, and tab creator."/>
+  <meta property="og:url" content="https://gembaguitar.com/tools/"/>
+  <meta property="og:type" content="website"/>
+  <title>All Tools — GembaGuitar</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="../css/gemba.css"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy:       #0b1e3d;
+      --navy-mid:   #122a52;
+      --navy-light: #1a3a6e;
+      --gold:       #c9a84c;
+      --gold-light: #e8c96a;
+      --cream:      #f5f0e8;
+      --muted:      #8fa3bf;
+      --border:     rgba(201,168,76,0.15);
+    }
+
+    body {
+      background: var(--navy);
+      color: var(--cream);
+      font-family: 'DM Sans', sans-serif;
+      line-height: 1.8;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      background: var(--navy-mid);
+      border-bottom: 1px solid var(--border);
+      padding: 72px 48px 64px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 60% 80% at 50% 100%, rgba(201,168,76,0.05) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(201,168,76,0.1);
+      border: 1px solid rgba(201,168,76,0.3);
+      border-radius: 100px;
+      padding: 5px 16px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 20px;
+    }
+
+    .hero h1 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(48px, 8vw, 80px);
+      letter-spacing: 2px;
+      line-height: 1;
+      margin-bottom: 20px;
+    }
+
+    .hero h1 em {
+      font-family: 'DM Serif Display', serif;
+      font-style: italic;
+      color: var(--gold);
+    }
+
+    .hero-lead {
+      font-size: 19px;
+      color: var(--muted);
+      max-width: 560px;
+      margin: 0 auto;
+      font-weight: 300;
+      line-height: 1.7;
+    }
+
+    .hero-lead strong {
+      color: var(--cream);
+      font-weight: 600;
+    }
+
+    /* ── CONTENT ── */
+    .content {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 72px 48px 96px;
+    }
+
+    .block-tag {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 10px;
+    }
+
+    .block-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(28px, 4vw, 40px);
+      letter-spacing: 1px;
+      line-height: 1.1;
+      margin-bottom: 8px;
+    }
+
+    .block-title em {
+      font-family: 'DM Serif Display', serif;
+      font-style: italic;
+      color: var(--gold);
+      font-size: 0.9em;
+    }
+
+    .block-desc {
+      font-size: 15px;
+      color: var(--muted);
+      max-width: 560px;
+      margin-bottom: 36px;
+    }
+
+    /* ── TOOL LIST ── */
+    .tool-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .tool-row {
+      display: grid;
+      grid-template-columns: 64px 1fr auto;
+      gap: 24px;
+      align-items: center;
+      background: var(--navy-mid);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 16px;
+      padding: 28px 32px;
+      text-decoration: none;
+      color: var(--cream);
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.25s, border-color 0.25s, box-shadow 0.25s;
+    }
+
+    .tool-row::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--gold), transparent);
+      opacity: 0;
+      transition: opacity 0.25s;
+    }
+
+    .tool-row:hover {
+      transform: translateY(-4px);
+      border-color: rgba(201,168,76,0.3);
+      box-shadow: 0 20px 44px rgba(0,0,0,0.3);
+    }
+
+    .tool-row:hover::before { opacity: 1; }
+
+    .tool-icon {
+      width: 56px;
+      height: 56px;
+      background: rgba(201,168,76,0.1);
+      border: 1px solid rgba(201,168,76,0.18);
+      border-radius: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .tool-icon svg {
+      width: 26px;
+      height: 26px;
+      stroke: var(--gold);
+    }
+
+    .tool-body h3 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 26px;
+      letter-spacing: 1px;
+      line-height: 1.2;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .tool-body p {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.65;
+      margin-bottom: 14px;
+    }
+
+    .tool-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      list-style: none;
+    }
+
+    .tool-tags li {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      color: rgba(245,240,232,0.6);
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 100px;
+      padding: 3px 12px;
+      line-height: 1.6;
+    }
+
+    .tool-open {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      color: var(--gold);
+      white-space: nowrap;
+    }
+
+    .tool-open svg {
+      width: 14px;
+      height: 14px;
+      stroke: var(--gold);
+      transition: transform 0.2s;
+    }
+
+    .tool-row:hover .tool-open svg { transform: translateX(4px); }
+
+    /* ── DIVIDER ── */
+    .divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 72px 0 56px;
+    }
+
+    /* ── RESOURCE CARDS ── */
+    .resource-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 16px;
+    }
+
+    .resource-card {
+      background: var(--navy-mid);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 26px 24px;
+      text-decoration: none;
+      color: var(--cream);
+      display: block;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+
+    .resource-card:hover {
+      border-color: var(--gold);
+      transform: translateY(-3px);
+    }
+
+    .resource-card-icon {
+      font-size: 22px;
+      margin-bottom: 10px;
+    }
+
+    .resource-card h4 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 21px;
+      letter-spacing: 1px;
+      margin-bottom: 6px;
+    }
+
+    .resource-card p {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    /* ── CTA BANNER ── */
+    .cta-banner {
+      background: linear-gradient(135deg, var(--navy-light), var(--navy-mid));
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 48px 40px;
+      text-align: center;
+      margin-top: 56px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cta-banner::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+      opacity: 0.5;
+    }
+
+    .cta-banner h3 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 36px;
+      letter-spacing: 1px;
+      margin-bottom: 12px;
+    }
+
+    .cta-banner h3 em {
+      font-family: 'DM Serif Display', serif;
+      font-style: italic;
+      color: var(--gold);
+    }
+
+    .cta-banner p {
+      color: var(--muted);
+      font-size: 15px;
+      max-width: 440px;
+      margin: 0 auto 28px;
+    }
+
+    .cta-buttons {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn-gold {
+      background: var(--gold);
+      color: var(--navy);
+      font-size: 14px;
+      font-weight: 700;
+      padding: 12px 24px;
+      border-radius: 10px;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: background 0.2s, transform 0.15s;
+    }
+
+    .btn-gold:hover {
+      background: var(--gold-light);
+      transform: translateY(-2px);
+    }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--cream);
+      font-size: 14px;
+      font-weight: 600;
+      padding: 12px 24px;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.15);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: border-color 0.2s, color 0.2s, transform 0.15s;
+    }
+
+    .btn-outline:hover {
+      border-color: var(--gold);
+      color: var(--gold);
+      transform: translateY(-2px);
+    }
+
+    @media (max-width: 768px) {
+      .hero { padding: 56px 24px; }
+      .content { padding: 48px 24px 72px; }
+
+      .tool-row {
+        grid-template-columns: 48px 1fr;
+        gap: 16px;
+        padding: 24px 20px;
+        align-items: start;
+      }
+
+      .tool-icon { width: 48px; height: 48px; border-radius: 13px; }
+      .tool-icon svg { width: 22px; height: 22px; }
+
+      .tool-open {
+        grid-column: 1 / -1;
+        margin-top: 4px;
+      }
+
+      .resource-grid { grid-template-columns: 1fr; }
+      .cta-banner { padding: 36px 24px; }
+    }
+  </style>
+  <script src="/js/gemba-nav.js"></script>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="gemba-nav">
+    <a href="/" class="gemba-nav-logo">
+      <svg class="gemba-nav-mark" viewBox="0 0 32 32" fill="none">
+        <rect width="32" height="32" rx="8" fill="#122a52"/>
+        <line x1="7" y1="9"  x2="25" y2="9"  stroke="#c9a84c" stroke-width="1.5" stroke-linecap="round" opacity="0.4"/>
+        <line x1="7" y1="16" x2="25" y2="16" stroke="#c9a84c" stroke-width="1.5" stroke-linecap="round" opacity="0.4"/>
+        <line x1="7" y1="23" x2="25" y2="23" stroke="#c9a84c" stroke-width="1.5" stroke-linecap="round" opacity="0.4"/>
+        <line x1="16" y1="5" x2="16" y2="27" stroke="#c9a84c" stroke-width="2" stroke-linecap="round"/>
+        <circle cx="16" cy="16" r="3.5" fill="#c9a84c"/>
+        <circle cx="16" cy="5"  r="2"   fill="#e8c96a"/>
+      </svg>
+      <div class="gemba-nav-text">
+        <strong>GembaGuitar</strong>
+        <span>Play. Learn. Master.</span>
+      </div>
+    </a>
+    <ul class="gemba-nav-links">
+      <li><a href="/chord-lookup">Chord Library</a></li>
+      <li><a href="/chord-generator">Chord Identifier</a></li>
+      <li><a href="/metronome">Metronome</a></li>
+      <li><a href="/tuner">Tuner</a></li>
+      <li><a href="/learn">Learn</a></li>
+      <li><a href="/blog">Blog</a></li>
+      <li><a href="/tab-creator">Tab Creator</a></li>
+      <li><a href="/resources">Resources</a></li>
+    </ul>
+    <a href="/" class="gemba-nav-home">← Home</a>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-tag">The Toolkit</div>
+    <h1>Every Tool,<br/><em>One Place</em></h1>
+    <p class="hero-lead">
+      Five free tools built for self-taught guitarists.
+      <strong>No sign-up, no cost, no ads.</strong> They all run right in your browser.
+    </p>
+  </section>
+
+  <div class="content">
+
+    <!-- ── TOOLS ── -->
+    <div class="block-tag">Practice Tools</div>
+    <h2 class="block-title">The Full <em>Lineup</em></h2>
+    <p class="block-desc">Everything you need for a practice session — get in tune, stay in time, look up a chord, and write down what you figured out.</p>
+
+    <div class="tool-list">
+
+      <a href="/chord-lookup" class="tool-row">
+        <div class="tool-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 6h16M4 10h16M4 14h8M4 18h6"/><circle cx="19" cy="17" r="3"/>
+          </svg>
+        </div>
+        <div class="tool-body">
+          <h3>Chord Library</h3>
+          <p>Every chord across all 12 keys — open positions and barre shapes, with an instant diagram for each voicing. Your complete reference when you need a shape fast.</p>
+          <ul class="tool-tags">
+            <li>All 12 keys</li>
+            <li>3 voicings each</li>
+            <li>Diagrams</li>
+          </ul>
+        </div>
+        <span class="tool-open">
+          Open Tool
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+          </svg>
+        </span>
+      </a>
+
+      <a href="/chord-generator" class="tool-row">
+        <div class="tool-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+            <rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>
+          </svg>
+        </div>
+        <div class="tool-body">
+          <h3>Chord Identifier</h3>
+          <p>Click any fret position on the interactive fretboard and instantly find out what chord you're holding. Export the diagram as SVG or PNG when you want to keep it.</p>
+          <ul class="tool-tags">
+            <li>Interactive fretboard</li>
+            <li>Names any shape</li>
+            <li>SVG / PNG export</li>
+          </ul>
+        </div>
+        <span class="tool-open">
+          Open Tool
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+          </svg>
+        </span>
+      </a>
+
+      <a href="/metronome" class="tool-row">
+        <div class="tool-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="12 2 2 20 22 20"/><line x1="12" y1="9" x2="16" y2="17"/>
+          </svg>
+        </div>
+        <div class="tool-body">
+          <h3>Metronome</h3>
+          <p>A full-featured metronome to keep your timing tight. Adjustable BPM, tap tempo, time signatures, subdivisions, and accent control for every practice session.</p>
+          <ul class="tool-tags">
+            <li>Tap tempo</li>
+            <li>Time signatures</li>
+            <li>Subdivisions</li>
+          </ul>
+        </div>
+        <span class="tool-open">
+          Open Tool
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+          </svg>
+        </span>
+      </a>
+
+      <a href="/tuner" class="tool-row">
+        <div class="tool-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>
+          </svg>
+        </div>
+        <div class="tool-body">
+          <h3>Tuner</h3>
+          <p>Get perfectly in tune before you play a note. Uses your device microphone to detect pitch in real time — no extra app and no clip-on tuner needed.</p>
+          <ul class="tool-tags">
+            <li>Real-time pitch</li>
+            <li>Uses your mic</li>
+            <li>No app needed</li>
+          </ul>
+        </div>
+        <span class="tool-open">
+          Open Tool
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+          </svg>
+        </span>
+      </a>
+
+      <a href="/tab-creator" class="tool-row">
+        <div class="tool-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="3" y1="14" x2="21" y2="14"/><line x1="3" y1="18" x2="21" y2="18"/>
+          </svg>
+        </div>
+        <div class="tool-body">
+          <h3>Tab Creator</h3>
+          <p>Write guitar tabs right in your browser. Add hammer-ons, pull-offs, slides, bends and vibrato, then print your tab or download it as a PNG to keep.</p>
+          <ul class="tool-tags">
+            <li>Full articulations</li>
+            <li>Print ready</li>
+            <li>PNG download</li>
+          </ul>
+        </div>
+        <span class="tool-open">
+          Open Tool
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+          </svg>
+        </span>
+      </a>
+
+    </div>
+
+    <hr class="divider"/>
+
+    <!-- ── LEARNING ── -->
+    <div class="block-tag">Beyond the Tools</div>
+    <h2 class="block-title">Learning <em>Resources</em></h2>
+    <p class="block-desc">Not everything on GembaGuitar is a tool. These are the places to go when you want to learn something new rather than practice something you know.</p>
+
+    <div class="resource-grid">
+      <a href="/learn" class="resource-card">
+        <div class="resource-card-icon">🎸</div>
+        <h4>Learn</h4>
+        <p>The beginner path — the chords, strumming patterns, and habits that get you playing real songs fastest.</p>
+      </a>
+      <a href="/blog" class="resource-card">
+        <div class="resource-card-icon">📝</div>
+        <h4>Blog</h4>
+        <p>Practical guides and gear advice written for self-taught players, without the jargon or the sales pitch.</p>
+      </a>
+      <a href="/videos" class="resource-card">
+        <div class="resource-card-icon">🎬</div>
+        <h4>Videos</h4>
+        <p>Watch-along lessons and walkthroughs. Still growing — new videos are being added over time.</p>
+      </a>
+      <a href="/resources" class="resource-card">
+        <div class="resource-card-icon">🖨️</div>
+        <h4>Resources</h4>
+        <p>Free printable practice sheets — blank tab paper and blank chord diagram grids, ready to download.</p>
+      </a>
+    </div>
+
+    <!-- CTA -->
+    <div class="cta-banner">
+      <h3>Not Sure <em>Where to Start?</em></h3>
+      <p>Tune up, then learn the 10 chords that unlock hundreds of songs. Both are free and ready right now.</p>
+      <div class="cta-buttons">
+        <a href="/tuner" class="btn-gold">Tune Your Guitar →</a>
+        <a href="/learn" class="btn-outline">Start the Beginner Path</a>
+      </div>
+    </div>
+
+  </div>
+
+</body>
+</html>
